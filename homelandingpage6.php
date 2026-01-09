@@ -13,8 +13,8 @@
             --primary-dark: #3a56d4;
             --primary-light: #eef2ff;
             --secondary: #7209b7;
-            --accent: #06d6a0;
-            --accent-dark: #05b587;
+            --accent: #FFDC00;
+            --accent-dark: #E6C600;
             --text-dark: #1a1a2e;
             --text-muted: #6c757d;
             --light-bg: #f8f9fa;
@@ -150,7 +150,7 @@
 
         .btn-accent {
             background-color: var(--accent);
-            color: white;
+            color: rgba(0, 0, 0, 1);
             box-shadow: 0 8px 20px rgba(6, 214, 160, 0.3);
         }
 
@@ -188,27 +188,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--primary);
+            text-decoration: none;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
+        .logo img {
+            height: 45px;
+            width: auto;
         }
 
         .nav-links {
@@ -252,13 +243,102 @@
 
         .mobile-menu-btn {
             display: none;
-            width: 40px;
-            height: 40px;
-            background: var(--primary-light);
+            width: 44px;
+            height: 44px;
+            background-color: var(--primary);
+            color: rgba(255, 255, 255, 1);
             border-radius: var(--radius-sm);
             border: none;
             align-items: center;
             justify-content: center;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .mobile-menu-btn i {
+            transition: var(--transition);
+        }
+
+        /* Mobile Menu Open State */
+        .navbar.mobile-open .nav-links,
+        .navbar.mobile-open .nav-actions {
+            display: flex !important;
+            flex-direction: column;
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            padding: 20px 24px;
+            gap: 0;
+            animation: slideDown 0.3s ease;
+        }
+
+        .navbar.mobile-open .nav-links {
+            top: 100%;
+            border-radius: 0;
+            box-shadow: none;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar.mobile-open .nav-actions {
+            top: calc(100% + 200px);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding-top: 12px;
+            gap: 12px;
+        }
+
+        .navbar.mobile-open .nav-links li {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar.mobile-open .nav-links li:last-child {
+            border-bottom: none;
+        }
+
+        .navbar.mobile-open .nav-links a {
+            display: block;
+            padding: 14px 0;
+            font-size: 16px;
+        }
+
+        .navbar.mobile-open .nav-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 14px 24px;
+        }
+
+        .navbar.mobile-open .nav-actions .btn-secondary {
+            display: flex !important;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .mobile-menu-overlay.active {
+            display: block;
+            opacity: 1;
             font-size: 20px;
             color: var(--primary);
             cursor: pointer;
@@ -469,12 +549,12 @@
         .floating-icon {
             width: 50px;
             height: 50px;
-            background: var(--primary-light);
+            background-color: var(--primary);
             border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
+            color: var(--accent);
             font-size: 22px;
         }
 
@@ -568,7 +648,7 @@
         }
 
         .feature-list i {
-            color: var(--accent);
+            color: var(--primary);
             font-size: 14px;
             margin-top: 5px;
         }
@@ -673,9 +753,16 @@
         .demo-tabs {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 12px;
             flex-wrap: wrap;
             margin-top: 26px;
+            position: relative;
+        }
+        
+        /* Center the step buttons as a group */
+        .demo-tabs .demo-tab {
+            flex-shrink: 0;
         }
         
         .demo-tab {
@@ -722,6 +809,40 @@
         .demo-tab[aria-selected="true"] .demo-tab-num {
             background: rgba(67, 97, 238, 0.12);
             color: var(--primary);
+        }
+        
+        /* ✅ Reset Demo Button */
+        .demo-reset-btn {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            position: absolute;
+            right: 0;
+        }
+        
+        .demo-reset-btn:hover {
+            background: rgba(108, 117, 125, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .demo-reset-btn:active {
+            transform: translateY(0);
+        }
+        
+        .demo-reset-btn i {
+            font-size: 12px;
         }
         
         /* ✅ Panels */
@@ -778,8 +899,11 @@
             .demo-frame-wrap {
                 height: 520px;
             }
+            
+            .demo-reset-btn {
+                display: none;
+            }
         }
-
         .demo-container {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-radius: var(--radius-lg);
@@ -808,7 +932,7 @@
         .demo-content {
             background: white;
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: 50px;
+            padding: 0px;
             margin-top: 40px;
             min-height: 500px;
             display: flex;
@@ -862,7 +986,7 @@
 
         .demo-feature:hover {
             transform: translateY(-5px);
-            background: var(--primary-light);
+            background-color: var(--primary);
         }
 
         .demo-feature i {
@@ -980,23 +1104,12 @@
         .footer-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
             margin-bottom: 20px;
         }
 
-        .footer-logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
+        .footer-logo img {
+            height: 50px;
+            width: auto;
         }
 
         .footer-about p {
@@ -1092,6 +1205,22 @@
             }
         }
 
+        /* Tablet breakpoint - adjust nav spacing */
+        @media (max-width: 1024px) {
+            .nav-links {
+                gap: 24px;
+            }
+            
+            .nav-actions {
+                gap: 12px;
+            }
+            
+            .nav-actions .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
         @media (max-width: 768px) {
             section {
                 padding: 80px 0;
@@ -1105,12 +1234,18 @@
                 font-size: 32px;
             }
             
-            .nav-links, .nav-actions .btn-secondary {
+            .nav-links, .nav-actions {
                 display: none;
             }
             
             .mobile-menu-btn {
                 display: flex;
+            }
+            
+            /* Ensure mobile menu shows correctly when open */
+            .navbar.mobile-open .nav-links,
+            .navbar.mobile-open .nav-actions {
+                display: flex !important;
             }
             
             .hero-actions {
@@ -1138,7 +1273,7 @@
             }
             
             .demo-content {
-                padding: 30px 20px;
+                padding: 0px;
             }
             
             .form-group {
@@ -1219,10 +1354,13 @@
           display:flex;
           align-items:center;
           justify-content:center;
-          font-weight: 700;
-          font-size: 18px;
-          color: #0033D9;
-          background: #FFD700;
+          overflow: hidden;
+        }
+        
+        .demo-step3-skin .demo-logo-box img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
         }
         
         .demo-step3-skin .inv-billto-title{
@@ -1390,10 +1528,34 @@
           background-color: var(--primary) !important;
           color: #fff !important;
           font-weight: 600;
+          cursor: text;
+          transition: background-color 0.2s ease, outline 0.2s ease;
+        }
+        
+        .demo-step3-skin .header-cell:hover{
+          background-color: #5a7aff !important;
+        }
+        
+        .demo-step3-skin .header-cell:focus{
+          background-color: #6b8aff !important;
+          outline: 2px solid #ffffff !important;
+          outline-offset: -2px;
         }
         
         .demo-step3-skin .editable-cell{
           background-color: #fff9db !important;
+          cursor: text;
+          transition: background-color 0.2s ease;
+        }
+        
+        .demo-step3-skin .editable-cell:hover{
+          background-color: #fff3b8 !important;
+        }
+        
+        .demo-step3-skin .editable-cell:focus{
+          background-color: #ffffff !important;
+          outline: 2px solid #4361ee !important;
+          outline-offset: -2px;
         }
         
         .demo-step3-skin .readonly-cell{
@@ -1684,7 +1846,7 @@
            In demo: keep the SAME padding so spacing looks identical. */
         .demo-app .main-content{
           flex: 1;
-          padding: calc(var(--header-height) + 1.5rem) 1.5rem 1.5rem;
+          padding: 24px 1.5rem 1.5rem;
           transition: var(--transition);
         }
         
@@ -2153,10 +2315,7 @@
         <div class="container">
             <nav class="navbar">
                 <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                    </div>
-                    <span>DocuBills</span>
+                    <img src="/assets/docubills-logo.png" alt="Docubills - Your paperwork, made simple">
                 </a>
                 
                 <ul class="nav-links">
@@ -2178,6 +2337,9 @@
             </nav>
         </div>
     </header>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -2198,8 +2360,8 @@
                             Start Free Trial
                         </a>
                         <a href="#demo" class="btn btn-secondary btn-lg">
-                            <i class="fas fa-play-circle"></i>
-                            Watch Interactive Demo
+                            <i class="fas fa-mouse-pointer"></i>
+                            Try Interactive Demo
                         </a>
                     </div>
                     
@@ -2400,6 +2562,10 @@
                                 id="tab-step3" aria-controls="panel-step3" aria-selected="false">
                             <span class="demo-tab-num">3</span> Step 3
                         </button>
+                        
+                        <button class="demo-reset-btn" type="button" id="demoResetBtn" title="Reset demo to default state">
+                            <i class="fas fa-redo"></i> Reset Demo
+                        </button>
                     </div>
                 </div>
     
@@ -2546,11 +2712,6 @@
                 
                     </div>
                   </div>
-                
-                  <div class="demo-note">
-                    <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 8px;"></i>
-                    Step 1 is a <b>copied UI demo</b> of <b>create-invoice.php</b> (no login / no DB / no fetch).
-                  </div>
                 </div>
     
                 <!-- ✅ Panel: Step 2 (Configure Invoice Pricing) -->
@@ -2630,11 +2791,6 @@
                 
                     </div>
                   </div>
-                
-                  <div class="demo-note">
-                    <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 8px;"></i>
-                    Step 2 is a <b>copied UI demo</b> of your <b>Select Price Column</b> page (no login / no session / no redirect).
-                  </div>
                 </div>
     
                 <!-- ✅ Panel: Step 3 (Invoice Preview Demo) -->
@@ -2661,7 +2817,7 @@
                                 <!-- Row 1 – logo + Bill-To -->
                                 <div class="inv-row-top">
                                   <div class="inv-logo">
-                                    <div class="demo-logo-box">Docubills</div>
+                                    <div class="demo-logo-box"><img src="/assets/docubills-logo.png" alt="Docubills"></div>
                                   </div>
                                   <div class="inv-billto-title">Bill&nbsp;To:</div>
                                 </div>
@@ -2702,7 +2858,7 @@
                                 <!-- Total Amount Section -->
                                 <div class="flex-container">
                                   <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                      <button type="button" id="demoAddFieldBtn" class="btn">+ Add Field</button>
+                                      <button type="button" id="demoAddFieldBtn" class="btn">Add Line Item</button>
                                   </div>
                                 
                                   <div class="total-display" style="display:flex;justify-content:flex-end;align-items:center;gap:7px;">
@@ -2858,13 +3014,8 @@
                 
                     </div>
                   </div>
-                
-                  <div class="demo-note">
-                    <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 8px;"></i>
-                    Step 3 is a <b>copied UI demo</b> of your <b>generate_invoice.php</b> (no login/session/DB, no real saving).
-                  </div>
                 </div>
-    
+
                </div>
             </div>
         </div>
@@ -2913,10 +3064,7 @@
             <div class="footer-content">
                 <div class="footer-about">
                     <a href="#" class="footer-logo">
-                        <div class="footer-logo-icon">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                        </div>
-                        <span>DocuBills</span>
+                        <img src="/assets/docubills-logo.png" alt="Docubills - Your paperwork, made simple">
                     </a>
                     <p>The simplest way to generate professional invoices from your spreadsheets. Streamline your billing process with our 3-step solution.</p>
                     <div class="social-links">
@@ -3001,38 +3149,35 @@
 
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.querySelector('.nav-links');
-        const navActions = document.querySelector('.nav-actions');
+        const navbar = document.querySelector('.navbar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
         
-        mobileMenuBtn.addEventListener('click', function() {
-            const isMobileMenuOpen = navLinks.style.display === 'flex';
+        function toggleMobileMenu() {
+            const isOpen = navbar.classList.contains('mobile-open');
             
-            if (isMobileMenuOpen) {
-                navLinks.style.display = 'none';
-                navActions.style.display = 'none';
+            if (isOpen) {
+                navbar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
             } else {
-                navLinks.style.display = 'flex';
-                navActions.style.display = 'flex';
-                
-                // Style for mobile
-                navLinks.style.flexDirection = 'column';
-                navLinks.style.position = 'absolute';
-                navLinks.style.top = '100%';
-                navLinks.style.left = '0';
-                navLinks.style.width = '100%';
-                navLinks.style.backgroundColor = 'var(--white)';
-                navLinks.style.padding = '30px 24px';
-                navLinks.style.boxShadow = 'var(--shadow-lg)';
-                navLinks.style.gap = '20px';
-                
-                navActions.style.flexDirection = 'column';
-                navActions.style.position = 'absolute';
-                navActions.style.top = 'calc(100% + 200px)';
-                navActions.style.left = '0';
-                navActions.style.width = '100%';
-                navActions.style.padding = '0 24px 30px';
-                navActions.style.gap = '16px';
+                navbar.classList.add('mobile-open');
+                mobileOverlay.classList.add('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
             }
+        }
+        
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        mobileOverlay.addEventListener('click', toggleMobileMenu);
+        
+        // Close mobile menu when clicking nav links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navbar.classList.contains('mobile-open')) {
+                    toggleMobileMenu();
+                }
+            });
         });
 
         // Form submission
@@ -3139,6 +3284,100 @@
         
           // default
           activate('tab-step1');
+          
+          // ✅ Reset Demo functionality
+          function resetDemo() {
+            // Reset global state to defaults
+            window.DOCUBILLS_DEMO_STATE = {
+              bill_to_name: 'Acme Logistics',
+              bill_to_rep: 'Sarah Khan',
+              bill_to_address: 'Suite 210, 123 Main St, Toronto, ON',
+              bill_to_phone: '+1 647-555-0199',
+              bill_to_email: 'billing@acmelogistics.com',
+              price_mode: 'column',
+              price_column: 'Sub Total',
+              include_cols: null, // Will default to all columns
+              titlebar_color: '#0033D9',
+              manual_total: null
+            };
+            
+            // Reset Step 1 form inputs
+            const step1Root = document.getElementById('demoStep1');
+            if (step1Root) {
+              const billToName = step1Root.querySelector('#bill_to_name');
+              const billToRep = step1Root.querySelector('#bill_to_rep');
+              const billToAddress = step1Root.querySelector('#bill_to_address');
+              const billToPhone = step1Root.querySelector('#bill_to_phone');
+              const billToEmail = step1Root.querySelector('#bill_to_email');
+              const googleSheetUrl = step1Root.querySelector('#google_sheet_url');
+              const invoiceSource = step1Root.querySelector('input[name="invoice_source"][value="google"]');
+              
+              if (billToName) billToName.value = 'Acme Logistics';
+              if (billToRep) billToRep.value = 'Sarah Khan';
+              if (billToAddress) billToAddress.value = 'Suite 210, 123 Main St, Toronto, ON';
+              if (billToPhone) billToPhone.value = '+1 647-555-0199';
+              if (billToEmail) billToEmail.value = 'billing@acmelogistics.com';
+              if (googleSheetUrl) googleSheetUrl.value = 'https://docs.google.com/spreadsheets/d/DEMO-SHEET-ID/edit#gid=0';
+              if (invoiceSource) invoiceSource.checked = true;
+              
+              // Hide upload section, show google section
+              const uploadSection = step1Root.querySelector('#upload-section');
+              const googleSection = step1Root.querySelector('#google-section');
+              if (uploadSection) uploadSection.style.display = 'none';
+              if (googleSection) googleSection.style.display = 'block';
+            }
+            
+            // Reset Step 2 pricing mode and column selections
+            const step2Root = document.getElementById('demoStep2');
+            if (step2Root) {
+              // Reset to automatic pricing with "Sub Total" column
+              const autoPriceOption = step2Root.querySelector('#demoAutoPriceOption input[value="column"]');
+              const manualPriceOption = step2Root.querySelector('#demoManualPriceOption input[value="manual"]');
+              const subTotalRadio = step2Root.querySelector('input[name="price_column2"][value="Sub Total"]');
+              
+              if (autoPriceOption) {
+                autoPriceOption.checked = true;
+                autoPriceOption.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+              if (manualPriceOption) manualPriceOption.checked = false;
+              
+              // Reset all column checkboxes to checked
+              const columnCheckboxes = step2Root.querySelectorAll('#demoColumnPicker input[type="checkbox"]');
+              columnCheckboxes.forEach(cb => {
+                cb.checked = true;
+                cb.disabled = false;
+              });
+              
+              // Select Sub Total as price column
+              if (subTotalRadio) {
+                subTotalRadio.checked = true;
+                subTotalRadio.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            }
+            
+            // Reset Step 3 data
+            const originalHeaders = ["Trip Date","Pickup","Dropoff","KM","Rate","Sub Total","Tax","Total"];
+            if (window.DocuBillsDemoStep3 && typeof window.DocuBillsDemoStep3.__resetData === 'function') {
+              window.DocuBillsDemoStep3.__resetData(originalHeaders);
+            }
+            
+            // Sync Step 3 after reset
+            if (window.DocuBillsDemoStep3 && typeof window.DocuBillsDemoStep3.sync === 'function') {
+              window.DocuBillsDemoStep3.sync();
+            }
+            
+            // Navigate to Step 1
+            go(1);
+          }
+          
+          // Expose reset function globally
+          window.DocuBillsDemo.reset = resetDemo;
+          
+          // Wire up reset button
+          const resetBtn = document.getElementById('demoResetBtn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', resetDemo);
+          }
         })();
         
         // Feature cards hover effect enhancement
@@ -4023,6 +4262,22 @@
     });
   }
 
+  // Update column toggle labels when headers change
+  function updateColumnToggleLabels(){
+    if (!els.toggles) return;
+    const toggleItems = els.toggles.querySelectorAll('.column-toggle-item');
+    toggleItems.forEach((item, idx) => {
+      if (idx < headers.length) {
+        // Find the text span (first span that's not the required-pill)
+        const spans = item.querySelectorAll('span');
+        const textSpan = Array.from(spans).find(span => !span.classList.contains('required-pill'));
+        if (textSpan) {
+          textSpan.textContent = headers[idx];
+        }
+      }
+    });
+  }
+
   // -----------------------------
   // Row checkboxes + table render
   // -----------------------------
@@ -4043,12 +4298,47 @@
     th0.innerHTML = `<input type="checkbox" id="demoSelectAllRows" title="Select all rows">`;
     trh.appendChild(th0);
 
-    // visible columns
+    // visible columns - editable headers
     headers.forEach((h, i) => {
       if (!visibleCols.has(i)) return;
       const th = document.createElement('th');
       th.className = "header-cell";
+      th.contentEditable = "true";
+      th.spellcheck = false;
+      th.setAttribute('data-col-index', i);
       th.textContent = h;
+
+      // Handle input changes to update headers array
+      th.addEventListener('input', () => {
+        headers[i] = th.textContent.trim();
+        // Update column toggle labels when header changes
+        updateColumnToggleLabels();
+      });
+
+      // Handle blur to ensure data is saved
+      th.addEventListener('blur', () => {
+        headers[i] = th.textContent.trim();
+        updateColumnToggleLabels();
+      });
+
+      // Handle Enter key to save and move to next header
+      th.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          th.blur();
+          // Move to next editable header in same row
+          const nextHeader = trh.querySelector(`th[data-col-index="${i + 1}"]`);
+          if (nextHeader && nextHeader.contentEditable === 'true') {
+            nextHeader.focus();
+          }
+        }
+        // Allow Escape to cancel (optional)
+        if (e.key === 'Escape') {
+          th.textContent = headers[i];
+          th.blur();
+        }
+      });
+
       trh.appendChild(th);
     });
 
@@ -4093,19 +4383,77 @@
       td0.appendChild(cb);
       tr.appendChild(td0);
 
-      // visible data cells
+      // visible data cells - all columns are editable (only if row is enabled)
       headers.forEach((_, cIdx) => {
         if (!visibleCols.has(cIdx)) return;
 
         const td = document.createElement('td');
-        td.className = "editable-cell";
-        td.contentEditable = "true";
+        const isRowEnabled = !!rowEnabled[rIdx];
+        td.className = isRowEnabled ? "editable-cell" : "editable-cell readonly-cell";
+        td.contentEditable = isRowEnabled ? "true" : "false";
         td.spellcheck = false;
+        td.setAttribute('data-row', rIdx);
+        td.setAttribute('data-col', cIdx);
         td.textContent = (row[cIdx] ?? "");
 
+        // Handle input changes (only if row is enabled)
         td.addEventListener('input', () => {
-          rows[rIdx][cIdx] = td.textContent;
+          if (!rowEnabled[rIdx]) {
+            // Row is disabled, restore original value
+            td.textContent = (row[cIdx] ?? "");
+            return;
+          }
+          rows[rIdx][cIdx] = td.textContent.trim();
           syncTotalsAndStripe();
+        });
+
+        // Handle blur to ensure data is saved and remove focus styling
+        td.addEventListener('blur', () => {
+          if (!rowEnabled[rIdx]) {
+            // Row is disabled, restore original value
+            td.textContent = (row[cIdx] ?? "");
+            td.style.backgroundColor = '';
+            td.style.outline = '';
+            return;
+          }
+          rows[rIdx][cIdx] = td.textContent.trim();
+          syncTotalsAndStripe();
+          td.style.backgroundColor = '';
+          td.style.outline = '';
+        });
+
+        // Handle Enter key to save and move to next cell
+        td.addEventListener('keydown', (e) => {
+          if (!rowEnabled[rIdx]) {
+            // Row is disabled, prevent editing
+            e.preventDefault();
+            return;
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            td.blur();
+            // Move to next editable cell in same row
+            const nextCell = tr.querySelector(`td[data-col="${cIdx + 1}"]`);
+            if (nextCell && nextCell.contentEditable === 'true') {
+              nextCell.focus();
+            }
+          }
+          // Allow Escape to cancel (optional)
+          if (e.key === 'Escape') {
+            td.textContent = (row[cIdx] ?? "");
+            td.blur();
+          }
+        });
+
+        // Add visual feedback on focus (only if row is enabled)
+        td.addEventListener('focus', () => {
+          if (!rowEnabled[rIdx]) {
+            // Row is disabled, blur immediately
+            td.blur();
+            return;
+          }
+          td.style.backgroundColor = '#fff';
+          td.style.outline = '2px solid #4361ee';
         });
 
         tr.appendChild(td);
@@ -4292,6 +4640,107 @@
       });
     }
   });
+
+  // ✅ Reset function for Step 3 data (inside main IIFE to access variables)
+  window.DocuBillsDemoStep3 = window.DocuBillsDemoStep3 || {};
+  window.DocuBillsDemoStep3.__resetData = function(originalHeaders) {
+    // Store original data
+    const originalRows = [
+      ["2026-01-01","Downtown","Airport","18","45.00","810.00","105.30","915.30"],
+      ["2026-01-02","Mall","Hotel","12","45.00","540.00","70.20","610.20"],
+      ["2026-01-03","Office","Station","8","45.00","360.00","46.80","406.80"],
+      ["2026-01-04","Clinic","Home","6","45.00","270.00","35.10","305.10"]
+    ];
+    
+    // Reset headers array (modify in place since it's const)
+    if (originalHeaders && Array.isArray(originalHeaders)) {
+      headers.length = 0;
+      headers.push(...originalHeaders);
+    }
+    
+    // Reset rows array
+    rows.length = 0;
+    rows.push(...originalRows.map(r => [...r]));
+    
+    // Reset row enabled flags
+    rowEnabled = rows.map(() => true);
+    
+    // Reset visible columns to all
+    visibleCols = new Set(headers.map((_,i)=>i));
+    
+    // Reset currency to CAD
+    if (els.currencySelect) els.currencySelect.value = 'CAD';
+    
+    // Reset manual total input
+    if (els.manualTotal) els.manualTotal.value = '';
+    
+    // Reset invoice date to today
+    if (els.invoiceDate) {
+      const today = new Date();
+      els.invoiceDate.value = today.toISOString().split('T')[0];
+    }
+    
+    // Reset due date to 30 days from today
+    if (els.dueDate) {
+      const due = new Date();
+      due.setDate(due.getDate() + 30);
+      els.dueDate.value = due.toISOString().split('T')[0];
+    }
+    
+    // Reset invoice time
+    if (els.invoiceTime) {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      els.invoiceTime.value = `${hours}:${minutes}`;
+    }
+    
+    // Reset title bar color to default
+    const defaultColor = "#0033D9";
+    const st = getState();
+    st.titlebar_color = defaultColor;
+    
+    if (els.swatchRow) {
+      els.swatchRow.querySelectorAll('.color-swatch').forEach(btn => {
+        btn.classList.toggle('is-selected', btn.dataset.color === defaultColor);
+      });
+    }
+    if (els.titlePreview) {
+      els.titlePreview.style.background = defaultColor;
+      els.titlePreview.style.color = "#ffffff";
+    }
+    
+    // Reset banking toggle
+    if (els.toggleBank) els.toggleBank.checked = false;
+    if (els.bankDrawer) els.bankDrawer.classList.remove('open');
+    
+    // Reset banking fields
+    const bankingFields = [
+      '#demoAccountHolder', '#demoBankName', '#demoAccountNumber',
+      '#demoIBAN', '#demoSWIFT', '#demoRoutingCode', '#demoPaymentInstructions'
+    ];
+    bankingFields.forEach(selector => {
+      const field = root.querySelector(selector);
+      if (field) field.value = '';
+    });
+    
+    // Reset recurring toggle
+    if (els.recurringBtn) {
+      els.recurringBtn.classList.remove('recurring-on');
+      els.recurringBtn.classList.add('recurring-off');
+    }
+    if (els.recurringText) els.recurringText.textContent = 'Disabled (One-time)';
+    
+    // Reset due time toggle
+    if (els.toggleDueTime) els.toggleDueTime.checked = false;
+    if (els.dueTimeWrap) els.dueTimeWrap.style.display = 'none';
+    
+    // Reset Stripe warning acknowledgment
+    if (els.stripeAck) els.stripeAck.checked = false;
+    
+    // Re-render everything
+    sync();
+  };
 
   sync();
 })();
@@ -4536,8 +4985,8 @@
     const st = __db_getState();
     const mode = String(st.price_mode || 'column').toLowerCase();
 
-    // ✅ Manual pricing must lock Sub Total
-    if (mode === 'manual') return 'Sub Total';
+    // ✅ Manual pricing: no column is required for total calculation
+    if (mode === 'manual') return null;
 
     // ✅ Auto pricing locks the selected price column
     const chosen = st.price_column ? String(st.price_column) : 'Sub Total';
@@ -4568,6 +5017,27 @@
 
     const items = Array.from(wrap.querySelectorAll('.column-toggle-item'));
     if (!items.length) return false;
+
+    // If manual pricing mode, no column is required - remove all pills and locks
+    if (!required) {
+      items.forEach(item => {
+        const cb = item.querySelector('input[type="checkbox"]');
+        if (!cb) return;
+
+        // Remove pill if present
+        const oldPill = item.querySelector('.required-pill');
+        if (oldPill) oldPill.remove();
+
+        // Remove locks that WE applied
+        if (cb.dataset.reqLock === '1') {
+          cb.disabled = false;
+          delete cb.dataset.reqLock;
+        }
+
+        item.classList.remove('price-column-label');
+      });
+      return true;
+    }
 
     items.forEach(item => {
       const cb = item.querySelector('input[type="checkbox"]');
