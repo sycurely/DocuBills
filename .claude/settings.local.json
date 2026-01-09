@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where.exe:*)",
+      "Bash(Test-Path \"C:\\\\php\\\\php.exe\")",
+      "Bash(powershell:*)",
+      "Bash(php:*)",
+      "Bash(rm \"D:\\\\Docubills\\\\add_php_to_path.ps1\")",
+      "Bash(ls:*)"
+    ]
+  }
+}

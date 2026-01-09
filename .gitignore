@@ -1,0 +1,46 @@
+# Vendor dependencies
+vendor/
+
+# Environment and server config
+.user.ini
+.ftpquota
+
+# IDE settings
+.vscode/
+
+# Logs and debug files
+*.log
+debug*.txt
+debug*.log
+debug_*.php
+error_log
+email_smtp_debug.log
+email_debug.log
+save_invoice_error.log
+
+# Uploads and user-generated content
+uploads/*
+!uploads/.gitkeep
+invoices/*
+!invoices/.gitkeep
+
+# Database dumps
+*.sql
+
+# Backup files
+*.txt
+!composer.lock
+
+# Large binary files
+*.zip
+
+# Temporary files
+After.txt
+Before.txt
+Backup.txt
+Date.txt
+Paid
+Unpaid
+
+# Sensitive configuration files
+config.php

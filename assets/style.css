@@ -1,0 +1,190 @@
+/* === Global Reset === */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin: 20px;
+  color: #333;
+}
+
+/* === Logo === */
+.invoice-logo-wrapper {
+  margin-bottom: 10px;
+}
+.invoice-logo {
+  max-height: 50px;
+  display: block;
+  width: auto;
+}
+
+/* === Company + Bill To Header Table === */
+.invoice-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+.invoice-header-table td {
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 3px 6px;
+  vertical-align: top;
+  border: none !important;
+}
+.invoice-header-table td.left-col {
+  text-align: left;
+  width: 50%;
+}
+.invoice-header-table td.right-col {
+  text-align: right;
+  width: 50%;
+}
+
+/* === Invoice Table === */
+.invoice-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.invoice-preview-table th,
+.invoice-preview-table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.invoice-preview-table th {
+  background: #f2f2f2;
+  font-weight: bold;
+}
+
+/* === History Table === */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.history-table th,
+.history-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: top;
+}
+.history-table th {
+  background-color: #f8f8f8;
+}
+
+/* === Invoice Total === */
+#totalAmount {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+/* === Editable Amount === */
+.amount {
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+/* === Buttons === */
+button {
+  padding: 8px 16px;
+  background-color: #0074D9;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+button:hover {
+  background-color: #005fa3;
+}
+
+/* === Print Cleanup === */
+@media print {
+  button {
+    display: none;
+  }
+}
+
+.bill-to-block {
+  width: 50%;
+  border: none !important;
+  padding: 0;
+  vertical-align: top;
+}
+
+.bill-to-inner {
+  width: 100%;
+  text-align: left;          /* ✅ Text inside stays left-aligned */
+  margin-left: auto;         /* ✅ This pushes the block to the right */
+  display: block;
+}
+
+/* === Header Table Layout === */
+.invoice-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.left-header {
+  width: 50%;
+  font-size: 14px;
+  line-height: 1.5;
+  vertical-align: top;
+  border: none !important;
+  text-align: left;
+  padding: 3px 6px;
+}
+
+.right-header {
+  width: 50%;
+  font-size: 14px;
+  line-height: 1.5;
+  vertical-align: top;
+  border: none !important;
+  padding: 3px 6px;
+  text-align: right; /* ✅ Aligns whole column to the right */
+}
+
+.bill-to-box {
+  display: inline-block;
+  text-align: left; /* ✅ But aligns the text inside to left */
+}
+
+/* === Restore History Table === */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.history-table th {
+  background-color: #f8f8f8;
+}
+
+.payment-link {
+  font-size: 13px;
+  color: #0074D9;
+  word-break: break-word;
+  background: #f3f3f3;
+  padding: 6px;
+  display: inline-block;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+

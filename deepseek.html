@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuBills - Free Custom Invoice Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f6f9ff 0%, #f0f4ff 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .step-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .demo-container {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalFade 0.3s ease-out;
+        }
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .demo-phase {
+            display: none;
+        }
+        .demo-phase.active {
+            display: block;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        .price-column-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .price-column-option:hover {
+            background-color: #eff6ff;
+            transform: scale(1.02);
+        }
+        .price-column-option.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
+                            <i class="fas fa-file-invoice text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-gray-900">Docu<span class="text-blue-600">Bills</span></span>
+                    </div>
+                    <nav class="hidden md:flex ml-12 space-x-8">
+                        <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Features</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">How It Works</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Pricing</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600 font-medium">Resources</a>
+                    </nav>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Login</a>
+                    <a href="#" class="btn-primary text-white font-medium px-6 py-2.5 rounded-lg shadow">Get Started Free</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg py-12 md:py-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 mb-12 lg:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
+                        Generate Custom Invoices
+                        <span class="text-blue-600">From Your Spreadsheets</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8">
+                        DocuBills is the world's first free tool that lets you upload Excel/Google Sheets to create professional invoices. Define your own price columns, toggle rows/columns, and automate payments.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#" class="btn-primary text-white font-semibold px-8 py-4 rounded-lg text-center text-lg shadow-lg">
+                            Start Creating Free Invoices
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <a href="#" class="bg-white text-gray-800 font-semibold px-8 py-4 rounded-lg text-center text-lg border border-gray-300 hover:shadow-lg transition-shadow">
+                            <i class="fas fa-play-circle mr-2 text-blue-600"></i>
+                            Watch Demo
+                        </a>
+                    </div>
+                    <div class="mt-8 flex items-center">
+                        <div class="flex -space-x-2 mr-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 border-2 border-white"></div>
+                            <div class="w-10 h-10 rounded-full bg-green-500 border-2 border-white"></div>
+                            <div class="w-10 h-10 rounded-full bg-yellow-500 border-2 border-white"></div>
+                            <div class="w-10 h-10 rounded-full bg-red-500 border-2 border-white"></div>
+                        </div>
+                        <p class="text-gray-600">
+                            <span class="font-bold text-gray-900">2,500+</span> businesses use DocuBills
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Interactive Demo Area -->
+                <div class="lg:w-1/2">
+                    <div class="demo-container bg-white mx-auto max-w-2xl">
+                        <div class="flex border-b border-gray-200">
+                            <div class="w-1/3 text-center py-3 font-medium border-b-2 border-blue-600 text-blue-600" id="phase1-tab">
+                                <i class="fas fa-edit mr-2"></i>1. Bill To
+                            </div>
+                            <div class="w-1/3 text-center py-3 font-medium text-gray-500" id="phase2-tab">
+                                <i class="fas fa-table mr-2"></i>2. Map Columns
+                            </div>
+                            <div class="w-1/3 text-center py-3 font-medium text-gray-500" id="phase3-tab">
+                                <i class="fas fa-file-invoice mr-2"></i>3. Preview
+                            </div>
+                        </div>
+                        
+                        <!-- Phase 1: Data Input -->
+                        <div class="demo-phase active p-6" id="phase1">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Create New Invoice</h3>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-medium mb-2">Bill To</label>
+                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg mb-4" placeholder="Company Name" value="Acme Corporation">
+                                <textarea class="w-full p-3 border border-gray-300 rounded-lg" rows="3" placeholder="Address, City, State, ZIP">123 Main St, San Francisco, CA 94107</textarea>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-medium mb-2">Data Source</label>
+                                <div class="flex space-x-4 mb-4">
+                                    <div class="w-1/2 border-2 border-blue-100 bg-blue-50 rounded-lg p-4 text-center">
+                                        <i class="fas fa-file-excel text-green-600 text-3xl mb-2"></i>
+                                        <p class="font-medium">Upload Excel File</p>
+                                        <p class="text-sm text-gray-600 mt-1">.xlsx, .xls, .csv</p>
+                                    </div>
+                                    <div class="w-1/2 border border-gray-300 rounded-lg p-4 text-center">
+                                        <i class="fab fa-google-drive text-blue-600 text-3xl mb-2"></i>
+                                        <p class="font-medium">Connect Google Sheets</p>
+                                        <p class="text-sm text-gray-600 mt-1">Real-time sync</p>
+                                    </div>
+                                </div>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-4"></i>
+                                    <p class="font-medium">Drag & drop your spreadsheet here</p>
+                                    <p class="text-gray-500 text-sm mt-1">or click to browse files</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button class="btn-primary text-white font-medium px-6 py-3 rounded-lg" id="next-to-phase2">
+                                    Next: Map Columns <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Phase 2: Price Column Mapping -->
+                        <div class="demo-phase p-6" id="phase2">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Map Your Price Columns</h3>
+                            <p class="text-gray-600 mb-6">Select which column from your spreadsheet should be used as the price column. This is the unique DocuBills advantage!</p>
+                            
+                            <div class="mb-6">
+                                <div class="text-gray-700 font-medium mb-3">Your Uploaded Data Preview:</div>
+                                <div class="overflow-x-auto border border-gray-300 rounded-lg">
+                                    <table class="min-w-full bg-white">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th class="py-2 px-4 border-r border-gray-300">Item</th>
+                                                <th class="py-2 px-4 border-r border-gray-300">Description</th>
+                                                <th class="py-2 px-4 border-r border-gray-300 price-column-option selected" data-column="unitPrice">Unit Price</th>
+                                                <th class="py-2 px-4 border-r border-gray-300 price-column-option" data-column="cost">Cost</th>
+                                                <th class="py-2 px-4 border-r border-gray-300">Quantity</th>
+                                                <th class="py-2 px-4 price-column-option" data-column="total">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="py-2 px-4 border-t border-gray-300">Web Design</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">Homepage redesign</td>
+                                                <td class="py-2 px-4 border-t border-gray-300 font-medium bg-blue-50">$750.00</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">$450.00</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">1</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">$750.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 px-4 border-t border-gray-300">Development</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">API integration</td>
+                                                <td class="py-2 px-4 border-t border-gray-300 font-medium bg-blue-50">$1,200.00</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">$800.00</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">1</td>
+                                                <td class="py-2 px-4 border-t border-gray-300">$1,200.00</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-600">
+                                    <i class="fas fa-info-circle text-blue-600 mr-1"></i>
+                                    Click on any column header to set it as your price column
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-check text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800">Price Column Selected: <span id="selected-price-column">Unit Price</span></h4>
+                                        <p class="text-gray-600 text-sm">This column will be used to calculate invoice totals</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <button class="border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-lg hover:bg-gray-50" id="back-to-phase1">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button class="btn-primary text-white font-medium px-6 py-3 rounded-lg" id="next-to-phase3">
+                                    Next: Preview Invoice <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Phase 3: The Hook -->
+                        <div class="demo-phase p-6" id="phase3">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Invoice Preview</h3>
+                            <p class="text-gray-600 mb-6">Your invoice is ready! Preview how it will look to your clients.</p>
+                            
+                            <div class="border border-gray-300 rounded-lg p-6 mb-6">
+                                <div class="flex justify-between items-start mb-8">
+                                    <div>
+                                        <div class="text-2xl font-bold text-gray-900">INVOICE</div>
+                                        <div class="text-gray-700">#INV-2023-001</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xl font-bold text-blue-600">DocuBills</div>
+                                        <div class="text-gray-700">123 Business Ave</div>
+                                        <div class="text-gray-700">San Francisco, CA 94107</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between mb-8">
+                                    <div>
+                                        <div class="font-bold text-gray-700 mb-1">Bill To:</div>
+                                        <div class="text-gray-900">Acme Corporation</div>
+                                        <div class="text-gray-700">123 Main St</div>
+                                        <div class="text-gray-700">San Francisco, CA 94107</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-gray-700 mb-1">Invoice Date:</div>
+                                        <div class="text-gray-900">June 15, 2023</div>
+                                        <div class="font-bold text-gray-700 mt-3 mb-1">Due Date:</div>
+                                        <div class="text-gray-900">July 15, 2023</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="overflow-x-auto border border-gray-300 rounded-lg mb-6">
+                                    <table class="min-w-full bg-white">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th class="py-3 px-4 text-left">Item</th>
+                                                <th class="py-3 px-4 text-left">Description</th>
+                                                <th class="py-3 px-4 text-left">Quantity</th>
+                                                <th class="py-3 px-4 text-left">Price</th>
+                                                <th class="py-3 px-4 text-left">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-t border-gray-300">
+                                                <td class="py-3 px-4">Web Design</td>
+                                                <td class="py-3 px-4">Homepage redesign</td>
+                                                <td class="py-3 px-4">1</td>
+                                                <td class="py-3 px-4">$750.00</td>
+                                                <td class="py-3 px-4">$750.00</td>
+                                            </tr>
+                                            <tr class="border-t border-gray-300">
+                                                <td class="py-3 px-4">Development</td>
+                                                <td class="py-3 px-4">API integration</td>
+                                                <td class="py-3 px-4">1</td>
+                                                <td class="py-3 px-4">$1,200.00</td>
+                                                <td class="py-3 px-4">$1,200.00</td>
+                                            </tr>
+                                            <tr class="border-t border-gray-300 bg-gray-50">
+                                                <td class="py-3 px-4 font-bold" colspan="3"></td>
+                                                <td class="py-3 px-4 font-bold">Subtotal</td>
+                                                <td class="py-3 px-4">$1,950.00</td>
+                                            </tr>
+                                            <tr class="border-t border-gray-300">
+                                                <td class="py-3 px-4 font-bold" colspan="3"></td>
+                                                <td class="py-3 px-4 font-bold">Tax (10%)</td>
+                                                <td class="py-3 px-4">$195.00</td>
+                                            </tr>
+                                            <tr class="border-t border-gray-300 bg-blue-50">
+                                                <td class="py-3 px-4 font-bold text-lg" colspan="3"></td>
+                                                <td class="py-3 px-4 font-bold text-lg">Total</td>
+                                                <td class="py-3 px-4 font-bold text-lg">$2,145.00</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="text-center text-gray-600 italic">
+                                    This is a preview. The final invoice will be generated after signup.
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <button class="border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-lg hover:bg-gray-50" id="back-to-phase2">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button class="btn-primary text-white font-medium px-6 py-3 rounded-lg" id="finalize-invoice">
+                                    Finalize & Send Invoice <i class="fas fa-paper-plane ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4-Step Process Flow -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple 4-Step Invoice Generation</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">From spreadsheet to professional invoice in minutes with DocuBills' unique custom column mapping</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Step 1 -->
+                <div class="step-card bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <div class="w-16 h-16 rounded-full hero-gradient flex items-center justify-center mb-6">
+                        <span class="text-white text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Fill in "Bill To" Info</h3>
+                    <p class="text-gray-600 mb-4">Enter your client's details once and reuse for future invoices.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <i class="fas fa-user-edit mr-2"></i>
+                        Client Management
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-card bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <div class="w-16 h-16 rounded-full hero-gradient flex items-center justify-center mb-6">
+                        <span class="text-white text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Connect Your Data</h3>
+                    <p class="text-gray-600 mb-4">Upload Excel or connect Google Sheets. Your data stays in sync automatically.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                        One-Time Upload
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-card bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <div class="w-16 h-16 rounded-full hero-gradient flex items-center justify-center mb-6">
+                        <span class="text-white text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Map Your Price Columns</h3>
+                    <p class="text-gray-600 mb-4">The unique DocuBills advantage: Choose any column as your price column.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <i class="fas fa-sliders-h mr-2"></i>
+                        Custom Mapping
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="step-card bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <div class="w-16 h-16 rounded-full hero-gradient flex items-center justify-center mb-6">
+                        <span class="text-white text-2xl font-bold">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Launch & Automate</h3>
+                    <p class="text-gray-600 mb-4">Send invoices, set up recurring billing, and integrate with Stripe for payments.</p>
+                    <div class="flex items-center text-blue-600 font-medium">
+                        <i class="fas fa-bolt mr-2"></i>
+                        Automation Ready
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 gradient-bg">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Powerful Features for Your Business</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Everything you need to create, manage, and send professional invoices</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-columns text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Custom Column Mapping</h3>
+                    <p class="text-gray-600">Choose any column from your spreadsheet as the price column. No need to reformat your data.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-sync-alt text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Automated Email Cadences</h3>
+                    <p class="text-gray-600">Set up automatic reminder emails for overdue invoices. Customize timing and messaging.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
+                        <i class="fab fa-stripe text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Stripe Integration</h3>
+                    <p class="text-gray-600">Accept payments directly on your invoices. One-click setup with Stripe for secure transactions.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-toggle-on text-yellow-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Toggle Rows/Columns</h3>
+                    <p class="text-gray-600">Show or hide specific rows and columns in your final invoice. Customize per client.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-history text-red-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Recurring Invoices</h3>
+                    <p class="text-gray-600">Set up monthly, quarterly, or annual recurring invoices. Automate your billing cycles.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-indigo-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Analytics & Reports</h3>
+                    <p class="text-gray-600">Track paid vs. unpaid invoices, revenue trends, and client payment history.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 hero-gradient">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center text-white">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Start Creating Professional Invoices in Minutes</h2>
+                <p class="text-xl mb-8 opacity-90">Join thousands of businesses that use DocuBills to streamline their invoicing process.</p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="#" class="bg-white text-blue-600 font-bold px-8 py-4 rounded-lg text-lg hover:shadow-xl transition-shadow">
+                        Get Started Free Forever
+                        <i class="fas fa-rocket ml-2"></i>
+                    </a>
+                    <a href="#" class="bg-transparent border-2 border-white text-white font-bold px-8 py-4 rounded-lg text-lg hover:bg-white hover:text-blue-600 transition-colors">
+                        Schedule a Demo
+                        <i class="fas fa-calendar-alt ml-2"></i>
+                    </a>
+                </div>
+                <p class="mt-6 opacity-80">No credit card required • Free plan includes 10 invoices/month</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
+                            <i class="fas fa-file-invoice text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold">Docu<span class="text-blue-400">Bills</span></span>
+                    </div>
+                    <p class="text-gray-400 mt-2">The world's first free custom invoice generator</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-github text-xl"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-gray-400 text-sm">
+                <div class="flex flex-col md:flex-row justify-between">
+                    <div class="mb-4 md:mb-0">
+                        &copy; 2023 DocuBills. All rights reserved.
+                    </div>
+                    <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+                        <a href="#" class="hover:text-white">Privacy Policy</a>
+                        <a href="#" class="hover:text-white">Terms of Service</a>
+                        <a href="#" class="hover:text-white">Cookie Policy</a>
+                        <a href="#" class="hover:text-white">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Signup Modal (The Hook) -->
+    <div class="modal-overlay" id="signup-modal">
+        <div class="modal-content p-8">
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-file-invoice-dollar text-blue-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Finalize Your First Invoice!</h3>
+                <p class="text-gray-600 mb-6">To generate and send this professional invoice to your client, create your free DocuBills account.</p>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        <span class="font-medium">What you'll get with your free account:</span>
+                    </div>
+                    <ul class="text-gray-700 ml-6 space-y-1">
+                        <li>• 10 free invoices per month</li>
+                        <li>• Custom column mapping</li>
+                        <li>• Excel & Google Sheets integration</li>
+                        <li>• Basic email reminders</li>
+                    </ul>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                    <button class="flex-1 bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors" id="create-account-btn">
+                        Create Free Account
+                    </button>
+                    <button class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors" id="close-modal">
+                        Maybe Later
+                    </button>
+                </div>
+                
+                <p class="text-gray-500 text-sm mt-4">No credit card required. Upgrade anytime for advanced features.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo Phase Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const phase1 = document.getElementById('phase1');
+            const phase2 = document.getElementById('phase2');
+            const phase3 = document.getElementById('phase3');
+            const phase1Tab = document.getElementById('phase1-tab');
+            const phase2Tab = document.getElementById('phase2-tab');
+            const phase3Tab = document.getElementById('phase3-tab');
+            const nextToPhase2 = document.getElementById('next-to-phase2');
+            const nextToPhase3 = document.getElementById('next-to-phase3');
+            const backToPhase1 = document.getElementById('back-to-phase1');
+            const backToPhase2 = document.getElementById('back-to-phase2');
+            const finalizeInvoice = document.getElementById('finalize-invoice');
+            const signupModal = document.getElementById('signup-modal');
+            const closeModal = document.getElementById('close-modal');
+            const createAccountBtn = document.getElementById('create-account-btn');
+            const priceColumnOptions = document.querySelectorAll('.price-column-option');
+            const selectedPriceColumn = document.getElementById('selected-price-column');
+            
+            // Function to switch phases
+            function switchPhase(toPhase) {
+                // Hide all phases
+                phase1.classList.remove('active');
+                phase2.classList.remove('active');
+                phase3.classList.remove('active');
+                
+                // Remove active class from all tabs
+                phase1Tab.classList.remove('border-blue-600', 'text-blue-600');
+                phase2Tab.classList.remove('border-blue-600', 'text-blue-600');
+                phase3Tab.classList.remove('border-blue-600', 'text-blue-600');
+                phase1Tab.classList.add('text-gray-500');
+                phase2Tab.classList.add('text-gray-500');
+                phase3Tab.classList.add('text-gray-500');
+                
+                // Show target phase
+                document.getElementById(toPhase).classList.add('active');
+                
+                // Update active tab
+                if (toPhase === 'phase1') {
+                    phase1Tab.classList.add('border-blue-600', 'text-blue-600');
+                    phase1Tab.classList.remove('text-gray-500');
+                } else if (toPhase === 'phase2') {
+                    phase2Tab.classList.add('border-blue-600', 'text-blue-600');
+                    phase2Tab.classList.remove('text-gray-500');
+                } else if (toPhase === 'phase3') {
+                    phase3Tab.classList.add('border-blue-600', 'text-blue-600');
+                    phase3Tab.classList.remove('text-gray-500');
+                }
+            }
+            
+            // Event listeners for phase navigation
+            nextToPhase2.addEventListener('click', () => switchPhase('phase2'));
+            nextToPhase3.addEventListener('click', () => switchPhase('phase3'));
+            backToPhase1.addEventListener('click', () => switchPhase('phase1'));
+            backToPhase2.addEventListener('click', () => switchPhase('phase2'));
+            
+            // Tab click handlers
+            phase1Tab.addEventListener('click', () => switchPhase('phase1'));
+            phase2Tab.addEventListener('click', () => switchPhase('phase2'));
+            phase3Tab.addEventListener('click', () => switchPhase('phase3'));
+            
+            // Price column selection
+            priceColumnOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    priceColumnOptions.forEach(opt => {
+                        opt.classList.remove('selected', 'bg-blue-50', 'font-medium');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected', 'bg-blue-50', 'font-medium');
+                    
+                    // Update selected column display
+                    selectedPriceColumn.textContent = this.textContent.trim();
+                });
+            });
+            
+            // Finalize invoice - show modal
+            finalizeInvoice.addEventListener('click', () => {
+                signupModal.style.display = 'flex';
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                signupModal.style.display = 'none';
+            });
+            
+            // Create account button
+            createAccountBtn.addEventListener('click', () => {
+                alert('Redirecting to signup page... In a real implementation, this would take you to the registration form.');
+                signupModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === signupModal) {
+                    signupModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

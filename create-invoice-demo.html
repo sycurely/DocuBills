@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Invoice (Demo) - DocuBills</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#4361ee; --secondary:#7209b7; --accent:#06d6a0;
+      --text:#1a1a2e; --muted:#6c757d; --bg:#f6f8ff; --white:#fff;
+      --border:#e9ecef; --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:linear-gradient(135deg,#f5f7ff 0%,#f0f4ff 100%);
+      color:var(--text);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:26px;}
+    .topbar{
+      background:var(--white); border:1px solid var(--border);
+      border-radius:18px; box-shadow:var(--shadow);
+      padding:18px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    }
+    .brand{display:flex; align-items:center; gap:12px;}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);
+      display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px;
+    }
+    .title h1{
+      margin:0; font-family:Poppins,Inter; font-size:18px; line-height:1.2;
+    }
+    .title p{margin:4px 0 0; color:var(--muted); font-size:13px;}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px; border-radius:999px;
+      background:rgba(67,97,238,.12);
+      color:#4361ee; font-weight:700; border:1px solid rgba(67,97,238,.22);
+      font-family:Poppins,Inter;
+      white-space:nowrap;
+    }
+    .badge i{color:#7209b7}
+    .grid{
+      margin-top:18px;
+      display:grid; grid-template-columns: 420px 1fr;
+      gap:18px;
+    }
+    .card{
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .card h2{
+      font-family:Poppins,Inter;
+      margin:0 0 12px; font-size:16px;
+    }
+    .muted{color:var(--muted); font-size:13px; margin:0 0 14px;}
+    .field{margin-bottom:12px;}
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:700;}
+    input[type="text"], input[type="url"]{
+      width:100%; padding:12px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      font-size:14px;
+      outline:none;
+    }
+    input:focus{border-color:rgba(67,97,238,.6); box-shadow:0 0 0 3px rgba(67,97,238,.15);}
+    .row{display:flex; gap:10px; flex-wrap:wrap;}
+    .btn{
+      border:0; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:12px 14px; border-radius:12px;
+      font-weight:800; font-family:Poppins,Inter; font-size:13px;
+      transition:.2s ease;
+    }
+    .btn-primary{background:var(--primary); color:#fff;}
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-ghost{
+      background:transparent; color:var(--primary);
+      border:2px solid var(--primary);
+    }
+    .btn-ghost:hover{background:rgba(67,97,238,.06); transform:translateY(-1px)}
+    .hint{
+      margin-top:10px; padding:12px; border-radius:12px;
+      background:rgba(6,214,160,.12); border:1px solid rgba(6,214,160,.25);
+      color:#0f5132; font-size:13px;
+    }
+
+    /* table */
+    .table-wrap{overflow:auto; border-radius:14px; border:1px solid var(--border);}
+    table{width:100%; border-collapse:collapse; min-width:760px; background:#fff;}
+    thead th{
+      position:sticky; top:0;
+      background:#f6f7ff;
+      text-align:left; font-size:12px; color:#334155;
+      padding:12px; border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:12px; border-bottom:1px solid var(--border);
+      font-size:13px; white-space:nowrap;
+    }
+    .col-toggle{
+      display:flex; align-items:center; gap:8px;
+      font-weight:800; font-size:12px; color:#0f172a;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background:#f8fafc; border:1px solid var(--border);
+      font-size:12px; color:var(--muted);
+      margin-top:12px;
+      justify-content:space-between;
+    }
+    .right{margin-left:auto}
+    .toast{
+      position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+      background:#111827; color:#fff; padding:12px 14px; border-radius:999px;
+      font-size:13px; opacity:0; pointer-events:none; transition:.25s ease;
+      box-shadow:0 10px 25px rgba(0,0,0,.18);
+    }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr;}
+      table{min-width:900px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="title">
+          <h1>Create Invoice (Demo)</h1>
+          <p>Pre-filled sample data. Nothing is saved. No database, no server calls.</p>
+        </div>
+      </div>
+      <div class="badge"><i class="fas fa-bolt"></i> Demo Mode</div>
+    </div>
+
+    <div class="grid">
+      <!-- Left: Inputs -->
+      <div class="card">
+        <h2>Step 1: Upload / Connect Data</h2>
+        <p class="muted">This is a simulated version of your Create Invoice page. Buttons work, but nothing is stored.</p>
+
+        <div class="field">
+          <label>Google Sheet URL (demo)</label>
+          <input id="sheetUrl" type="url" value="https://docs.google.com/spreadsheets/d/DEMO-SHEET-ID/edit#gid=0" />
+        </div>
+
+        <div class="field">
+          <label>Spreadsheet Upload (demo)</label>
+          <input type="text" value="demo-invoice-data.xlsx (simulated)" readonly />
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary" id="btnLoad">
+            <i class="fas fa-magic"></i> Load Sample Data
+          </button>
+          <button class="btn btn-ghost" id="btnReset">
+            <i class="fas fa-rotate-left"></i> Reset
+          </button>
+        </div>
+
+        <div class="hint">
+          <b>Tip:</b> Use the header checkboxes to include/exclude columns. Use left checkboxes to include/exclude rows.
+        </div>
+
+        <div class="pill">
+          <span><i class="fas fa-table-columns"></i> Selected Columns: <b id="colCount">0</b></span>
+          <span class="right"><i class="fas fa-list-check"></i> Selected Rows: <b id="rowCount">0</b></span>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn btn-primary" id="btnGenerate" style="flex:1;">
+            <i class="fas fa-file-pdf"></i> Generate Preview (Demo)
+          </button>
+        </div>
+
+        <p class="muted" style="margin-top:12px;">
+          Next, click <b>Step 2</b> tab on the landing page to continue the demo.
+        </p>
+      </div>
+
+      <!-- Right: Table Preview -->
+      <div class="card">
+        <h2>Data Preview (Demo)</h2>
+        <p class="muted">Select columns and rows like the real workflow.</p>
+
+        <div class="table-wrap">
+          <table id="demoTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ✅ Demo data (edit these if you want different pre-filled data)
+    const DEMO_COLUMNS = [
+      { key: "date", label: "Date" },
+      { key: "invoice", label: "Invoice #" },
+      { key: "customer", label: "Customer" },
+      { key: "email", label: "Email" },
+      { key: "service", label: "Service" },
+      { key: "qty", label: "Qty" },
+      { key: "rate", label: "Rate" },
+      { key: "total", label: "Total" }
+    ];
+
+    const DEMO_ROWS = [
+      { date:"2026-01-02", invoice:"INV-DEMO-1001", customer:"Acme Logistics", email:"billing@acme.com", service:"Dispatch Services", qty:1, rate:650, total:650 },
+      { date:"2026-01-03", invoice:"INV-DEMO-1002", customer:"NorthStar Towing", email:"accounts@northstar.ca", service:"Monthly Retainer", qty:1, rate:1200, total:1200 },
+      { date:"2026-01-04", invoice:"INV-DEMO-1003", customer:"BlueRiver Clinic", email:"finance@blueriver.com", service:"Invoice Setup", qty:2, rate:150, total:300 },
+      { date:"2026-01-04", invoice:"INV-DEMO-1004", customer:"Peak Media", email:"payables@peakmedia.io", service:"Marketing Support", qty:5, rate:90, total:450 },
+      { date:"2026-01-05", invoice:"INV-DEMO-1005", customer:"WomenFirst Demo", email:"demo@womenfirst.ca", service:"Security Audit", qty:1, rate:250, total:250 }
+    ];
+
+    const table = document.getElementById("demoTable");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+
+    const colCount = document.getElementById("colCount");
+    const rowCount = document.getElementById("rowCount");
+    const toast = document.getElementById("toast");
+
+    // state
+    let enabledCols = new Set(DEMO_COLUMNS.map(c => c.key));
+    let enabledRows = new Set(DEMO_ROWS.map((_, i) => i));
+
+    function money(n){ return "$" + Number(n).toFixed(2); }
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function render(){
+      // header
+      thead.innerHTML = "";
+      const tr = document.createElement("tr");
+
+      // row checkbox col
+      const thSel = document.createElement("th");
+      thSel.innerHTML = `<span class="col-toggle"><input id="toggleAllRows" type="checkbox" checked> Rows</span>`;
+      tr.appendChild(thSel);
+
+      DEMO_COLUMNS.forEach(col => {
+        const th = document.createElement("th");
+        const checked = enabledCols.has(col.key) ? "checked" : "";
+        th.innerHTML = `
+          <span class="col-toggle">
+            <input type="checkbox" data-col="${col.key}" ${checked}>
+            ${col.label}
+          </span>
+        `;
+        tr.appendChild(th);
+      });
+
+      thead.appendChild(tr);
+
+      // body
+      tbody.innerHTML = "";
+      DEMO_ROWS.forEach((row, idx) => {
+        const trb = document.createElement("tr");
+
+        // row selector
+        const tdSel = document.createElement("td");
+        const rChecked = enabledRows.has(idx) ? "checked" : "";
+        tdSel.innerHTML = `<input type="checkbox" data-row="${idx}" ${rChecked}>`;
+        trb.appendChild(tdSel);
+
+        DEMO_COLUMNS.forEach(col => {
+          const td = document.createElement("td");
+          const visible = enabledCols.has(col.key);
+
+          let val = row[col.key];
+          if (col.key === "rate" || col.key === "total") val = money(val);
+
+          td.textContent = val;
+          td.style.display = visible ? "" : "none";
+          trb.appendChild(td);
+        });
+
+        tbody.appendChild(trb);
+      });
+
+      // update counts
+      colCount.textContent = enabledCols.size;
+      rowCount.textContent = enabledRows.size;
+
+      // update "toggle all rows"
+      const toggleAll = document.getElementById("toggleAllRows");
+      if (toggleAll) toggleAll.checked = (enabledRows.size === DEMO_ROWS.length);
+    }
+
+    function bind(){
+      // column toggle
+      thead.addEventListener("change", (e) => {
+        const col = e.target.getAttribute("data-col");
+        if (col){
+          if (e.target.checked) enabledCols.add(col);
+          else enabledCols.delete(col);
+          render();
+          showToast("Column selection updated (demo)");
+        }
+
+        if (e.target.id === "toggleAllRows"){
+          if (e.target.checked){
+            enabledRows = new Set(DEMO_ROWS.map((_, i) => i));
+          } else {
+            enabledRows = new Set();
+          }
+          render();
+          showToast("Row selection updated (demo)");
+        }
+      });
+
+      // row toggle
+      tbody.addEventListener("change", (e) => {
+        const row = e.target.getAttribute("data-row");
+        if (row !== null){
+          const idx = Number(row);
+          if (e.target.checked) enabledRows.add(idx);
+          else enabledRows.delete(idx);
+          render();
+        }
+      });
+
+      // buttons
+      document.getElementById("btnLoad").addEventListener("click", () => {
+        enabledCols = new Set(DEMO_COLUMNS.map(c => c.key));
+        enabledRows = new Set(DEMO_ROWS.map((_, i) => i));
+        render();
+        showToast("Sample data loaded (demo)");
+      });
+
+      document.getElementById("btnReset").addEventListener("click", () => {
+        enabledCols = new Set(DEMO_COLUMNS.map(c => c.key));
+        enabledRows = new Set(DEMO_ROWS.map((_, i) => i));
+        document.getElementById("sheetUrl").value = "https://docs.google.com/spreadsheets/d/DEMO-SHEET-ID/edit#gid=0";
+        render();
+        showToast("Reset complete (demo)");
+      });
+
+      document.getElementById("btnGenerate").addEventListener("click", (e) => {
+        e.preventDefault();
+        showToast("Preview generated (demo only). Nothing saved.");
+      });
+
+      // prevent any accidental navigation inside iframe
+      document.addEventListener("click", (e) => {
+        const a = e.target.closest("a");
+        if (a) e.preventDefault();
+      });
+    }
+
+    render();
+    bind();
+  </script>
+</body>
+</html>

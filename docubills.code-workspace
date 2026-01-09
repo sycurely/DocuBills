@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "/ — (Remote)",
+			"uri": "ftp://ftp.docubills.com/"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
