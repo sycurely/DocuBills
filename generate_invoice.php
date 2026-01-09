@@ -198,20 +198,50 @@ $allowedCurrencies = [
 // ─────────────────────────────────────────────
 // Invoice Title Bar Color (PDF heading section)
 // ─────────────────────────────────────────────
-$allowedTitleBarColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
+$allowedTitleBarColors = [
+    '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
+    '#06d6a0', '#16a34a', '#f72585', '#f8961e',
+    '#111827', '#0f172a'
+];
+
+/**
+ * Calculate relative luminance of a hex color (WCAG formula)
+ * Returns a value between 0 and 1
+ */
+function calculateLuminance($hex) {
+    $hex = str_replace('#', '', $hex);
+    $r = hexdec(substr($hex, 0, 2)) / 255;
+    $g = hexdec(substr($hex, 2, 2)) / 255;
+    $b = hexdec(substr($hex, 4, 2)) / 255;
+    
+    $r = $r <= 0.03928 ? $r / 12.92 : pow(($r + 0.055) / 1.055, 2.4);
+    $g = $g <= 0.03928 ? $g / 12.92 : pow(($g + 0.055) / 1.055, 2.4);
+    $b = $b <= 0.03928 ? $b / 12.92 : pow(($b + 0.055) / 1.055, 2.4);
+    
+    return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+}
 
 // default background + text color rule:
-// ✅ Yellow (#FFDC00) => text #0033D9
-// ✅ All others => white
+// ✅ Use luminance-based calculation: if luminance > 0.6, use dark text, otherwise white
 $invoice_title_bg = strtoupper(trim($_SESSION['invoice_data']['invoice_title_bg'] ?? '#FFDC00'));
 
-// validate background
-if (!in_array($invoice_title_bg, $allowedTitleBarColors, true)) {
+// validate background (case-insensitive comparison)
+$invoice_title_bg_normalized = strtoupper($invoice_title_bg);
+$isValid = false;
+foreach ($allowedTitleBarColors as $color) {
+    if (strtoupper($color) === $invoice_title_bg_normalized) {
+        $isValid = true;
+        $invoice_title_bg = $color; // Use the exact case from allowed array
+        break;
+    }
+}
+if (!$isValid) {
     $invoice_title_bg = '#FFDC00';
 }
 
-// decide text color based on background
-$invoice_title_text = ($invoice_title_bg === '#FFDC00') ? '#0033D9' : '#FFFFFF';
+// decide text color based on luminance (matching homepage logic)
+$luminance = calculateLuminance($invoice_title_bg);
+$invoice_title_text = ($luminance > 0.6) ? '#111827' : '#ffffff';
 
 // persist
 $_SESSION['invoice_data']['invoice_title_bg']   = $invoice_title_bg;
@@ -1061,7 +1091,11 @@ $is_recurring = isset($data['is_recurring'])
         
           <div class="color-swatch-row" id="titleBarColorRow">
             <?php
-              $titleColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
+              $titleColors = [
+                '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
+                '#06d6a0', '#16a34a', '#f72585', '#f8961e',
+                '#111827', '#0f172a'
+              ];
               foreach ($titleColors as $c):
                 $selected = (strtoupper($c) === strtoupper($invoice_title_bg));
             ?>
@@ -2120,9 +2154,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
       if (!row || !bgInput || !preview) return;
     
+      // Calculate relative luminance (WCAG formula) - matching homepage logic
+      const luminance = (hex) => {
+        const c = hex.replace('#', '');
+        const r = parseInt(c.substring(0, 2), 16) / 255;
+        const g = parseInt(c.substring(2, 4), 16) / 255;
+        const b = parseInt(c.substring(4, 6), 16) / 255;
+        const a = [r, g, b].map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+        return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+      };
+    
       const getTextColor = (bg) => {
-        const c = String(bg || '').trim().toUpperCase();
-        return (c === '#FFDC00') ? '#0033D9' : '#FFFFFF';
+        const lum = luminance(bg);
+        return (lum > 0.6) ? '#111827' : '#ffffff';
       };
     
       const setSelected = (color) => {

@@ -254,7 +254,7 @@
             display: none;
             width: 40px;
             height: 40px;
-            background: var(--primary-light);
+            background-color: var(--primary);
             border-radius: var(--radius-sm);
             border: none;
             align-items: center;
@@ -469,12 +469,12 @@
         .floating-icon {
             width: 50px;
             height: 50px;
-            background: var(--primary-light);
+            background-color: var(--primary);
             border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
+            color: var(--accent);
             font-size: 22px;
         }
 
@@ -808,7 +808,7 @@
         .demo-content {
             background: white;
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: 50px;
+            padding: 0;
             margin-top: 40px;
             min-height: 500px;
             display: flex;
@@ -862,7 +862,7 @@
 
         .demo-feature:hover {
             transform: translateY(-5px);
-            background: var(--primary-light);
+            background-color: var(--primary);
         }
 
         .demo-feature i {
@@ -2167,8 +2167,8 @@
                 </ul>
                 
                 <div class="nav-actions">
-                    <a href="#" class="btn btn-secondary">Sign In</a>
-                    <a href="#cta" class="btn btn-primary">Get Started Free</a>
+                    <a href="login.php" class="btn btn-secondary">Sign In</a>
+                    <a href="register.php" class="btn btn-primary">Get Started Free</a>
                 </div>
                 
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -2197,8 +2197,8 @@
                             Start Free Trial
                         </a>
                         <a href="#demo" class="btn btn-secondary btn-lg">
-                            <i class="fas fa-play-circle"></i>
-                            Watch Interactive Demo
+                            <i class="fas fa-mouse-pointer"></i>
+                            Try Interactive Demo
                         </a>
                     </div>
                     

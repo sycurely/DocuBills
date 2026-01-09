@@ -2,7 +2,13 @@
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $file = __DIR__ . $path;
 
-if ($path === '/' || $path === '/favicon.ico') {
+if ($path === '/') {
+    // Route root path to index.php
+    require __DIR__ . '/index.php';
+    exit;
+}
+
+if ($path === '/favicon.ico') {
     http_response_code(404);
     exit;
 }

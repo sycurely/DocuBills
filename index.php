@@ -4,7 +4,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
   // ✅ Show landing page without changing URL to /home.php
   define('DOCUBILLS_LANDING', true);
-  require __DIR__ . '/home.php';
+  require __DIR__ . '/homelandingpage6.php';
   exit;
 }
 

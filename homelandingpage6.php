@@ -865,9 +865,9 @@
         
         .demo-frame-wrap {
             width: 100%;
-            height: 650px;
+            height: auto;
             border-radius: var(--radius);
-            overflow: hidden;
+            overflow: visible;
             border: 1px solid var(--border);
             background: #fff;
             box-shadow: var(--shadow);
@@ -895,9 +895,186 @@
             text-align: center;
         }
         
+        /* Signup Modal Styles */
+        .demo-signup-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 10000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .demo-signup-modal-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+        }
+        
+        .demo-signup-modal-content {
+          position: relative;
+          background: var(--white);
+          border-radius: 16px;
+          padding: 40px;
+          max-width: 520px;
+          width: 90%;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          z-index: 10001;
+        }
+        
+        .demo-signup-modal-close {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: var(--light-bg);
+          border: none;
+          color: var(--text-dark);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          font-size: 18px;
+        }
+        
+        .demo-signup-modal-close:hover {
+          background: var(--primary-light);
+          color: var(--primary);
+          transform: rotate(90deg);
+        }
+        
+        .demo-signup-modal-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: var(--text-dark);
+          margin: 0 0 16px 0;
+          line-height: 1.3;
+        }
+        
+        .demo-signup-modal-intro {
+          font-size: 15px;
+          color: var(--text-muted);
+          margin: 0 0 24px 0;
+          line-height: 1.5;
+        }
+        
+        .demo-signup-features-box {
+          background: var(--primary-light);
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 24px;
+          border: 1px solid var(--border);
+        }
+        
+        .demo-signup-features-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 16px;
+          color: var(--primary);
+          font-size: 16px;
+          font-weight: 600;
+        }
+        
+        .demo-signup-features-header i {
+          font-size: 18px;
+        }
+        
+        .demo-signup-features-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .demo-signup-features-list li {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: var(--text-dark);
+          font-size: 15px;
+          margin-bottom: 12px;
+          padding-left: 0;
+        }
+        
+        .demo-signup-features-list li:last-child {
+          margin-bottom: 0;
+        }
+        
+        .demo-signup-features-list i {
+          color: var(--primary);
+          font-size: 16px;
+        }
+        
+        .demo-signup-modal-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        
+        .demo-signup-btn-primary {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 16px 24px;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: white;
+          text-decoration: none;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .demo-signup-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .demo-signup-btn-secondary {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 14px 24px;
+          background: var(--white);
+          color: var(--primary);
+          text-decoration: none;
+          border: 2px solid var(--primary);
+          border-radius: 10px;
+          font-weight: 500;
+          font-size: 15px;
+          transition: all 0.2s ease;
+        }
+        
+        .demo-signup-btn-secondary:hover {
+          background: var(--primary-light);
+          border-color: var(--primary-dark);
+        }
+        
+        .demo-signup-modal-footer {
+          text-align: center;
+          font-size: 13px;
+          color: var(--text-muted);
+          margin: 0;
+        }
+        
         @media (max-width: 768px) {
             .demo-frame-wrap {
-                height: 520px;
+                height: auto;
             }
             
             .demo-reset-btn {
@@ -1291,22 +1468,22 @@
         ========================================================= */
         
         .demo-step1-embed{
-          height: 100%;
-          overflow: auto;
+          height: auto;
+          overflow: visible;
           background: #f5f7fb; /* same as --body-bg */
         }
         
         /* ✅ Step 2 embed wrapper */
         .demo-step2-embed{
-          height: 100%;
-          overflow: auto;
+          height: auto;
+          overflow: visible;
           background: #f5f7fb; /* same as --body-bg */
         }
         
         /* ✅ Step 3 embed wrapper */
         .demo-step3-embed{
-          height: 100%;
-          overflow: auto;
+          height: auto;
+          overflow: visible;
           background: #f5f7fb;
         }
         
@@ -1476,6 +1653,12 @@
         .demo-step3-skin .column-toggle-item.price-column-label{
           border-color: var(--primary);
           background: #e9f0ff;
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+        
+        .demo-step3-skin .column-toggle-item.price-column-label input[type="checkbox"]{
+          cursor: not-allowed;
         }
         
         .demo-step3-skin .required-pill{
@@ -2071,6 +2254,54 @@
           box-shadow: var(--shadow-hover);
         }
         
+        /* Save Invoice Button - Stand Out Styling */
+        #demoSaveBtn,
+        #demoSaveBtnBottom {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+          color: white;
+          font-weight: 700;
+          padding: 14px 28px;
+          font-size: 1.05rem;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+          border: none;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+        
+        #demoSaveBtn::before,
+        #demoSaveBtnBottom::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s;
+        }
+        
+        #demoSaveBtn:hover::before,
+        #demoSaveBtnBottom:hover::before {
+          left: 100%;
+        }
+        
+        #demoSaveBtn:hover,
+        #demoSaveBtnBottom:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        #demoSaveBtn:active,
+        #demoSaveBtnBottom:active {
+          transform: translateY(0);
+        }
+        
+        #demoSaveBtn i,
+        #demoSaveBtnBottom i {
+          margin-right: 8px;
+        }
+        
         /* (Optional classes referenced in your real file) */
         .demo-app .btn-secondary{
           background: transparent;
@@ -2322,13 +2553,11 @@
                     <li><a href="#features" class="active">Features</a></li>
                     <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#demo">Interactive Demo</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
                 </ul>
                 
                 <div class="nav-actions">
-                    <a href="#" class="btn btn-secondary">Sign In</a>
-                    <a href="#cta" class="btn btn-primary">Get Started Free</a>
+                    <a href="login.php" class="btn btn-secondary">Sign In</a>
+                    <a href="register.php" class="btn btn-primary">Get Started Free</a>
                 </div>
                 
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -2731,8 +2960,7 @@
                             <!-- demo alert (hidden by default) -->
                             <div class="alert demo-step2-alert" style="display:none;"></div>
                 
-                            <div class="card">
-                              <form id="demoPricingForm" autocomplete="off">
+                            <form id="demoPricingForm" autocomplete="off">
                 
                                 <div class="form-section">
                                   <h2 class="form-section-title"><i class="fas fa-money-bill-wave"></i> Pricing Method</h2>
@@ -2782,8 +3010,7 @@
                                   Demo mode: preview-only — no session, no redirect, no database.
                                 </div>
                 
-                              </form>
-                            </div>
+                            </form>
                 
                           </div>
                         </div>
@@ -2806,13 +3033,12 @@
                               <div class="page-title">Invoice Preview</div>
                               <div class="page-actions">
                                 <button type="button" class="btn" id="demoSaveBtn">
-                                  Save Invoice
+                                  <i class="fas fa-save"></i> Save Invoice
                                 </button>
                               </div>
                             </div>
                 
-                            <div class="card">
-                              <div class="invoice-box">
+                            <div class="invoice-box">
                 
                                 <!-- Row 1 – logo + Bill-To -->
                                 <div class="inv-row-top">
@@ -3006,6 +3232,12 @@
                                 </div>
 
                               </div>
+                            
+                            <!-- Bottom Save Invoice Button -->
+                            <div style="margin-top: 24px; text-align: center;">
+                              <button type="button" class="btn btn-save-demo" id="demoSaveBtnBottom">
+                                <i class="fas fa-save"></i> Save Invoice
+                              </button>
                             </div>
                 
                           </div>
@@ -3089,7 +3321,6 @@
                         <li><a href="#features">Features</a></li>
                         <li><a href="#how-it-works">How It Works</a></li>
                         <li><a href="#demo">Interactive Demo</a></li>
-                        <li><a href="#pricing">Pricing</a></li>
                         <li><a href="#signup">Sign Up Free</a></li>
                     </ul>
                 </div>
@@ -4226,6 +4457,7 @@
     headers.forEach((name, idx) => {
       const wrap = document.createElement('label');
       wrap.className = 'column-toggle-item';
+      wrap.dataset.col = name; // Store column name for sync function
       if (idx === requiredIdx) wrap.classList.add('price-column-label');
 
       const cb = document.createElement('input');
@@ -4236,6 +4468,7 @@
       if (idx === requiredIdx){
         cb.checked = true;
         cb.disabled = true;          // grey + unclickable
+        visibleCols.add(idx);        // ensure it's in visible set
       }
 
       cb.addEventListener('change', () => {
@@ -4254,7 +4487,7 @@
       if (idx === requiredIdx){
         const pill = document.createElement('span');
         pill.className = 'required-pill';
-        pill.textContent = 'Required for total';
+        pill.textContent = 'REQUIRED FOR TOTAL';
         wrap.appendChild(pill);
       }
 
@@ -5051,7 +5284,7 @@
       let col = (item.getAttribute('data-col') || item.dataset.col || '').trim();
       if (!col) {
         col = (item.textContent || '')
-          .replace(/required for total/i, '')
+          .replace(/REQUIRED FOR TOTAL/i, '')
           .trim();
         item.dataset.col = col; // cache it
       }
@@ -5078,7 +5311,7 @@
 
         const pill = document.createElement('span');
         pill.className = 'required-pill';
-        pill.textContent = 'Required for total';
+        pill.textContent = 'REQUIRED FOR TOTAL';
         item.appendChild(pill);
       }
     });
@@ -5125,6 +5358,108 @@
 
 })();
 </script>
+
+<script>
+// Signup Modal Handlers - Initialize when DOM is ready
+(function() {
+  function initSignupModal() {
+    const signupModal = document.getElementById('demoSignupModal');
+    if (!signupModal) return;
+    
+    function showSignupModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      signupModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function hideSignupModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      signupModal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    
+    // Use event delegation for Save Invoice buttons (handles clicks on button or child elements like icons)
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('#demoSaveBtn, #demoSaveBtnBottom');
+      if (btn) {
+        showSignupModal(e);
+        return false;
+      }
+    }, true); // Use capture phase to catch early
+    
+    // Close modal handlers - use event delegation
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('#demoSignupModalClose')) {
+        hideSignupModal(e);
+        return false;
+      }
+      
+      // Close modal when clicking overlay
+      if (e.target.classList.contains('demo-signup-modal-overlay')) {
+        hideSignupModal(e);
+        return false;
+      }
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && signupModal.style.display === 'flex') {
+        hideSignupModal(e);
+      }
+    });
+  }
+  
+  // Initialize modal handlers when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSignupModal);
+  } else {
+    initSignupModal();
+  }
+})();
+</script>
+
+<!-- Signup Modal -->
+<div id="demoSignupModal" class="demo-signup-modal" style="display: none;">
+  <div class="demo-signup-modal-overlay"></div>
+  <div class="demo-signup-modal-content">
+    <button type="button" class="demo-signup-modal-close" id="demoSignupModalClose">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <h2 class="demo-signup-modal-title">To finalize your first invoice, sign up for free!</h2>
+    <p class="demo-signup-modal-intro">You're one step away from generating a PDF, adding Stripe "Pay Now", and enabling automated reminders.</p>
+    
+    <div class="demo-signup-features-box">
+      <div class="demo-signup-features-header">
+        <i class="fas fa-star"></i>
+        <strong>Unlocked after signup</strong>
+      </div>
+      <ul class="demo-signup-features-list">
+        <li><i class="fas fa-check"></i> Generate invoice PDF</li>
+        <li><i class="fas fa-check"></i> Stripe payment links</li>
+        <li><i class="fas fa-check"></i> Email cadences + reminders</li>
+        <li><i class="fas fa-check"></i> Recurring invoices</li>
+      </ul>
+    </div>
+    
+    <div class="demo-signup-modal-actions">
+      <a href="https://docubills.com/register.php" class="demo-signup-btn-primary">
+        Sign up free <i class="fas fa-arrow-right"></i>
+      </a>
+      <a href="https://docubills.com/login.php" class="demo-signup-btn-secondary">
+        I already have an account
+      </a>
+    </div>
+    
+    <p class="demo-signup-modal-footer">No credit card required to start.</p>
+  </div>
+</div>
 
 </body>
 </html>

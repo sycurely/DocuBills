@@ -121,16 +121,49 @@ if ($currency_display === '' || !preg_match('/^[A-Z0-9]{3,10}$/', $currency_disp
 // ─────────────────────────────────────────────
 // ✅ Invoice Title Bar Color (store per invoice)
 // ─────────────────────────────────────────────
-$allowedTitleBarColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
+$allowedTitleBarColors = [
+    '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
+    '#06d6a0', '#16a34a', '#f72585', '#f8961e',
+    '#111827', '#0f172a'
+];
+
+/**
+ * Calculate relative luminance of a hex color (WCAG formula)
+ * Returns a value between 0 and 1
+ */
+function calculateLuminance($hex) {
+    $hex = str_replace('#', '', $hex);
+    $r = hexdec(substr($hex, 0, 2)) / 255;
+    $g = hexdec(substr($hex, 2, 2)) / 255;
+    $b = hexdec(substr($hex, 4, 2)) / 255;
+    
+    $r = $r <= 0.03928 ? $r / 12.92 : pow(($r + 0.055) / 1.055, 2.4);
+    $g = $g <= 0.03928 ? $g / 12.92 : pow(($g + 0.055) / 1.055, 2.4);
+    $b = $b <= 0.03928 ? $b / 12.92 : pow(($b + 0.055) / 1.055, 2.4);
+    
+    return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+}
 
 // Prefer POST; fallback to default
 $invoice_title_bg = strtoupper(trim((string)($_POST['invoice_title_bg'] ?? '#FFDC00')));
-if (!in_array($invoice_title_bg, $allowedTitleBarColors, true)) {
+
+// validate background (case-insensitive comparison)
+$invoice_title_bg_normalized = strtoupper($invoice_title_bg);
+$isValid = false;
+foreach ($allowedTitleBarColors as $color) {
+    if (strtoupper($color) === $invoice_title_bg_normalized) {
+        $isValid = true;
+        $invoice_title_bg = $color; // Use the exact case from allowed array
+        break;
+    }
+}
+if (!$isValid) {
     $invoice_title_bg = '#FFDC00';
 }
 
-// ✅ Text color rule: Yellow => Blue text (#0033D9), otherwise White
-$invoice_title_text = ($invoice_title_bg === '#FFDC00') ? '#0033D9' : '#FFFFFF';
+// ✅ Text color rule: Use luminance-based calculation (matching homepage logic)
+$luminance = calculateLuminance($invoice_title_bg);
+$invoice_title_text = ($luminance > 0.6) ? '#111827' : '#ffffff';
 
 // ─────────────────────────────────────────────
 // Pricing mode + invoice total (trusted amount)
