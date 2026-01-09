@@ -247,6 +247,9 @@ $invoice_title_text = ($luminance > 0.6) ? '#111827' : '#ffffff';
 $_SESSION['invoice_data']['invoice_title_bg']   = $invoice_title_bg;
 $_SESSION['invoice_data']['invoice_title_text'] = $invoice_title_text;
 
+// Get invoice number from session (if user provided one)
+$rawInvNo = trim($_SESSION['invoice_data']['invoice_number'] ?? '');
+
 // If it's only digits, make it look like your INV format
 if ($rawInvNo !== '' && preg_match('/^\d+$/', $rawInvNo)) {
     $rawInvNo = 'INV' . $rawInvNo;
