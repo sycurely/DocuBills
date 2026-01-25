@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "DocuBills",
+    "version": "1.1.8",
+    "type": "php-web-app",
+    "description": "Monolithic PHP SSR app with AJAX endpoints for invoice and expense management."
+  },
+  "stack": {
+    "language": "php",
+    "runtime": "php-8.2+",
+    "web_server": "apache-or-php-built-in",
+    "database": "mysql-or-mariadb",
+    "package_manager": "composer"
+  },
+  "entrypoints": {
+    "web_root": ".",
+    "default_route": "/",
+    "index": "index.php",
+    "router": "router.php",
+    "cron_dir": "cron"
+  },
+  "routes": {
+    "source_of_truth": "API_ENDPOINTS.md",
+    "pages": [
+      "index.php",
+      "login.php",
+      "logout.php",
+      "clients.php",
+      "create-invoice.php",
+      "expenses.php",
+      "users.php",
+      "settings-permissions.php",
+      "settings-taxes.php",
+      "payment-success.php"
+    ],
+    "ajax_endpoints": [
+      "dashboard-data.php",
+      "dashboard-summary.php",
+      "search_clients.php",
+      "ajax-check-username.php",
+      "ajax-check-password.php",
+      "ajax-update-password.php",
+      "taxes_api.php"
+    ],
+    "webhooks": [
+      "save_invoice.php"
+    ],
+    "cron_endpoints": [
+      "cron/"
+    ]
+  },
+  "deployables": {
+    "deploy_root": ".",
+    "public_assets": [
+      "assets",
+      "fonts"
+    ],
+    "libraries": [
+      "libs",
+      "vendor"
+    ],
+    "writable_dirs": [
+      "uploads",
+      "invoices",
+      "Paid",
+      "Unpaid"
+    ],
+    "sensitive_files": [
+      "config.php"
+    ]
+  },
+  "database": {
+    "engine": "mysql",
+    "name": "docubill_old",
+    "config_file": "config.php",
+    "example_config_file": "config.example.php",
+    "schema_doc": "DATABASE.md"
+  },
+  "integrations": {
+    "payments": "stripe",
+    "email": "smtp",
+    "pdf": "dompdf",
+    "spreadsheets": "phpspreadsheet"
+  },
+  "storage": {
+    "uploads_dir": "uploads",
+    "invoices_dir": "invoices",
+    "paid_dir": "Paid",
+    "unpaid_dir": "Unpaid"
+  },
+  "configuration": {
+    "app_name_constant": "APP_NAME",
+    "base_url_constant": "BASE_URL",
+    "base_path_constant": "BASE_PATH",
+    "secrets_location": "config.php"
+  },
+  "docs": [
+    "ARCHITECTURE.md",
+    "API_ENDPOINTS.md",
+    "DATABASE.md",
+    "DEPENDENCIES.md",
+    "PROJECT_AUDIT.md",
+    "MODULE_01_AUTHENTICATION_AUTHORIZATION.md",
+    "MODULE_02_INVOICE_MANAGEMENT.md",
+    "MODULE_03_CLIENT_MANAGEMENT.md",
+    "MODULE_04_EXPENSE_MANAGEMENT.md",
+    "MODULE_05_DASHBOARD_ANALYTICS.md",
+    "MODULE_06_EMAIL_SYSTEM.md",
+    "MODULE_07_USER_MANAGEMENT.md",
+    "MODULE_08_SETTINGS_CONFIGURATION.md"
+  ],
+  "ide_hints": {
+    "workspace_file": "docubills.code-workspace",
+    "php_server_command": "php -S localhost:8000 -t . router.php"
+  },
+  "notes": [
+    "config.php contains environment-specific secrets; do not commit real credentials.",
+    "Full route inventory is maintained in API_ENDPOINTS.md."
+  ]
+}
