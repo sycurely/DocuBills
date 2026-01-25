@@ -48,6 +48,8 @@ try {
         SELECT slug, label
         FROM notification_types
         WHERE deleted_at IS NULL
+           OR deleted_at = ''
+           OR deleted_at = '0000-00-00 00:00:00'
         ORDER BY label ASC
     ")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
@@ -65,6 +67,8 @@ try {
             SELECT id, template_name
             FROM email_templates
             WHERE deleted_at IS NULL
+               OR deleted_at = ''
+               OR deleted_at = '0000-00-00 00:00:00'
             ORDER BY template_name ASC
         ")->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
@@ -199,10 +203,16 @@ if (isset($_GET['error'])) {
                             <option disabled>────────────</option>
                         
                             <?php foreach ($templatesList as $t): ?>
+                              <?php
+                                $tplName = trim((string)($t['template_name'] ?? ''));
+                                if ($tplName === '') {
+                                  $tplName = 'Template #' . (int)$t['id'];
+                                }
+                              ?>
                               <option value="<?= (int)$t['id'] ?>"
                                 <?= ($edit_id && (int)$edit_id === (int)$t['id']) ? 'selected' : '' ?>
                                 <?= $canEditTemplate ? '' : 'disabled' ?>>
-                                <?= htmlspecialchars($t['template_name']) ?>
+                                <?= htmlspecialchars($tplName) ?>
                               </option>
                             <?php endforeach; ?>
                           </select>

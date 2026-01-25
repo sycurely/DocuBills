@@ -2556,8 +2556,8 @@
                 </ul>
                 
                 <div class="nav-actions">
-                    <a href="login.php" class="btn btn-secondary">Sign In</a>
-                    <a href="register.php" class="btn btn-primary">Get Started Free</a>
+                    <a href="https://docubills.com/login.php" class="btn btn-secondary" id="signInBtn">Sign In</a>
+                    <a href="#cta" class="btn btn-primary">Get Started Free</a>
                 </div>
                 
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -3428,7 +3428,7 @@
             }
         });
 
-        // Smooth scrolling for anchor links
+        // Smooth scrolling for anchor links (only for # links)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -3451,6 +3451,19 @@
                 }
             });
         });
+
+        // Ensure Sign In button works properly
+        const signInBtn = document.getElementById('signInBtn');
+        if (signInBtn) {
+            signInBtn.addEventListener('click', function(e) {
+                // Close mobile menu if open
+                if (window.innerWidth <= 768 && navbar.classList.contains('mobile-open')) {
+                    toggleMobileMenu();
+                }
+                // Allow default navigation to login page
+                // Don't prevent default - let the href work naturally
+            });
+        }
 
         // ✅ Demo Tabs Logic (Step 1 / Step 2 / Step 3) + programmatic navigation
         (function () {

@@ -212,6 +212,10 @@ $isSettingsPage = ($activeMenu === 'settings');
           <i class="fas fa-credit-card"></i> Payment Methods
         </a>
         <?php endif; ?>
+
+        <a href="settings-taxes.php" class="submenu-item <?= $activeTab === 'taxes' ? 'active' : '' ?>">
+          <i class="fas fa-percent"></i> Tax Classes
+        </a>
     
         <?php if (has_permission('manage_reminder_settings')): ?>
           <a href="settings-reminders.php" class="submenu-item <?= $activeTab === 'reminder_settings' ? 'active' : '' ?>">

@@ -61,7 +61,7 @@ function render_template_vars(string $html, array $replacements): string {
 }
 
 // Main function to send email
-function sendInvoiceEmail($to_email, $to_name, $subject, $body_html, $attachment_path = '', $attachment_name = '', $cc_emails = [], $bcc_emails = []) {
+function sendInvoiceEmail($to_email, $to_name, $subject, $body_html, $attachment_path = '', $attachment_name = '', $cc_emails = [], $bcc_emails = [], $attachment_data = null) {
     $mail = new PHPMailer(true);
 
     // 🔍 Extra SMTP debug logging (goes into email_smtp_debug.log)
@@ -155,8 +155,56 @@ function sendInvoiceEmail($to_email, $to_name, $subject, $body_html, $attachment
 
 
         // Attach invoice PDF
-        if (!empty($attachment_path) && file_exists($attachment_path)) {
-            $mail->addAttachment($attachment_path, $attachment_name ?: basename($attachment_path));
+        $attachment_path = trim((string)$attachment_path);
+        if ($attachment_path !== '') {
+            $resolved_path = realpath($attachment_path);
+            $attach_path = $resolved_path !== false ? $resolved_path : $attachment_path;
+
+            if (is_file($attach_path) && is_readable($attach_path)) {
+                $attach_name = $attachment_name ?: basename($attach_path);
+                $added = $mail->addAttachment($attach_path, $attach_name);
+                if (!$added) {
+                    error_log("Attachment add failed: {$attach_path}");
+                    file_put_contents(__DIR__ . '/email_debug.log',
+                        "Attachment add failed: {$attach_path}\n",
+                        FILE_APPEND
+                    );
+                } else {
+                    error_log("Attachment added: {$attach_path} (" . filesize($attach_path) . " bytes)");
+                    file_put_contents(__DIR__ . '/email_debug.log',
+                        "Attachment added: {$attach_path} (" . filesize($attach_path) . " bytes)\n",
+                        FILE_APPEND
+                    );
+                }
+            } else {
+                error_log("Attachment missing or unreadable: {$attach_path}");
+                file_put_contents(__DIR__ . '/email_debug.log',
+                    "Attachment missing or unreadable: {$attach_path}\n",
+                    FILE_APPEND
+                );
+            }
+        } else {
+            if (!empty($attachment_data)) {
+                $attach_name = $attachment_name ?: 'invoice.pdf';
+                $added = $mail->addStringAttachment($attachment_data, $attach_name);
+                if (!$added) {
+                    error_log("String attachment failed for {$attach_name}");
+                    file_put_contents(__DIR__ . '/email_debug.log',
+                        "String attachment failed for {$attach_name}\n",
+                        FILE_APPEND
+                    );
+                } else {
+                    file_put_contents(__DIR__ . '/email_debug.log',
+                        "String attachment added: {$attach_name} (" . strlen($attachment_data) . " bytes)\n",
+                        FILE_APPEND
+                    );
+                }
+            } else {
+                file_put_contents(__DIR__ . '/email_debug.log',
+                    "Attachment path empty, skipping addAttachment\n",
+                    FILE_APPEND
+                );
+            }
         }
 
         // Email content

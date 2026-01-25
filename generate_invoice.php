@@ -195,60 +195,65 @@ $allowedCurrencies = [
   'AED' => ['label' => 'AED', 'display' => 'AED'],
 ];
 
+// Load taxes for taxable invoices (optional)
+$taxRows = [];
+$lineTaxes = [];
+$invoiceTaxes = [];
+try {
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS taxes (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            percentage DECIMAL(5,2) NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    $cols = $pdo->query("SHOW COLUMNS FROM taxes")->fetchAll(PDO::FETCH_COLUMN, 0);
+    if (!in_array('tax_type', $cols, true)) {
+        $pdo->exec("ALTER TABLE taxes ADD COLUMN tax_type VARCHAR(20) NOT NULL DEFAULT 'line'");
+    }
+    if (!in_array('calc_order', $cols, true)) {
+        $pdo->exec("ALTER TABLE taxes ADD COLUMN calc_order INT NOT NULL DEFAULT 1");
+    }
+
+    $stmt = $pdo->query("SELECT id, name, percentage, tax_type, calc_order FROM taxes ORDER BY id ASC");
+    $taxRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    foreach ($taxRows as $tax) {
+        $type = strtolower(trim((string)($tax['tax_type'] ?? 'line')));
+        if ($type === 'invoice') {
+            $invoiceTaxes[] = $tax;
+        } else {
+            $lineTaxes[] = $tax;
+        }
+    }
+} catch (Throwable $e) {
+    $taxRows = [];
+    $lineTaxes = [];
+    $invoiceTaxes = [];
+}
+
 // ─────────────────────────────────────────────
 // Invoice Title Bar Color (PDF heading section)
 // ─────────────────────────────────────────────
-$allowedTitleBarColors = [
-    '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
-    '#06d6a0', '#16a34a', '#f72585', '#f8961e',
-    '#111827', '#0f172a'
-];
-
-/**
- * Calculate relative luminance of a hex color (WCAG formula)
- * Returns a value between 0 and 1
- */
-function calculateLuminance($hex) {
-    $hex = str_replace('#', '', $hex);
-    $r = hexdec(substr($hex, 0, 2)) / 255;
-    $g = hexdec(substr($hex, 2, 2)) / 255;
-    $b = hexdec(substr($hex, 4, 2)) / 255;
-    
-    $r = $r <= 0.03928 ? $r / 12.92 : pow(($r + 0.055) / 1.055, 2.4);
-    $g = $g <= 0.03928 ? $g / 12.92 : pow(($g + 0.055) / 1.055, 2.4);
-    $b = $b <= 0.03928 ? $b / 12.92 : pow(($b + 0.055) / 1.055, 2.4);
-    
-    return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
-}
+$allowedTitleBarColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
 
 // default background + text color rule:
-// ✅ Use luminance-based calculation: if luminance > 0.6, use dark text, otherwise white
+// ✅ Yellow (#FFDC00) => text #0033D9
+// ✅ All others => white
 $invoice_title_bg = strtoupper(trim($_SESSION['invoice_data']['invoice_title_bg'] ?? '#FFDC00'));
 
-// validate background (case-insensitive comparison)
-$invoice_title_bg_normalized = strtoupper($invoice_title_bg);
-$isValid = false;
-foreach ($allowedTitleBarColors as $color) {
-    if (strtoupper($color) === $invoice_title_bg_normalized) {
-        $isValid = true;
-        $invoice_title_bg = $color; // Use the exact case from allowed array
-        break;
-    }
-}
-if (!$isValid) {
+// validate background
+if (!in_array($invoice_title_bg, $allowedTitleBarColors, true)) {
     $invoice_title_bg = '#FFDC00';
 }
 
-// decide text color based on luminance (matching homepage logic)
-$luminance = calculateLuminance($invoice_title_bg);
-$invoice_title_text = ($luminance > 0.6) ? '#111827' : '#ffffff';
+// decide text color based on background
+$invoice_title_text = ($invoice_title_bg === '#FFDC00') ? '#0033D9' : '#FFFFFF';
 
 // persist
 $_SESSION['invoice_data']['invoice_title_bg']   = $invoice_title_bg;
 $_SESSION['invoice_data']['invoice_title_text'] = $invoice_title_text;
-
-// Get invoice number from session (if user provided one)
-$rawInvNo = trim($_SESSION['invoice_data']['invoice_number'] ?? '');
 
 // If it's only digits, make it look like your INV format
 if ($rawInvNo !== '' && preg_match('/^\d+$/', $rawInvNo)) {
@@ -335,6 +340,7 @@ $is_recurring = isset($data['is_recurring'])
   <script>
       const STRIPE_MAX_TOTAL = 999999.99; // Stripe single payment hard limit
       const MANUAL_MODE = <?= $manual_mode ? 'true' : 'false' ?>;
+      const HIDE_TAX_COLS_IN_PREVIEW = false;
   </script>
 
   <style>
@@ -879,6 +885,126 @@ $is_recurring = isset($data['is_recurring'])
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
+
+    .tax-cell {
+      white-space: nowrap;
+      background-color: #fff9db !important;
+    }
+
+    .row-disabled .tax-cell {
+      background: var(--light) !important;
+      color: #777;
+    }
+
+    .tax-cell input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+
+    .tax-cell .tax-inputs {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .tax-cell .tax-amount {
+      display: inline-block;
+      width: 64px;
+      padding: 2px 4px;
+      border: 1px solid #d8d8d8;
+      border-radius: 4px;
+      background: transparent;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .tax-cell .tax-amount:focus {
+      outline: 2px solid rgba(67, 97, 238, 0.25);
+      outline-offset: 1px;
+    }
+
+    .tax-header {
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+      .taxable-toggle-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 6px 0 8px;
+      }
+
+      .taxable-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      
+      .invoice-tax-list {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 16px;
+        flex-wrap: wrap;
+      }
+
+      .invoice-tax-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+
+      .invoice-tax-item input {
+        width: 14px;
+        height: 14px;
+      }
+
+    .taxable-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .taxable-toggle .toggle-track {
+      width: 42px;
+      height: 22px;
+      background: #cbd5e1;
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .taxable-toggle .toggle-track::after {
+      content: '';
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .taxable-toggle input:checked + .toggle-track {
+      background: var(--primary);
+    }
+
+    .taxable-toggle input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
     
     .company-info,
     .bill-to {
@@ -1094,11 +1220,7 @@ $is_recurring = isset($data['is_recurring'])
         
           <div class="color-swatch-row" id="titleBarColorRow">
             <?php
-              $titleColors = [
-                '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
-                '#06d6a0', '#16a34a', '#f72585', '#f8961e',
-                '#111827', '#0f172a'
-              ];
+              $titleColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
               foreach ($titleColors as $c):
                 $selected = (strtoupper($c) === strtoupper($invoice_title_bg));
             ?>
@@ -1163,6 +1285,36 @@ $is_recurring = isset($data['is_recurring'])
           </div>
         </div>
 
+        <div class="taxable-toggle-bar">
+          <label class="taxable-toggle">
+            <input type="checkbox" id="taxableInvoiceToggle">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Taxable invoice</span>
+          </label>
+          <?php if (!empty($invoiceTaxes)): ?>
+            <div class="invoice-tax-list" id="invoiceTaxList">
+              <?php foreach ($invoiceTaxes as $tax): ?>
+                <?php
+                  $taxId = (int)$tax['id'];
+                  $taxName = (string)$tax['name'];
+                  $taxPct = rtrim(rtrim(number_format((float)$tax['percentage'], 2, '.', ''), '0'), '.');
+                  $taxOrder = (int)($tax['calc_order'] ?? 1);
+                ?>
+                <label class="invoice-tax-item">
+                  <input type="checkbox"
+                         class="invoice-tax-check"
+                         data-tax-id="<?= $taxId ?>"
+                         data-tax-rate="<?= htmlspecialchars($taxPct) ?>"
+                         data-tax-name="<?= htmlspecialchars($taxName, ENT_QUOTES) ?>"
+                         data-tax-order="<?= $taxOrder ?>"
+                         <?= $can_edit_invoice ? '' : 'disabled' ?>>
+                  <?= htmlspecialchars($taxName) ?> (<?= htmlspecialchars($taxPct) ?>%)
+                </label>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+
        <div class="invoice-table-scroll">
         <table id="invoiceTable">
           <colgroup id="invoiceColgroup"></colgroup>
@@ -1185,6 +1337,17 @@ $is_recurring = isset($data['is_recurring'])
                     <?= htmlspecialchars($col) ?>
                   </th>
                 <?php endforeach; ?>
+
+              <?php foreach ($lineTaxes as $tax): ?>
+                <?php
+                  $taxId = (int)$tax['id'];
+                  $taxName = (string)$tax['name'];
+                  $taxPct = rtrim(rtrim(number_format((float)$tax['percentage'], 2, '.', ''), '0'), '.');
+                ?>
+                <th class="tax-col tax-header" data-tax-id="<?= $taxId ?>" data-tax-rate="<?= htmlspecialchars($taxPct) ?>" style="display:none;">
+                  <?= htmlspecialchars($taxName) ?> (<?= htmlspecialchars($taxPct) ?>%)
+                </th>
+              <?php endforeach; ?>
             </tr>
           </thead>
           <tbody>
@@ -1216,6 +1379,20 @@ $is_recurring = isset($data['is_recurring'])
                       <?= htmlspecialchars($rawValue) ?>
                     </td>
               <?php endforeach; ?>
+
+              <?php foreach ($lineTaxes as $tax): ?>
+                <?php
+                  $taxId = (int)$tax['id'];
+                  $taxPct = rtrim(rtrim(number_format((float)$tax['percentage'], 2, '.', ''), '0'), '.');
+                ?>
+                <td class="tax-col tax-cell" data-tax-id="<?= $taxId ?>" data-tax-rate="<?= htmlspecialchars($taxPct) ?>" style="display:none;">
+                  <input type="checkbox"
+                         class="tax-check"
+                         data-tax-id="<?= $taxId ?>"
+                         data-tax-rate="<?= htmlspecialchars($taxPct) ?>"
+                         <?= $can_edit_invoice ? '' : 'disabled' ?>>
+                </td>
+              <?php endforeach; ?>
               </tr>
             <?php endforeach; ?>
           </tbody>
@@ -1226,7 +1403,7 @@ $is_recurring = isset($data['is_recurring'])
       <!-- Total Amount Section -->
       <div class="flex-container">
         <?php if ($can_add_field): ?>
-          <button type="button" id="addFieldBtn" class="btn">+ Add Field</button>
+          <button type="button" id="addFieldBtn" class="btn">+ Line Item</button>
         <?php endif; ?>
         
         <?php if ($manual_mode): ?>
@@ -1257,6 +1434,10 @@ $is_recurring = isset($data['is_recurring'])
               </div>
             </div>
         <?php else: ?>
+          <div id="totalTaxDisplay" style="display:none;justify-content:flex-end;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="font-weight:700;">Total Taxes:</div>
+              <span id="totalTaxAmount" style="text-align:right; display:inline-block;">0.00</span>
+            </div>
           <div class="total-display" style="display:flex;justify-content:flex-end;align-items:center;gap:7px;">
               <div style="font-weight:700;">Total Amount:</div>
             
@@ -1483,7 +1664,9 @@ $is_recurring = isset($data['is_recurring'])
 
       <textarea name="invoice_html" hidden id="invoiceHTML"></textarea>
       <input type="hidden" name="invoice_total" id="invoiceTotal" value="<?= $sum ?>">
-      <input type="hidden" name="skip_stripe" id="skipStripe" value="0">
+        <input type="hidden" name="invoice_tax_total" id="invoiceTaxTotal" value="0.00">
+        <input type="hidden" name="invoice_tax_summary" id="invoiceTaxSummary" value="">
+        <input type="hidden" name="skip_stripe" id="skipStripe" value="0">
       <input type="hidden" name="currency_display" id="currency_display" value="<?= htmlspecialchars($currency_display) ?>">
 
       <?php if (!empty($data['bill_to'])): ?>
@@ -1522,6 +1705,188 @@ $is_recurring = isset($data['is_recurring'])
       .replace(/'/g, '&#039;');
   }
 
+    function formatTaxRate(rate) {
+      const num = parseFloat(rate);
+      if (isNaN(num)) return '0';
+      return num.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    function buildInvoiceTotalsHtml(summary, ccy) {
+      if (!summary) return '';
+      const money = (value) => `${ccy}${Number(value || 0).toFixed(2)}`;
+        const rows = [];
+
+        rows.push(
+          '<tr>' +
+            '<th colspan="2" style="text-align:left;padding:7px 8px;background:#f5f6f8;border-bottom:1px solid #e5e7eb;font-size:12px;letter-spacing:0.4px;">' +
+              'Invoice Totals' +
+            '</th>' +
+          '</tr>'
+        );
+
+        const pushRow = (label, amount, emphasis = false) => {
+          const labelText = escapeHtml(label);
+          const amountText = escapeHtml(money(amount));
+          const weight = emphasis ? 'font-weight:700;' : '';
+          const bg = emphasis ? 'background:#f9fafb;' : '';
+          rows.push(
+            `<tr>` +
+              `<td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;${weight}${bg}">${labelText}</td>` +
+              `<td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap;${weight}${bg}">${amountText}</td>` +
+            `</tr>`
+          );
+        };
+
+      pushRow('Net Total', summary.netTotal);
+      pushRow('Total Line-Level Taxes', summary.lineTaxTotal);
+      pushRow('Subtotal', summary.subtotal);
+
+      if (summary.invoiceSubtotalTaxes && summary.invoiceSubtotalTaxes.length) {
+        summary.invoiceSubtotalTaxes.forEach(tax => {
+          const name = tax.name || '';
+          const rateLabel = tax.rateLabel || '0';
+          pushRow(`${name} (${rateLabel}% on Subtotal)`, tax.amount);
+        });
+      }
+
+      const showAdjusted = (summary.invoiceSubtotalTaxes && summary.invoiceSubtotalTaxes.length)
+        || (summary.invoiceAdjustedTaxes && summary.invoiceAdjustedTaxes.length);
+      if (showAdjusted) {
+        pushRow('Adjusted Subtotal', summary.adjustedSubtotal);
+      }
+
+      if (summary.invoiceAdjustedTaxes && summary.invoiceAdjustedTaxes.length) {
+        summary.invoiceAdjustedTaxes.forEach(tax => {
+          const name = tax.name || '';
+          const rateLabel = tax.rateLabel || '0';
+          pushRow(`${name} (${rateLabel}% on Adjusted Subtotal)`, tax.amount);
+        });
+      }
+
+      pushRow('Grand Total', summary.grandTotal, true);
+
+        return (
+          '<table class="invoice-totals" data-invoice-totals="1" ' +
+            'style="width:60%;max-width:420px;margin-top:16px;border-collapse:collapse;font-size:12px;border:1px solid #e5e7eb;margin-left:auto;margin-right:0;">' +
+            rows.join('') +
+          '</table>'
+        );
+    }
+
+  function getTaxAmountValue(el) {
+    if (!el) return 0;
+    const raw = el.tagName === 'INPUT' ? el.value : el.textContent;
+    const num = parseFloat(String(raw).replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
+
+  function setTaxAmountValue(el, value) {
+    if (!el) return;
+    const formatted = isNaN(value) ? '0.00' : Number(value).toFixed(2);
+    if (el.tagName === 'INPUT') {
+      el.value = formatted;
+    } else {
+      el.textContent = formatted;
+    }
+  }
+
+  function clearTaxManual(el) {
+    if (el) el.dataset.manual = '0';
+  }
+
+  function getCellNumber(cell) {
+    if (!cell) return NaN;
+    const raw = cell.tagName === 'INPUT' ? cell.value : cell.textContent;
+    const num = parseFloat(String(raw).replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? NaN : num;
+  }
+
+  function setAmountCellValue(cell, value) {
+    if (!cell) return;
+    const formatted = isNaN(value) ? '' : Number(value).toFixed(2);
+    if (cell.tagName === 'INPUT') {
+      cell.value = formatted;
+    } else {
+      cell.textContent = formatted;
+    }
+  }
+
+  function clearAmountCellValue(cell) {
+    if (!cell) return;
+    if (cell.tagName === 'INPUT') {
+      cell.value = '';
+    } else {
+      cell.textContent = '';
+    }
+  }
+
+  function getBaseAmountFromCell(cell) {
+    if (!cell) return 0;
+    if (cell.dataset.baseAmount !== undefined) {
+      const stored = cell.dataset.baseAmount;
+      if (stored === '') return 0;
+      const num = parseFloat(stored);
+      return isNaN(num) ? 0 : num;
+    }
+    const num = getCellNumber(cell);
+    if (!isNaN(num)) {
+      cell.dataset.baseAmount = num.toFixed(2);
+      return num;
+    }
+    cell.dataset.baseAmount = '';
+    return 0;
+  }
+
+  function syncBaseAmountFromCell(cell) {
+    if (!cell) return;
+    const num = getCellNumber(cell);
+    if (isNaN(num)) {
+      cell.dataset.baseAmount = '';
+    } else {
+      cell.dataset.baseAmount = num.toFixed(2);
+    }
+  }
+
+  function getTaxBaseColumnIndex() {
+    if (PRICE_COL_IDX !== null) return PRICE_COL_IDX;
+    const table = document.getElementById('invoiceTable');
+    if (!table || !table.tHead || !table.tHead.rows.length) return null;
+    const headerRow = table.tHead.rows[0];
+    for (let i = 0; i < headerRow.cells.length; i++) {
+      const cell = headerRow.cells[i];
+      if (cell.classList.contains('tax-col')) continue;
+      const label = (cell.textContent || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      if (label.includes('total value')) return i;
+    }
+    return null;
+  }
+
+  function getTaxBaseCell(row) {
+    const idx = getTaxBaseColumnIndex();
+    if (idx !== null && row && row.cells && row.cells[idx]) return row.cells[idx];
+    return row ? row.querySelector('.amount') : null;
+  }
+
+  function getRowBaseAmount(row) {
+    const cell = getTaxBaseCell(row);
+    return getBaseAmountFromCell(cell);
+  }
+
+  function bindBaseCellForRow(row) {
+    if (!row) return;
+    const baseCell = getTaxBaseCell(row);
+    if (!baseCell) return;
+    if (baseCell.dataset.baseBound === '1') return;
+    baseCell.dataset.baseBound = '1';
+    syncBaseAmountFromCell(baseCell);
+    if (baseCell.classList.contains('editable-cell')) {
+      baseCell.addEventListener('input', () => {
+        syncBaseAmountFromCell(baseCell);
+        updateTotal();
+      });
+    }
+  }
+
   function toggleDueTime() {
     const cb = document.getElementById('toggle_due_time');
     const container = document.getElementById('due_time_container');
@@ -1535,33 +1900,244 @@ $is_recurring = isset($data['is_recurring'])
     }
   }
 
-   function updateTotal() {
-    let total = 0;
-    document.querySelectorAll('tr.data-row').forEach(row => {
-      const cb = row.querySelector('.rowCheckbox');
-      const includeRow = (!cb) || cb.checked;
-      if (!includeRow || row.style.display === 'none') return;
+    function updateTotal() {
+      let netTotal = 0;
+      let lineTaxTotal = 0;
 
-      const amtCell = row.querySelector('.amount');
-      if (!amtCell) return;
+      const taxableToggle = document.getElementById('taxableInvoiceToggle');
+      const taxableOn = taxableToggle ? taxableToggle.checked : false;
 
-      const num = parseFloat(amtCell.textContent.replace(/[^0-9.]/g, ''));
-      if (!isNaN(num)) total += num;
+      document.querySelectorAll('tr.data-row').forEach(row => {
+        const cb = row.querySelector('.rowCheckbox');
+        const includeRow = (!cb) || cb.checked;
+        const baseCell = getTaxBaseCell(row);
+        const baseAmount = getBaseAmountFromCell(baseCell);
+        const hasBase = baseCell ? baseCell.dataset.baseAmount !== '' : false;
+
+        if (!includeRow || row.style.display === 'none') {
+          row.querySelectorAll('.tax-amount').forEach(el => {
+            clearTaxManual(el);
+            setTaxAmountValue(el, 0);
+          });
+          if (baseCell) {
+            if (!hasBase) {
+              clearAmountCellValue(baseCell);
+            } else {
+              setAmountCellValue(baseCell, baseAmount);
+            }
+          }
+          return;
+        }
+
+        netTotal += baseAmount;
+        let rowTaxSum = 0;
+
+        if (taxableOn) {
+          row.querySelectorAll('.tax-check').forEach(chk => {
+            const rate = parseFloat(chk.dataset.taxRate || '0');
+            if (chk.checked && !isNaN(rate)) {
+              const rowTax = (baseAmount * rate) / 100;
+              lineTaxTotal += rowTax;
+              rowTaxSum += rowTax;
+            }
+          });
+        }
+
+        if (baseCell) {
+          if (!hasBase && rowTaxSum === 0) {
+            clearAmountCellValue(baseCell);
+          } else {
+            setAmountCellValue(baseCell, baseAmount);
+          }
+        }
+      });
+
+      const subtotal = netTotal + lineTaxTotal;
+      const invoiceSubtotalTaxes = [];
+      const invoiceAdjustedTaxes = [];
+      let invoiceSubtotalTaxTotal = 0;
+
+      if (taxableOn) {
+        document.querySelectorAll('.invoice-tax-check').forEach(chk => {
+          if (!chk.checked) return;
+          const rateValue = parseFloat(chk.dataset.taxRate || '0');
+          if (isNaN(rateValue)) return;
+
+          const taxName = chk.dataset.taxName || '';
+          const rateLabel = (chk.dataset.taxRate || '').toString();
+          const taxOrder = chk.dataset.taxOrder || '1';
+
+          const entry = {
+            id: chk.dataset.taxId || '',
+            name: taxName,
+            rateLabel,
+            rateValue,
+            amount: 0
+          };
+
+          if (String(taxOrder) === '3') {
+            invoiceAdjustedTaxes.push(entry);
+          } else {
+            invoiceSubtotalTaxes.push(entry);
+          }
+        });
+      }
+
+      invoiceSubtotalTaxes.forEach(entry => {
+        entry.amount = (subtotal * entry.rateValue) / 100;
+        invoiceSubtotalTaxTotal += entry.amount;
+      });
+
+      const adjustedSubtotal = subtotal + invoiceSubtotalTaxTotal;
+      let finalTaxTotal = 0;
+
+      invoiceAdjustedTaxes.forEach(entry => {
+        entry.amount = (adjustedSubtotal * entry.rateValue) / 100;
+        finalTaxTotal += entry.amount;
+      });
+
+      const totalTaxes = lineTaxTotal + invoiceSubtotalTaxTotal + finalTaxTotal;
+      const grandTotal = adjustedSubtotal + finalTaxTotal;
+
+      const totalSpan  = document.getElementById('totalAmount');
+      const totalInput = document.getElementById('invoiceTotal');
+      const taxTotalSpan = document.getElementById('totalTaxAmount');
+      const taxTotalInput = document.getElementById('invoiceTaxTotal');
+      const taxTotalDisplay = document.getElementById('totalTaxDisplay');
+
+      if (totalSpan) {
+        totalSpan.textContent = grandTotal.toFixed(2);
+      }
+
+      if (totalInput) {
+        totalInput.value = grandTotal.toFixed(2);
+      }
+
+      if (taxTotalSpan) {
+        taxTotalSpan.textContent = totalTaxes.toFixed(2);
+      }
+
+      if (taxTotalInput) {
+        taxTotalInput.value = totalTaxes.toFixed(2);
+      }
+
+      if (taxTotalDisplay) {
+        taxTotalDisplay.style.display = taxableOn ? 'flex' : 'none';
+      }
+
+      window.__invoiceTaxSummary = {
+        taxableOn,
+        netTotal,
+        lineTaxTotal,
+        subtotal,
+        invoiceSubtotalTaxes,
+        invoiceAdjustedTaxes,
+        invoiceSubtotalTaxTotal,
+        adjustedSubtotal,
+        finalTaxTotal,
+        totalTaxes,
+        grandTotal
+      };
+
+      checkStripeLimit();
+    }
+
+    function setTaxColumnsVisible(show) {
+      const forceHide = (typeof HIDE_TAX_COLS_IN_PREVIEW !== 'undefined') && HIDE_TAX_COLS_IN_PREVIEW;
+      const showCols = show && !forceHide;
+
+      document.querySelectorAll('.tax-col').forEach(cell => {
+        cell.style.display = showCols ? 'table-cell' : 'none';
+      });
+
+        document.querySelectorAll('.tax-check').forEach(chk => {
+          chk.disabled = !show;
+        });
+  
+        document.querySelectorAll('.invoice-tax-check').forEach(chk => {
+          chk.disabled = !show || forceHide;
+        });
+      document.querySelectorAll('.tax-amount').forEach(input => {
+        if (input.tagName === 'INPUT') {
+          input.disabled = !show || forceHide;
+        }
+      });
+
+    const taxTotalDisplay = document.getElementById('totalTaxDisplay');
+    if (taxTotalDisplay) {
+      taxTotalDisplay.style.display = show ? 'flex' : 'none';
+    }
+
+      if (!show) {
+        document.querySelectorAll('.tax-amount').forEach(el => {
+          clearTaxManual(el);
+          setTaxAmountValue(el, 0);
+        });
+        const taxTotalSpan = document.getElementById('totalTaxAmount');
+        const taxTotalInput = document.getElementById('invoiceTaxTotal');
+        if (taxTotalSpan) taxTotalSpan.textContent = '0.00';
+        if (taxTotalInput) taxTotalInput.value = '0.00';
+      }
+
+    if (typeof applyHeaderBasedWidths === 'function') {
+      requestAnimationFrame(applyHeaderBasedWidths);
+    }
+  }
+
+  function bindTaxEventDelegates() {
+    if (window.__taxDelegatesBound) return;
+    window.__taxDelegatesBound = true;
+
+      document.addEventListener('change', (e) => {
+        const target = e.target;
+        if (!target) return;
+
+        if (target.id === 'taxableInvoiceToggle') {
+          setTaxColumnsVisible(target.checked);
+          updateTotal();
+          return;
+        }
+
+        if (target.classList.contains('tax-check')) {
+          updateTotal();
+          return;
+        }
+
+        if (target.classList.contains('invoice-tax-check')) {
+          updateTotal();
+        }
+      });
+
+    document.addEventListener('input', (e) => {
+      const target = e.target;
+      if (!target) return;
+
+      if (target.classList.contains('tax-amount')) {
+        target.dataset.manual = '1';
+        updateTotal();
+        return;
+      }
+
+      if (target.classList.contains('amount')) {
+        syncBaseAmountFromCell(target);
+        updateTotal();
+      }
     });
 
-    const totalSpan  = document.getElementById('totalAmount');
-    const totalInput = document.getElementById('invoiceTotal');
+    document.addEventListener('blur', (e) => {
+      const target = e.target;
+      if (target && target.classList.contains('tax-amount')) {
+        const val = getTaxAmountValue(target);
+        setTaxAmountValue(target, val);
+      }
+    }, true);
 
-    if (totalSpan) {
-      totalSpan.textContent = total.toFixed(2);
-    }
-
-    if (totalInput) {
-      totalInput.value = total.toFixed(2);
-    }
-
-    checkStripeLimit();
+    window.addEventListener('load', () => {
+      if (!MANUAL_MODE) updateTotal();
+    });
   }
+
+  bindTaxEventDelegates();
   
     function checkStripeLimit() {
     const totalInput = document.getElementById('invoiceTotal');
@@ -1762,6 +2338,7 @@ function toggleRow(rowCb) {
 
   row.querySelectorAll('td').forEach((td, idx) => {
     if (idx === 0) return;                       // skip the checkbox cell
+    if (td.classList.contains('tax-cell')) return;
 
     if (disable) {
       /* ----- HARD LOCK ----- */
@@ -1776,6 +2353,23 @@ function toggleRow(rowCb) {
       td.classList.remove('readonly-cell');
     }
   });
+
+  row.querySelectorAll('.tax-check').forEach(chk => {
+    if (disable) {
+      chk.checked = false;
+      chk.disabled = true;
+    } else {
+      const taxableToggle = document.getElementById('taxableInvoiceToggle');
+      chk.disabled = !(taxableToggle && taxableToggle.checked);
+    }
+  });
+
+  if (disable) {
+    row.querySelectorAll('.tax-amount').forEach(el => {
+      clearTaxManual(el);
+      setTaxAmountValue(el, 0);
+    });
+  }
 
   updateTotal();
 }
@@ -1796,11 +2390,47 @@ function toggleRow(rowCb) {
       dueDate.value = due.toISOString().slice(0, 10);
     }
 
-    // Initialize editable cells
-    document.querySelectorAll('.amount').forEach(cell => {
-      if (cell.classList.contains('editable-cell')) {
-        cell.addEventListener('input', updateTotal);
-      }
+    const taxableToggle = document.getElementById('taxableInvoiceToggle');
+    const taxCols = document.querySelectorAll('.tax-col');
+    const invoiceTaxChecks = document.querySelectorAll('.invoice-tax-check');
+    const toggleBar = document.querySelector('.taxable-toggle-bar');
+
+    if (taxCols.length === 0 && invoiceTaxChecks.length === 0 && toggleBar) {
+      toggleBar.style.display = 'none';
+    } else if (taxableToggle) {
+      setTaxColumnsVisible(taxableToggle.checked);
+      taxableToggle.addEventListener('change', () => {
+        setTaxColumnsVisible(taxableToggle.checked);
+        updateTotal();
+      });
+    }
+
+    const taxTable = document.getElementById('invoiceTable');
+    if (taxTable) {
+      taxTable.addEventListener('change', (e) => {
+        if (e.target && e.target.classList.contains('tax-check')) {
+          updateTotal();
+        }
+      });
+
+      taxTable.addEventListener('input', (e) => {
+        if (e.target && e.target.classList.contains('tax-amount')) {
+          e.target.dataset.manual = '1';
+          updateTotal();
+        }
+      });
+
+      taxTable.addEventListener('blur', (e) => {
+        if (e.target && e.target.classList.contains('tax-amount')) {
+          const val = getTaxAmountValue(e.target);
+          setTaxAmountValue(e.target, val);
+        }
+      }, true);
+    }
+
+    // Initialize base cells for totals (handles Total Value column)
+    document.querySelectorAll('tr.data-row').forEach(row => {
+      bindBaseCellForRow(row);
     });
     
     // Initialize total for automatic mode
@@ -1929,31 +2559,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('invoiceForm');
   if (!form) return;
 
-  form.addEventListener('submit', function () {
-    let html = '';
-    const table = document.getElementById('invoiceTable');
+    form.addEventListener('submit', function () {
+      let html = '';
+      const ccy = (typeof CURRENCY_DISPLAY !== 'undefined' ? CURRENCY_DISPLAY : '$');
+      const table = document.getElementById('invoiceTable');
 
-    if (table) {
-      const hasRowCheckbox = !!document.getElementById('selectAll');
-      const headerRow = table.tHead ? table.tHead.rows[0] : table.rows[0];
+        if (table) {
+          const hasRowCheckbox = !!document.getElementById('selectAll');
+          const taxToggle = document.getElementById('taxableInvoiceToggle');
+          const taxableOn = !!(taxToggle && taxToggle.checked);
+          const headerRow = table.tHead ? table.tHead.rows[0] : table.rows[0];
+          const baseColIndex = getTaxBaseColumnIndex();
 
-      const visibleCols = [];
+        const visibleCols = [];
+        const taxHeaderMap = {};
 
-      if (headerRow) {
-        for (let c = 0; c < headerRow.cells.length; c++) {
-          // skip the row-select checkbox column
-          if (hasRowCheckbox && c === 0) continue;
-
-          const cell = headerRow.cells[c];
-          const style = window.getComputedStyle(cell);
-          if (style.display === 'none') continue; // hidden via column toggles
-
-          visibleCols.push({
-            index: c,
-            label: cell.textContent.trim()
+        if (headerRow) {
+          headerRow.querySelectorAll('.tax-col').forEach((th) => {
+            const taxId = th.dataset.taxId || '';
+            const label = (th.textContent || '').trim();
+            if (taxId) taxHeaderMap[taxId] = label;
           });
+
+          for (let c = 0; c < headerRow.cells.length; c++) {
+            // skip the row-select checkbox column
+            if (hasRowCheckbox && c === 0) continue;
+
+            const cell = headerRow.cells[c];
+            if (cell.classList.contains('tax-col')) continue;
+            const style = window.getComputedStyle(cell);
+            if (style.display === 'none') continue; // hidden via column toggles
+
+            visibleCols.push({
+              index: c,
+              label: cell.textContent.trim()
+            });
+          }
         }
-      }
 
       html += '<table class="invoice-table"><thead><tr>';
       visibleCols.forEach(col => {
@@ -1964,48 +2606,99 @@ document.addEventListener('DOMContentLoaded', () => {
       const body = table.tBodies[0];
       const bodyRows = body ? Array.from(body.rows) : Array.from(table.rows).slice(1);
 
-      bodyRows.forEach(row => {
-        const cb = row.querySelector('.rowCheckbox');
-        if (cb && !cb.checked) {
-          // unchecked row = do not include in final invoice
-          return;
-        }
+        bodyRows.forEach(row => {
+          const cb = row.querySelector('.rowCheckbox');
+          if (cb && !cb.checked) {
+            // unchecked row = do not include in final invoice
+            return;
+          }
 
-        html += '<tr>';
-        visibleCols.forEach(col => {
-          const cell = row.cells[col.index];
-          let text = cell ? cell.textContent : '';
-          text = text.replace(/\s+/g, ' ').trim();
-          html += '<td>' + escapeHtml(text) + '</td>';
+          html += '<tr>';
+          visibleCols.forEach(col => {
+            const cell = row.cells[col.index];
+            let text = cell ? cell.textContent : '';
+            text = text.replace(/\s+/g, ' ').trim();
+
+              if (baseColIndex !== null && col.index === baseColIndex) {
+                const baseAmount = getRowBaseAmount(row);
+                let rowTaxSum = 0;
+                const appliedTaxLabels = [];
+
+                if (taxableOn) {
+                  row.querySelectorAll('.tax-check').forEach((chk) => {
+                    if (!chk.checked) return;
+                    const rate = parseFloat(chk.dataset.taxRate || '0');
+                    if (isNaN(rate)) return;
+                    const amount = (baseAmount * rate) / 100;
+                    const taxId = chk.dataset.taxId || '';
+                    const label = taxHeaderMap[taxId] || '';
+                    if (label) appliedTaxLabels.push(escapeHtml(label));
+                    rowTaxSum += amount;
+                  });
+                }
+
+                const lineItemTotal = baseAmount + rowTaxSum;
+                const lineItems = [];
+                const ccySafe = escapeHtml(ccy);
+                lineItems.push('<div style="margin-bottom:2px;"><strong>Line Item Amount (Net):</strong> ' + ccySafe + baseAmount.toFixed(2) + '</div>');
+                if (appliedTaxLabels.length) {
+                  lineItems.push('<div style="margin-bottom:2px;"><strong>Applied Tax(es):</strong> ' + appliedTaxLabels.join(', ') + '</div>');
+                }
+                lineItems.push('<div><strong>Line Item Total:</strong> ' + ccySafe + lineItemTotal.toFixed(2) + '</div>');
+
+                html += '<td>' + lineItems.join('') + '</td>';
+                return;
+              }
+
+            html += '<td>' + escapeHtml(text) + '</td>';
+          });
+          html += '</tr>';
         });
-        html += '</tr>';
-      });
 
       html += '</tbody></table>';
     }
 
-    // Make sure total is in sync with what's on screen
-    if (MANUAL_MODE) {
-      const manualInput = document.getElementById('manualTotal');
-      const totalInput  = document.getElementById('invoiceTotal');
-
-      if (manualInput && totalInput) {
-        const v = parseFloat(manualInput.value || '0');
-        totalInput.value = isNaN(v) ? '0.00' : v.toFixed(2);
+      // Make sure total is in sync with what's on screen
+      if (MANUAL_MODE) {
+        const manualInput = document.getElementById('manualTotal');
+        const totalInput  = document.getElementById('invoiceTotal');
+  
+        if (manualInput && totalInput) {
+          const v = parseFloat(manualInput.value || '0');
+          totalInput.value = isNaN(v) ? '0.00' : v.toFixed(2);
+        }
+      } else {
+        // uses the same logic you see on screen for auto totals
+        updateTotal();
       }
-    } else {
-      // uses the same logic you see on screen for auto totals
-      updateTotal();
-    }
 
-    const totalInput = document.getElementById('invoiceTotal');
-    const totalVal   = totalInput ? (totalInput.value || '0') : '0';
+      let summary = window.__invoiceTaxSummary || null;
+      if (MANUAL_MODE) {
+        const totalInput = document.getElementById('invoiceTotal');
+        const manualTotal = totalInput ? parseFloat(totalInput.value || '0') : 0;
+        summary = {
+          taxableOn: false,
+          netTotal: manualTotal,
+          lineTaxTotal: 0,
+          subtotal: manualTotal,
+          invoiceSubtotalTaxes: [],
+          invoiceAdjustedTaxes: [],
+          invoiceSubtotalTaxTotal: 0,
+          adjustedSubtotal: manualTotal,
+          finalTaxTotal: 0,
+          totalTaxes: 0,
+          grandTotal: manualTotal
+        };
+      }
 
-    const ccy = (typeof CURRENCY_DISPLAY !== 'undefined' ? CURRENCY_DISPLAY : '$');
+      if (summary) {
+        html += buildInvoiceTotalsHtml(summary, ccy);
+      }
 
-    html += `<div style="margin-top:20px;text-align:right;font-size:16px;font-weight:bold;">
-               Total Amount: ${escapeHtml(ccy)}${parseFloat(totalVal || '0').toFixed(2)}
-             </div>`;
+      const taxSummaryInput = document.getElementById('invoiceTaxSummary');
+      if (taxSummaryInput) {
+        taxSummaryInput.value = summary ? JSON.stringify(summary) : '';
+      }
 
     const dbMethod = <?= json_encode($final_payment_method) ?>;
     if (dbMethod) {
@@ -2088,6 +2781,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
   // Add field button functionality
+  const canEditInvoice = <?= $can_edit_invoice ? 'true' : 'false' ?>;
+
   document.getElementById("addFieldBtn")?.addEventListener("click", () => {
   const table = document.getElementById("invoiceTable");
   const tbody = table.querySelector("tbody");
@@ -2099,9 +2794,27 @@ document.addEventListener('DOMContentLoaded', () => {
     html += '<td><input type="checkbox" class="rowCheckbox" checked></td>';
   }
 
-  const colCount = table.rows[0].cells.length;
+  const headerRow = table.tHead ? table.tHead.rows[0] : table.rows[0];
+  const colCount = headerRow ? headerRow.cells.length : 0;
   for (let i = 0; i < colCount; i++) {
     if (i === 0 && document.getElementById('selectAll')) continue;
+    const th = headerRow ? headerRow.cells[i] : null;
+    const isTaxCol = th && th.classList.contains('tax-col');
+    const isHidden = th && th.style.display === 'none';
+
+    if (isTaxCol) {
+      const taxId = th.dataset.taxId || '';
+      const taxRate = th.dataset.taxRate || '0';
+      const taxLabel = (th.textContent || '').trim();
+      const hiddenStyle = isHidden ? 'display:none;' : '';
+      const disabledAttr = (isHidden || !canEditInvoice) ? 'disabled' : '';
+      const safeLabel = escapeHtml(taxLabel);
+      html += `<td class="tax-col tax-cell" data-tax-id="${taxId}" data-tax-rate="${taxRate}" style="${hiddenStyle}">
+        <input type="checkbox" class="tax-check" data-tax-id="${taxId}" data-tax-rate="${taxRate}" data-tax-label="${safeLabel}" ${disabledAttr}>
+      </td>`;
+      continue;
+    }
+
     if (PRICE_COL_IDX !== null && i === PRICE_COL_IDX) {
       html += '<td class="amount editable-cell" contenteditable="true"></td>';
     } else {
@@ -2118,9 +2831,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // recalc on input in the new price cell(s)
-  tr.querySelectorAll('.amount').forEach(cell => {
-    cell.addEventListener('input', updateTotal);
-  });
+  bindBaseCellForRow(tr);
+
+  updateTotal();
 });
   </script>
   
@@ -2157,19 +2870,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
       if (!row || !bgInput || !preview) return;
     
-      // Calculate relative luminance (WCAG formula) - matching homepage logic
-      const luminance = (hex) => {
-        const c = hex.replace('#', '');
-        const r = parseInt(c.substring(0, 2), 16) / 255;
-        const g = parseInt(c.substring(2, 4), 16) / 255;
-        const b = parseInt(c.substring(4, 6), 16) / 255;
-        const a = [r, g, b].map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
-        return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
-      };
-    
       const getTextColor = (bg) => {
-        const lum = luminance(bg);
-        return (lum > 0.6) ? '#111827' : '#ffffff';
+        const c = String(bg || '').trim().toUpperCase();
+        return (c === '#FFDC00') ? '#0033D9' : '#FFFFFF';
       };
     
       const setSelected = (color) => {

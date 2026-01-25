@@ -121,49 +121,16 @@ if ($currency_display === '' || !preg_match('/^[A-Z0-9]{3,10}$/', $currency_disp
 // ─────────────────────────────────────────────
 // ✅ Invoice Title Bar Color (store per invoice)
 // ─────────────────────────────────────────────
-$allowedTitleBarColors = [
-    '#0033D9', '#4361ee', '#3f37c9', '#7209b7',
-    '#06d6a0', '#16a34a', '#f72585', '#f8961e',
-    '#111827', '#0f172a'
-];
-
-/**
- * Calculate relative luminance of a hex color (WCAG formula)
- * Returns a value between 0 and 1
- */
-function calculateLuminance($hex) {
-    $hex = str_replace('#', '', $hex);
-    $r = hexdec(substr($hex, 0, 2)) / 255;
-    $g = hexdec(substr($hex, 2, 2)) / 255;
-    $b = hexdec(substr($hex, 4, 2)) / 255;
-    
-    $r = $r <= 0.03928 ? $r / 12.92 : pow(($r + 0.055) / 1.055, 2.4);
-    $g = $g <= 0.03928 ? $g / 12.92 : pow(($g + 0.055) / 1.055, 2.4);
-    $b = $b <= 0.03928 ? $b / 12.92 : pow(($b + 0.055) / 1.055, 2.4);
-    
-    return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
-}
+$allowedTitleBarColors = ['#0033D9', '#169E18', '#000000', '#FFDC00', '#5E17EB'];
 
 // Prefer POST; fallback to default
 $invoice_title_bg = strtoupper(trim((string)($_POST['invoice_title_bg'] ?? '#FFDC00')));
-
-// validate background (case-insensitive comparison)
-$invoice_title_bg_normalized = strtoupper($invoice_title_bg);
-$isValid = false;
-foreach ($allowedTitleBarColors as $color) {
-    if (strtoupper($color) === $invoice_title_bg_normalized) {
-        $isValid = true;
-        $invoice_title_bg = $color; // Use the exact case from allowed array
-        break;
-    }
-}
-if (!$isValid) {
+if (!in_array($invoice_title_bg, $allowedTitleBarColors, true)) {
     $invoice_title_bg = '#FFDC00';
 }
 
-// ✅ Text color rule: Use luminance-based calculation (matching homepage logic)
-$luminance = calculateLuminance($invoice_title_bg);
-$invoice_title_text = ($luminance > 0.6) ? '#111827' : '#ffffff';
+// ✅ Text color rule: Yellow => Blue text (#0033D9), otherwise White
+$invoice_title_text = ($invoice_title_bg === '#FFDC00') ? '#0033D9' : '#FFFFFF';
 
 // ─────────────────────────────────────────────
 // Pricing mode + invoice total (trusted amount)
@@ -275,10 +242,16 @@ $data['next_run_date']        = $next_run_date;
 
 // Prepare HTML safely for DB (special characters, encoding)
 $invoiceHtmlForDb = $_POST['invoice_html'] ?? '';
+$invoiceTaxSummary = $_POST['invoice_tax_summary'] ?? '';
 
 if (!is_string($invoiceHtmlForDb)) {
     $invoiceHtmlForDb = (string)$invoiceHtmlForDb;
 }
+if (!is_string($invoiceTaxSummary)) {
+    $invoiceTaxSummary = (string)$invoiceTaxSummary;
+}
+
+$data['invoice_tax_summary'] = $invoiceTaxSummary;
 
 // If mbstring is available, ensure UTF-8 encoding to avoid DB charset issues
 if (function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
@@ -568,6 +541,7 @@ $invoice_data = [
     'next_run_date'   => $next_run_date,
     'data'            => $data,
     'invoice_html'    => ($invoiceHtmlForDb ?? ''),
+    'invoice_tax_summary' => ($invoiceTaxSummary ?? ''),
     'payment_method'  => $data['payment_method'] ?? null,
 
     // 🏦 Banking details for this invoice
@@ -591,6 +565,7 @@ $htmlPath = $invoiceDir . "/{$invoiceNumber}.html";
 file_put_contents($htmlPath, $html);
 
 // Generate PDF only if DomPDF is available
+$pdf_output = null;
 if (class_exists(\Dompdf\Dompdf::class)) {
     $dompdf = new Dompdf();
 
@@ -604,10 +579,41 @@ if (class_exists(\Dompdf\Dompdf::class)) {
     $dompdf->setPaper('A4', 'landscape');
     
     $dompdf->render();
-    file_put_contents($pdfPath, $dompdf->output());
+    $pdf_output = $dompdf->output();
+    $pdf_bytes = file_put_contents($pdfPath, $pdf_output);
+    if ($pdf_bytes === false || $pdf_bytes === 0 || !is_file($pdfPath)) {
+        error_log("PDF write failed or empty for {$pdfPath}");
+    }
     
 } else {
     error_log('DomPDF class not available, skipping PDF generation.');
+}
+
+// Fallback: retry PDF generation from saved HTML if missing/empty
+if (!is_file($pdfPath) || filesize($pdfPath) === 0) {
+    error_log("PDF missing after initial render for {$invoiceNumber}. Retrying from HTML file.");
+    if (class_exists(\Dompdf\Dompdf::class) && is_file($htmlPath)) {
+        $retry_html = file_get_contents($htmlPath);
+        if ($retry_html !== false) {
+            $dompdf = new Dompdf();
+            $dompdf->set_option('isHtml5ParserEnabled', true);
+            $dompdf->set_option('isRemoteEnabled', true);
+            $dompdf->loadHtml($retry_html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            $pdf_output = $dompdf->output();
+            $retry_bytes = file_put_contents($pdfPath, $pdf_output);
+            if ($retry_bytes === false || $retry_bytes === 0 || !is_file($pdfPath)) {
+                error_log("PDF retry failed for {$pdfPath}");
+            } else {
+                error_log("PDF retry succeeded for {$pdfPath} (" . $retry_bytes . " bytes)");
+            }
+        } else {
+            error_log("PDF retry failed: HTML read failed for {$htmlPath}");
+        }
+    } else {
+        error_log("PDF retry skipped: DomPDF missing or HTML missing for {$htmlPath}");
+    }
 }
 
 // Send email
@@ -615,7 +621,16 @@ if ($can_email_invoice && filter_var($client_email, FILTER_VALIDATE_EMAIL)) {
     try {
         $company_name  = get_setting('company_name');
         $subject = "Your Invoice {$invoiceNumber} from {$company_name}";
-        $pdf_path = __DIR__ . "/{$pdfPath}";
+        $pdf_path = (is_file($pdfPath) && filesize($pdfPath) > 0) ? $pdfPath : '';
+        $attachment_data = null;
+        if ($pdf_path === '') {
+            if (!empty($pdf_output)) {
+                $attachment_data = $pdf_output;
+                error_log("PDF missing on disk; using in-memory PDF for attachment: {$invoiceNumber}");
+            } else {
+                error_log("PDF not found for email attachment: {$pdfPath}");
+            }
+        }
 
         $replacements = [
             '{{client_name}}'    => $client_name,
@@ -636,7 +651,17 @@ if ($can_email_invoice && filter_var($client_email, FILTER_VALIDATE_EMAIL)) {
             <p>Please find the attached invoice in PDF format.</p>
         ";
 
-        sendInvoiceEmail($client_email, $client_name, $subject, $body, $pdf_path, basename($pdf_path), $ccList, $bccList);
+        sendInvoiceEmail(
+            $client_email,
+            $client_name,
+            $subject,
+            $body,
+            $pdf_path,
+            $pdf_path !== '' ? basename($pdf_path) : "{$invoiceNumber}.pdf",
+            $ccList,
+            $bccList,
+            $attachment_data
+        );
     } catch (Exception $e) {
         error_log("❌ Email sending failed: " . $e->getMessage());
     }

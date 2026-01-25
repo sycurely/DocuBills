@@ -1059,11 +1059,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </td>
                   <td class="actions-cell">
                   <?php $ts = time(); ?>
-                    <?php $pdfBase = "invoices/" . rawurlencode($row['invoice_number']) . ".pdf"; ?>
+                    <?php $invoiceNum = rawurlencode($row['invoice_number']); ?>
+                    <?php $viewPdfUrl = "view_pdf.php?invoice=" . $invoiceNum . "&t=" . $ts; ?>
+                    <?php $downloadPdfUrl = "view_pdf.php?invoice=" . $invoiceNum . "&t=" . $ts . "&download=1"; ?>
                     
                     <?php if (has_permission('view_invoices')): ?>
-                      <a href="<?= $pdfBase ?>?t=<?= $ts ?>"
-                         data-pdf-base="<?= $pdfBase ?>"
+                      <a href="<?= $viewPdfUrl ?>"
                          target="_blank"
                          class="action-btn view"
                          title="View Invoice">
@@ -1072,9 +1073,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                     
                     <?php if (has_permission('download_invoice_pdf')): ?>
-                      <a href="<?= $pdfBase ?>?t=<?= $ts ?>"
-                         data-pdf-base="<?= $pdfBase ?>"
-                         download
+                      <a href="<?= $downloadPdfUrl ?>"
                          class="action-btn download"
                          title="Download PDF">
                         <i class="fas fa-download"></i>

@@ -2,10 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-  // ✅ Regenerate session ID to prevent session fixation and ensure fresh session
-  session_regenerate_id(true);
-  
-  // ✅ Show landing page without changing URL to /home.php
+  // ✅ Show landing page without changing URL to /homelandingpage6.php
   define('DOCUBILLS_LANDING', true);
   require __DIR__ . '/homelandingpage6.php';
   exit;

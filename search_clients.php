@@ -28,11 +28,7 @@ if ($q === '') {
 }
 
 // Safety limit
-if (function_exists('mb_strlen')) {
-    if (mb_strlen($q) > 80) $q = mb_substr($q, 0, 80);
-} else {
-    if (strlen($q) > 80) $q = substr($q, 0, 80);
-}
+if (mb_strlen($q) > 80) $q = mb_substr($q, 0, 80);
 
 // Escape LIKE wildcards safely
 function escape_like($str) {
