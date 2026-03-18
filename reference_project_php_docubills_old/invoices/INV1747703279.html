@@ -1,0 +1,81 @@
+<html><head>
+  <title>Invoice Preview</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="invoice-box">
+    <form method="post" action="save_invoice.php">
+      <div class="header">
+        <img src="assets/logo.png" alt="Logo" style="max-height: 80px;">
+        <div class="company-info">
+          <strong>WomenFirst, Inc.</strong><br>
+          123 Main St, London<br>
+          info@womenfirst.com | 01234 567890
+        </div>
+        <div class="bill-to">
+          <strong>Bill To:</strong><br>
+          Sycurely, Ltd<br>
+          184, Nargis Block, Allama Iqbal Town<br>
+          marto9ine@gmail.com        </div>
+      </div>
+
+      <table id="invoiceTable">
+        <tbody><tr>
+          <th>Booking ID</th>
+          <th>Customer</th>
+          <th>Car Type</th>
+          <th>Amount Paid</th>
+          <th>Status</th>
+        </tr>
+                <tr>
+          <td contenteditable="true">+17805322672"</td>
+          <td contenteditable="true">Economy</td>
+          <td contenteditable="true">9913 93 Ave, Grande Prairie, AB T8V 0J6, Canada</td>
+          <td contenteditable="true" class="amount">0.00</td>
+          <td contenteditable="true"></td>
+        </tr>
+                <tr>
+          <td contenteditable="true">+17805381332"</td>
+          <td contenteditable="true">Economy</td>
+          <td contenteditable="true">Grande Prairie Regional Hospital (GPRH), 110 Street, Grande Prairie, AB, Canada</td>
+          <td contenteditable="true" class="amount">0.00</td>
+          <td contenteditable="true"></td>
+        </tr>
+                <tr>
+          <td contenteditable="true">+17805381332"</td>
+          <td contenteditable="true">SUV</td>
+          <td contenteditable="true">10118 101 Ave, Grande Prairie, AB T8V 0Y4, Canada</td>
+          <td contenteditable="true" class="amount">0.00</td>
+          <td contenteditable="true"></td>
+        </tr>
+              </tbody></table>
+
+      <h3>Total: <span id="totalAmount">£0.00</span></h3>
+
+      <!-- Hidden field to store full invoice HTML for saving -->
+      <textarea name="invoice_html" hidden="" id="invoiceHTML"></textarea>
+      <button type="submit">Save Invoice</button>
+    </form>
+  </div>
+
+  <script>
+    // Update invoice HTML before saving
+    document.querySelector("form").addEventListener("submit", function () {
+      document.getElementById("invoiceHTML").value = document.documentElement.outerHTML;
+    });
+
+    // Recalculate total on edit
+    document.querySelectorAll(".amount").forEach(cell => {
+      cell.addEventListener("blur", () => {
+        let total = 0;
+        document.querySelectorAll(".amount").forEach(amountCell => {
+          const val = parseFloat(amountCell.textContent);
+          if (!isNaN(val)) total += val;
+        });
+        document.getElementById("totalAmount").textContent = "£" + total.toFixed(2);
+      });
+    });
+  </script>
+
+
+</body></html>

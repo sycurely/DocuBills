@@ -1,0 +1,7 @@
+[30-Dec-2025 21:50:31 UTC] PHP Parse error:  syntax error, unexpected token "<", expecting "elseif" or "else" or "endif" in /home/docubill/public_html/template_invoice.php on line 553
+[31-Dec-2025 20:04:08 UTC] PHP Warning:  Undefined variable $allowedTitleTextColors in /home/docubill/public_html/update_status.php on line 421
+[31-Dec-2025 20:04:08 UTC] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, null given in /home/docubill/public_html/update_status.php:421
+Stack trace:
+#0 /home/docubill/public_html/update_status.php(421): in_array('#FFFFFF', NULL, true)
+#1 {main}
+  thrown in /home/docubill/public_html/update_status.php on line 421

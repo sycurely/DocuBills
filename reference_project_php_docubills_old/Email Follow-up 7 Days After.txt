@@ -1,0 +1,703 @@
+{
+  "body": {
+    "id": "yiaJBx_TBa",
+    "rows": [
+      {
+        "id": "QSO_pPI_x5",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_1", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": ""
+        },
+        "columns": [
+          {
+            "id": "LiGl4dib8D",
+            "values": {
+              "_meta": { "htmlID": "u_column_1", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "pVrQyN5w4c",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 170%;\"><span style=\"font-size: 14px; line-height: 23.8px;\">View Email in Browser</span></p>",
+                  "_meta": { "htmlID": "u_content_text_1", "htmlClassNames": "u_content_text" },
+                  "color": "#afb0c7",
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "170%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "10px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Y2BqIm4TZD",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_2", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": "#ffffff"
+        },
+        "columns": [
+          {
+            "id": "HXiei0a2U2",
+            "values": {
+              "_meta": { "htmlID": "u_column_2", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "Fj5FZmIpaK",
+                "type": "image",
+                "values": {
+                  "src": {
+                    "url": "https://cdn.templates.unlayer.com/assets/1597218426091-xx.png",
+                    "width": 537,
+                    "height": 137,
+                    "dynamic": true,
+                    "maxWidth": "32%",
+                    "autoWidth": false
+                  },
+                  "_meta": { "htmlID": "u_content_image_1", "htmlClassNames": "u_content_image" },
+                  "action": { "name": "web", "values": { "href": "", "target": "_blank" } },
+                  "anchor": "",
+                  "locked": false,
+                  "altText": "Image",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "20px",
+                  "displayCondition": null
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DTnzFcAvVU",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_3", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": "#003399"
+        },
+        "columns": [
+          {
+            "id": "oiTKRxF4VL",
+            "values": {
+              "_meta": { "htmlID": "u_column_3", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "YE1VK3eu9P",
+                "type": "image",
+                "values": {
+                  "src": {
+                    "url": "https://cdn.templates.unlayer.com/assets/1597218650916-xxxxc.png",
+                    "width": 335,
+                    "height": 93,
+                    "dynamic": true,
+                    "maxWidth": "26%",
+                    "autoWidth": false
+                  },
+                  "_meta": { "htmlID": "u_content_image_2", "htmlClassNames": "u_content_image" },
+                  "action": { "name": "web", "values": { "href": "", "target": "_blank" } },
+                  "anchor": "",
+                  "locked": false,
+                  "altText": "Image",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "40px 10px 10px",
+                  "displayCondition": null
+                }
+              },
+              {
+                "id": "02zLnAtlu3",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 140%;\"><strong>S E C O N D&nbsp;&nbsp;R E M I N D E R</strong></p>",
+                  "_meta": { "htmlID": "u_content_text_3", "htmlClassNames": "u_content_text" },
+                  "color": "#e5eaf5",
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "140%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "10px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              },
+              {
+                "id": "t7AkPMlpVz",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 140%;\"><span style=\"font-size: 28px; line-height: 39.2px;\"><strong><span style=\"line-height: 39.2px; font-size: 28px;\">Invoice overdue by 7 days</span></strong></span></p>",
+                  "_meta": { "htmlID": "u_content_text_4", "htmlClassNames": "u_content_text" },
+                  "color": "#e5eaf5",
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "140%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "0px 10px 31px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "qwVcDqxuQa",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_4", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": "#ffffff"
+        },
+        "columns": [
+          {
+            "id": "Q6n8f-IYGV",
+            "values": {
+              "_meta": { "htmlID": "u_column_4", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "DOVJiY4poL",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 22px; line-height: 35.2px;\">Hi {{client_name}},</span></p>\n<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 18px; line-height: 28.8px;\">Following up on invoice <strong>{{invoice_number}}</strong> (due <strong>{{due_date}}</strong>). It is now <strong>7 days overdue</strong>, with <strong>{{amount_due}}</strong> outstanding.</span></p>\n<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 18px; line-height: 28.8px;\">If you can share an expected payment date, that also helps us update our records.</span></p>",
+                  "_meta": { "htmlID": "u_content_text_6", "htmlClassNames": "u_content_text" },
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "160%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "33px 55px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              },
+              {
+                "id": "H3GrWY1Xl5",
+                "type": "button",
+                "values": {
+                  "href": { "name": "web", "values": { "href": "{{invoice_url}}", "target": "_blank" } },
+                  "size": { "width": "100%", "autoWidth": true },
+                  "text": "<span style=\"font-size: 16px; line-height: 19.2px;\"><strong><span style=\"line-height: 19.2px; font-size: 16px;\">VIEW INVOICE / PAY NOW</span></strong></span>",
+                  "_meta": { "htmlID": "u_content_button_1", "htmlClassNames": "u_content_button" },
+                  "anchor": "",
+                  "border": {},
+                  "locked": false,
+                  "padding": "14px 44px 13px",
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "120%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "borderRadius": "4px",
+                  "buttonColors": {
+                    "color": "#FFFFFF",
+                    "hoverColor": "#FFFFFF",
+                    "backgroundColor": "#ff6600",
+                    "hoverBackgroundColor": "#3AAEE0"
+                  },
+                  "duplicatable": true,
+                  "calculatedWidth": 234,
+                  "calculatedHeight": 46,
+                  "containerPadding": "10px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              },
+              {
+                "id": "nTm74M_ZC6",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"line-height: 160%; font-size: 14px;\"><span style=\"font-size: 18px; line-height: 28.8px;\">Thanks,</span></p>\n<p style=\"line-height: 160%; font-size: 14px;\"><span style=\"font-size: 18px; line-height: 28.8px;\">{{company_name}} Accounts Team</span></p>",
+                  "_meta": { "htmlID": "u_content_text_7", "htmlClassNames": "u_content_text" },
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "160%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "33px 55px 60px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dBeI5prUR-",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_5", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": "#e5eaf5"
+        },
+        "columns": [
+          {
+            "id": "mdQTbIuSQm",
+            "values": {
+              "_meta": { "htmlID": "u_column_5", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "dnfnyfKj5c",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 20px; line-height: 32px;\"><strong>Get in touch</strong></span></p>\n<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 16px; line-height: 25.6px; color: #000000;\">+11 111 333 4444</span></p>\n<p style=\"font-size: 14px; line-height: 160%;\"><span style=\"font-size: 16px; line-height: 25.6px; color: #000000;\">Info@YourCompany.com</span></p>",
+                  "_meta": { "htmlID": "u_content_text_5", "htmlClassNames": "u_content_text" },
+                  "color": "#003399",
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "160%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "41px 55px 18px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              },
+              {
+                "id": "Em59_xlRXg",
+                "type": "social",
+                "values": {
+                  "_meta": { "htmlID": "u_content_social_1", "htmlClassNames": "u_content_social" },
+                  "align": "center",
+                  "icons": {
+                    "icons": [
+                      { "url": "https://facebook.com/", "name": "Facebook" },
+                      { "url": "https://linkedin.com/", "name": "LinkedIn" },
+                      { "url": "https://instagram.com/", "name": "Instagram" },
+                      { "url": "https://youtube.com/", "name": "YouTube" },
+                      { "url": "https://email.com/", "name": "Email" }
+                    ],
+                    "editor": {
+                      "data": {
+                        "customIcons": [],
+                        "customOptions": [],
+                        "showDefaultIcons": true,
+                        "showDefaultOptions": true
+                      }
+                    },
+                    "iconType": "circle-black"
+                  },
+                  "anchor": "",
+                  "locked": false,
+                  "spacing": 17,
+                  "hideable": true,
+                  "iconSize": 32,
+                  "deletable": true,
+                  "draggable": true,
+                  "hideMobile": false,
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "10px 10px 33px",
+                  "displayCondition": null
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "3F83bQ_uaj",
+        "cells": [1],
+        "values": {
+          "_meta": { "htmlID": "u_row_6", "htmlClassNames": "u_row" },
+          "anchor": "",
+          "locked": false,
+          "columns": false,
+          "padding": "0px",
+          "hideable": true,
+          "deletable": true,
+          "draggable": true,
+          "hideMobile": false,
+          "selectable": true,
+          "_styleGuide": null,
+          "hideDesktop": false,
+          "duplicatable": true,
+          "noStackMobile": false,
+          "backgroundColor": "",
+          "backgroundImage": {
+            "url": "",
+            "size": "custom",
+            "repeat": "no-repeat",
+            "position": "top-center",
+            "fullWidth": true,
+            "customPosition": ["50%", "0%"]
+          },
+          "displayCondition": null,
+          "columnsBackgroundColor": "#003399"
+        },
+        "columns": [
+          {
+            "id": "R1haTTz0wt",
+            "values": {
+              "_meta": { "htmlID": "u_column_6", "htmlClassNames": "u_column" },
+              "border": {},
+              "padding": "0px",
+              "deletable": true,
+              "backgroundColor": ""
+            },
+            "contents": [
+              {
+                "id": "BM7f8qhC_n",
+                "type": "text",
+                "values": {
+                  "text": "<p style=\"font-size: 14px; line-height: 180%;\"><span style=\"font-size: 16px; line-height: 28.8px;\">Copyrights &copy; Company All Rights Reserved</span></p>",
+                  "_meta": { "htmlID": "u_content_text_8", "htmlClassNames": "u_content_text" },
+                  "color": "#fafafa",
+                  "anchor": "",
+                  "locked": false,
+                  "fontSize": "14px",
+                  "hideable": true,
+                  "deletable": true,
+                  "draggable": true,
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#0000ee",
+                    "linkUnderline": true,
+                    "linkHoverColor": "#0000ee",
+                    "linkHoverUnderline": true
+                  },
+                  "textAlign": "center",
+                  "hideMobile": false,
+                  "lineHeight": "180%",
+                  "selectable": true,
+                  "_styleGuide": null,
+                  "hideDesktop": false,
+                  "duplicatable": true,
+                  "containerPadding": "10px",
+                  "displayCondition": null
+                },
+                "hasDeprecatedFontControls": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "values": {
+      "_meta": { "htmlID": "u_body", "htmlClassNames": "u_body" },
+      "language": {},
+      "linkStyle": {
+        "body": true,
+        "linkColor": "#0000ee",
+        "linkUnderline": true,
+        "linkHoverColor": "#0000ee",
+        "linkHoverUnderline": true
+      },
+      "textColor": "#000000",
+      "fontFamily": {
+        "url": "https://fonts.googleapis.com/css?family=Cabin:400,700",
+        "label": "Cabin",
+        "value": "'Cabin',sans-serif",
+        "defaultFont": true
+      },
+      "popupWidth": "600px",
+      "_styleGuide": null,
+      "popupHeight": "auto",
+      "borderRadius": "10px",
+      "contentAlign": "center",
+      "contentWidth": "600px",
+      "popupPosition": "center",
+      "preheaderText": "Invoice {{invoice_number}} is 7 days overdue — {{amount_due}} outstanding.",
+      "backgroundColor": "#f9f9f9",
+      "backgroundImage": {
+        "url": "",
+        "size": "custom",
+        "repeat": "no-repeat",
+        "position": "top-center",
+        "fullWidth": true,
+        "customPosition": ["50%", "0%"]
+      },
+      "contentVerticalAlign": "center",
+      "popupBackgroundColor": "#FFFFFF",
+      "popupBackgroundImage": {
+        "url": "",
+        "size": "cover",
+        "repeat": "no-repeat",
+        "position": "center",
+        "fullWidth": true
+      },
+      "popupCloseButton_action": {
+        "name": "close_popup",
+        "attrs": {
+          "onClick": "document.querySelector('.u-popup-container').style.display = 'none';"
+        }
+      },
+      "popupCloseButton_margin": "0px",
+      "popupCloseButton_position": "top-right",
+      "popupCloseButton_iconColor": "#000000",
+      "popupOverlay_backgroundColor": "rgba(0, 0, 0, 0.1)",
+      "popupCloseButton_borderRadius": "0px",
+      "popupCloseButton_backgroundColor": "#DDDDDD"
+    },
+    "footers": [],
+    "headers": []
+  },
+  "counters": {
+    "u_row": 6,
+    "u_column": 6,
+    "u_content_text": 8,
+    "u_content_image": 2,
+    "u_content_button": 1,
+    "u_content_social": 1
+  },
+  "schemaVersion": 21
+}

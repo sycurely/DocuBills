@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice Docu-KVAO-01</title>
+      <style>
+            @font-face {
+        font-family: "NotoSans";
+        src: url("file:///home/docubill/public_html/fonts/NotoSans-Regular.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+          
+            @font-face {
+        font-family: "NotoArabic";
+        src: url("file:///home/docubill/public_html/fonts/NotoNaskhArabic-Regular.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      
+      /* ✅ Only currency symbols use Unicode-capable fonts */
+      .currency-glyph {
+          font-family:
+            "NotoArabic",             "NotoSans",             "DejaVu Sans",
+            Arial,
+            sans-serif !important;
+      }
+          </style>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      color: #001028;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      margin-bottom: 8px;
+    }
+
+    .logo img {
+      height: 70px;
+    }
+
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .header-table td {
+      vertical-align: top;
+      padding: 2px 6px;
+      font-size: 12px;
+      border: none;
+    }
+
+    .left-header {
+      text-align: left;
+      width: 50%;
+    }
+
+    .right-header {
+      text-align: right;
+      width: 50%;
+    }
+
+    .bill-to-label {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 3px; /* Reduced spacing */
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      color: #5D6975;
+      margin: 20px 0;
+      border-top: 1px solid #5D6975;
+      border-bottom: 1px solid #5D6975;
+      padding: 10px 0;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+      padding: 6px;
+      font-size: 11px;
+      border: 1px solid #ccc;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .invoice-table th {
+      background-color: #f0f0f0;
+    }
+
+    .total-row td {
+      font-weight: bold;
+      border-top: 2px solid #5D6975;
+      background: #f9f9f9;
+      font-size: 13px;
+    }
+
+    .total-row td {
+      font-weight: bold;
+      font-size: 13px;
+      background: #f9f9f9;
+      border-top: 2px solid #5D6975;
+    }
+    
+    .total-row td:nth-child(6) {
+      text-align: left;
+      border-left: none;
+      border-right: none;
+    }
+
+    .total-row td:last-child {
+      text-align: right;
+    }
+    
+    .total-row {
+      margin-top: 15px;
+    }
+
+    .pay-button {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .notice-box {
+      margin-top: 30px;
+      padding: 10px 15px;
+      border-left: 4px solid #5D6975;
+      background: #f5f5f5;
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #5D6975;
+      border-top: 1px solid #C1CED9;
+      padding-top: 10px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+            <div style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 100px; color: rgba(0, 128, 0, 0.15); font-weight: bold; z-index: 999;">PAID</div>
+      
+  <div class="container">
+    <!-- HEADER (logo + company vs Bill-To) -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
+      <!-- 1st row – logo  |  Bill-To label -->
+      <tr>
+        <td style="width:50%; text-align:left; vertical-align:top;">
+                      <img src="https://www.docubills.com/assets/uploads/ocubills-high-resolution-logo_1764808661.png" alt="Logo" style="height:70px;">
+                  </td>
+        <td style="width:50%; text-align:right; vertical-align:top;">
+          <div style="font-weight:bold; font-size:13px;">Bill To:</div>
+        </td>
+      </tr>
+    
+      <!-- 2nd row – company lines  |  client lines -->
+      <tr>
+        <!-- company -->
+        <td style="text-align:left; vertical-align:top; font-size:12px; line-height:1.4; padding-top:6px;">
+          <strong>DocuBills</strong><br>
+          Pakistan<br>
+          +92-323-8970703<br>
+          docubills@gmail.com<br>
+          GST/HST: 9876543210        </td>
+    
+        <!-- client -->
+        <td style="text-align:right; vertical-align:top; font-size:12px; line-height:1.4; padding-top:6px;">
+                                    Kihn, Veum and Osinski<br>
+                                                dusty.klocko@breitenberg.com<br>
+                                                Bentley  Josie<br>
+                                                +44-38-4943-0269<br>
+                                                226 York Road Housing Estate Flat 31 Nottingham, England.<br>
+                                                                          </td>
+      </tr>
+    </table>
+
+    <!-- INVOICE TITLE -->
+    <h1>INVOICE Docu-KVAO-01</h1>
+    
+    <!-- DATE ROW (Left and Right Aligned) -->
+    <table style="width:100%; margin-bottom: 20px; border-collapse: collapse;">
+      <tr>
+          <td style="text-align: left; font-size: 12px;">
+              <strong>Invoice Date:</strong> 2025-12-22 08:21 PM          </td>
+          <td style="text-align: right; font-size: 12px;">
+            <strong>Due Date:</strong>
+                          2026-01-05                                    </td>
+        </tr>
+    </table>
+    
+  <!-- Invoice Items Table -->
+
+
+
+  <table class="invoice-table"><thead><tr><th>PO #</th><th>SKU</th><th>Product Description</th><th>Quantity (pieces)</th><th>Unit Value (USD</th><th>Total Value (USD)</th></tr></thead><tbody><tr><td>PO-2025-001</td><td>LAPTOP-15PRO-INTEL-I7-32-1TB</td><td>15 &quot; Enterprise Laptop Pro – Intel i7, 32GB RAM, 1TB NVMe, Win 11 Ent</td><td>150</td><td>1,899.95</td><td>284992.5</td></tr><tr><td>PO-2025-001</td><td>BAG-BACKPACK-EXEC-BLACK</td><td>Executive Laptop Backpack – Water-Resistant, TSA-Ready</td><td>150</td><td>89.90</td><td>13485</td></tr><tr><td>PO-2025-002</td><td>MONITOR-27-UHD-HDR</td><td>27&quot; 4K UHD Monitor – HDR10, USB‑C Power Delivery</td><td>220</td><td>379.75</td><td>83545</td></tr><tr><td>PO-2025-002</td><td>ARM-DUAL-MONITOR-GAS</td><td>Dual Gas-Spring Monitor Arm – Desk Mount</td><td>220</td><td>129.40</td><td>28468</td></tr></tbody></table><div style="margin-top:20px;text-align:right;font-size:16px;font-weight:bold;">
+               Total Amount: د.إ2499.00
+             </div>
+<div style="margin-top: 8px; text-align: right; font-size: 12px;"><strong>Payment Method:</strong> Direct Debit</div>
+        
+          <div class="notice-box">
+        <strong>Banking Details</strong><br>
+                  Account Name: Najeeb Malik<br>
+                          Bank: Standard Chartered Bank (Pakistan) Ltd.<br>
+                          Account Number: 01295641101<br>
+                          IBAN: PK15SCBL0000001295641101<br>
+                          SWIFT / BIC: SCBLPKKXLHR<br>
+                              </div>
+    
+          <div class="notice-box">
+        <strong>NOTICE:</strong> A 1.5% monthly fee charge applies to unpaid balances.      </div>
+    
+    <footer>
+      Invoice was generated electronically and is valid without signature or seal.
+    </footer>
+  </div>
+</body>
+</html>

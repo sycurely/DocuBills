@@ -1,0 +1,21 @@
+Array
+(
+    [permissions] => Array
+        (
+            [1] => Array
+                (
+                    [1] => on
+                    [2] => on
+                    [3] => on
+                    [5] => on
+                )
+
+            [2] => Array
+                (
+                    [1] => on
+                    [2] => on
+                )
+
+        )
+
+)

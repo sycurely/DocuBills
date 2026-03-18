@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice INV1747868111</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; color: #333; }
+    .header { display: flex; justify-content: space-between; }
+    .company, .billto { width: 45%; }
+    .billto { text-align: right; }
+    .logo { max-height: 60px; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; vertical-align: top; }
+    th { background: #f9f9f9; }
+    .total { text-align: right; font-weight: bold; margin-top: 10px; font-size: 14px; }
+    .pay-button {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGO -->
+  <div class="header">
+    <div class="company">
+      <img src="https://womenfirst.ca/accounting/invoice-generator/assets/logo.png" class="logo" alt="Logo">
+      <div><strong>WomenFirst, Inc.</strong></div>
+      <div>123 Main St, London</div>
+      <div>info@womenfirst.com</div>
+      <div>01234 567890</div>
+      <div>GST/HST: 1234567890</div>
+    </div>
+    <div class="billto">
+      <strong>Bill To:</strong><br>
+      Sycurely, Ltd<br>
+    </div>
+  </div>
+
+  <!-- INVOICE INFO -->
+  <h2 style="margin-top: 30px;">Invoice INV1747868111</h2>
+  <div>Date: 2025-05-21 23:55:11</div>
+  <div>Status: Unpaid</div>
+
+  <!-- INVOICE ITEMS TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Booking ID</th>
+        <th>Car Type</th>
+        <th>Pick-up</th>
+        <th>Drop-off</th>
+        <th>Booking Time</th>
+        <th>Amount Paid</th>
+        <th>Payment Method</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+            <tr>
+        <td>2183</td>
+        <td>Economy</td>
+        <td>9913 93 Ave, Grande Prairie</td>
+        <td>10026 103 Ave, Grande Prairie</td>
+        <td>Monday, Apr 28, 2025 15:37:22</td>
+        <td>£10.20</td>
+        <td>WALLET</td>
+        <td>Completed</td>
+      </tr>
+            <tr>
+        <td>1344</td>
+        <td>Economy</td>
+        <td>Grande Prairie Regional Hospital (GPRH), 110 Street, Grande Prairie</td>
+        <td>9913 93 Ave, Grande Prairie</td>
+        <td>Sunday, Apr 13, 2025 20:17:06</td>
+        <td>£0.00</td>
+        <td>WALLET</td>
+        <td>Driver Cancelled
+Reason: Rider was not available</td>
+      </tr>
+            <tr>
+        <td>1042</td>
+        <td>SUV</td>
+        <td>10118 101 Ave, Grande Prairie</td>
+        <td>9913 93 Avenue, Grande Prairie</td>
+        <td>Tuesday, Apr 8, 2025 14:22:59</td>
+        <td>£9.34</td>
+        <td>WALLET</td>
+        <td>Completed</td>
+      </tr>
+          </tbody>
+  </table>
+
+  <!-- TOTAL -->
+  <div class="total">Total: £19.54</div>
+
+  <!-- PAYMENT BUTTON -->
+      <div style="margin-top: 20px;">
+      <a href="https://womenfirst.ca/accounting/invoice-generator/fake-checkout.php?invoice=INV1747868111" class="pay-button" target="_blank">💳 Pay Now</a>
+    </div>
+  
+</body>
+</html>

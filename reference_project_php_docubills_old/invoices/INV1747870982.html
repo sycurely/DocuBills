@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice INV1747870982</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      color: #001028;
+      background: #FFFFFF;
+      width: 21cm;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    #logo img {
+      height: 50px;
+    }
+
+    #company, #client {
+      width: 48%;
+    }
+
+    #company {
+      text-align: left;
+    }
+
+    #client {
+      text-align: right;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      color: #5D6975;
+      margin: 20px 0;
+      border-top: 1px solid #5D6975;
+      border-bottom: 1px solid #5D6975;
+      padding: 10px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
+
+    table th,
+    table td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      font-size: 11px;
+      vertical-align: top;
+    }
+
+    table th {
+      background-color: #f0f0f0;
+      text-align: left;
+    }
+
+    .total-row td {
+      font-weight: bold;
+      border-top: 2px solid #5D6975;
+      background: #f9f9f9;
+    }
+
+    .pay-button {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .paid-badge {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 6px 12px;
+      border: 2px solid green;
+      display: inline-block;
+    }
+
+    .notice-box {
+      margin-top: 30px;
+      padding: 10px 15px;
+      border-left: 4px solid #5D6975;
+      background: #f5f5f5;
+      font-size: 12px;
+      color: #333;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #5D6975;
+      border-top: 1px solid #C1CED9;
+      padding-top: 10px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div id="company">
+      <img src="https://womenfirst.ca/accounting/invoice-generator/assets/logo.png" alt="Logo">
+      <div><strong>WomenFirst, Inc.</strong></div>
+      <div>123 Main St, London</div>
+      <div>01234 567890</div>
+      <div>info@womenfirst.com</div>
+      <div>GST/HST: 1234567890</div>
+    </div>
+
+    <div id="client">
+      <div><strong>Bill To:</strong></div>
+      <div>Sycurely, Ltd</div>
+      <div>Date: May 22, 2025</div>
+    </div>
+  </header>
+
+  <!-- Invoice Title -->
+  <h1>INVOICE INV1747870982</h1>
+
+  <!-- Items Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Booking ID</th>
+        <th>Car Type</th>
+        <th>Pick-up</th>
+        <th>Drop-off</th>
+        <th>Booking Time</th>
+        <th>Amount</th>
+        <th>Payment Method</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+              <tr>
+          <td>2183</td>
+          <td>Economy</td>
+          <td>9913 93 Ave, Grande Prairie</td>
+          <td>10026 103 Ave, Grande Prairie</td>
+          <td>Monday, Apr 28, 2025 15:37:22</td>
+          <td>£10.20</td>
+          <td>WALLET</td>
+          <td>Completed</td>
+        </tr>
+              <tr>
+          <td>1344</td>
+          <td>Economy</td>
+          <td>Grande Prairie Regional Hospital (GPRH), 110 Street, Grande Prairie</td>
+          <td>9913 93 Ave, Grande Prairie</td>
+          <td>Sunday, Apr 13, 2025 20:17:06</td>
+          <td>£0.00</td>
+          <td>WALLET</td>
+          <td>Driver Cancelled
+Reason: Rider was not available</td>
+        </tr>
+              <tr>
+          <td>1042</td>
+          <td>SUV</td>
+          <td>10118 101 Ave, Grande Prairie</td>
+          <td>9913 93 Avenue, Grande Prairie</td>
+          <td>Tuesday, Apr 8, 2025 14:22:59</td>
+          <td>£9.34</td>
+          <td>WALLET</td>
+          <td>Completed</td>
+        </tr>
+            <tr class="total-row">
+        <td colspan="5">Total</td>
+        <td colspan="3">£19.54</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Payment Badge or Button -->
+      <a href="https://womenfirst.ca/accounting/invoice-generator/fake-checkout.php?invoice=INV1747870982" class="pay-button" target="_blank">Pay Now</a>
+  
+  <!-- Notice -->
+  <div class="notice-box">
+    <strong>NOTICE:</strong> A finance charge of 1.5% will be applied to unpaid balances after 30 days.
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Invoice was generated electronically and is valid without signature or seal.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DocuBills — Invoice automation with admin-grade control</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#05060C;
+      --panel: rgba(255,255,255,.05);
+      --panel2: rgba(255,255,255,.07);
+      --line: rgba(255,255,255,.10);
+      --text:#F2F5FF;
+      --muted: rgba(242,245,255,.70);
+      --muted2: rgba(242,245,255,.52);
+      --a:#00D1FF;
+      --b:#7C5CFF;
+      --c:#2BE4A7;
+      --radius:18px;
+      --radius2:26px;
+      --max:1160px;
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 18% 16%, rgba(0,209,255,.18), transparent 60%),
+        radial-gradient(1000px 600px at 78% 12%, rgba(124,92,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 52% 80%, rgba(43,228,167,.12), transparent 60%),
+        linear-gradient(180deg, #05060C, #070A14);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 18px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:12px 16px; border-radius:14px;
+      border:1px solid transparent; font-weight:900;
+      cursor:pointer; transition:.18s ease; white-space:nowrap;
+      user-select:none;
+    }
+    .btn.primary{
+      color:#07101A;
+      background: linear-gradient(135deg, var(--a), var(--b));
+      box-shadow: 0 14px 36px rgba(0,209,255,.14);
+    }
+    .btn.primary:hover{transform:translateY(-1px); filter:brightness(1.03)}
+    .btn.ghost{
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.14);
+    }
+    .btn.ghost:hover{background: rgba(255,255,255,.085)}
+    .nav{
+      position:sticky; top:0; z-index:50;
+      background: rgba(5,6,12,.78);
+      backdrop-filter: blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .navin{display:flex; align-items:center; justify-content:space-between; padding:12px 0; gap:12px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:950}
+    .mark{
+      width:34px;height:34px;border-radius: 14px;
+      background: linear-gradient(135deg, var(--a), var(--b));
+      display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 26px rgba(124,92,255,.18);
+      color:#07101A; font-weight:950;
+    }
+    .links{display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:850; flex-wrap:wrap;}
+    .links a{padding:8px 10px;border-radius:12px}
+    .links a:hover{background: rgba(255,255,255,.06); color:var(--text)}
+    .cta{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .hide-sm{display:none}
+
+    .hero{padding:58px 0 22px}
+    .grid{display:grid; grid-template-columns: 1.02fr .98fr; gap:18px; align-items:stretch;}
+    h1{margin:14px 0 10px; font-size: clamp(34px, 4.3vw, 56px); line-height:1.05; letter-spacing:-.9px;}
+    .sub{margin:0 0 18px; color:var(--muted); line-height:1.7; font-weight:650; max-width: 62ch;}
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px; border-radius:999px;
+      background: rgba(0,209,255,.10);
+      border:1px solid rgba(0,209,255,.20);
+      color: rgba(0,209,255,.92);
+      font-weight:950;
+    }
+    .actions{display:flex; gap:12px; flex-wrap:wrap}
+    .proof{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; color:var(--muted2); font-weight:750;}
+    .proof span{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+    }
+
+    .panel{
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelTop{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      background: rgba(255,255,255,.03);
+    }
+    .panelTop b{font-weight:950}
+    .panelBody{padding:14px 16px}
+    .miniGrid{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    .stat{border-radius: 18px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); padding:12px;}
+    .stat .k{color:var(--muted2); font-weight:900; font-size:12px}
+    .stat .v{font-weight:950; font-size:18px; letter-spacing:-.3px; margin-top:6px}
+
+    section{padding:56px 0}
+    .title{font-size:28px; margin:0 0 10px; font-weight:950; letter-spacing:-.7px}
+    .desc{margin:0 0 18px; color:var(--muted); line-height:1.7; font-weight:650; max-width: 78ch}
+    .grid3{display:grid; grid-template-columns: repeat(3, 1fr); gap:14px}
+    .card{
+      padding:16px; border-radius: 26px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      transition:.15s ease;
+      min-height: 150px;
+    }
+    .card:hover{transform: translateY(-2px); background: rgba(255,255,255,.07)}
+    .ic{
+      width:44px;height:44px;border-radius: 16px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(0,209,255,.16), rgba(124,92,255,.14));
+      border:1px solid rgba(0,209,255,.22);
+      margin-bottom:10px;
+      font-weight:950;
+    }
+    .card h4{margin:0 0 6px; font-weight:950; font-size:15px}
+    .card p{margin:0; color:var(--muted); line-height:1.6; font-weight:650; font-size:13px}
+
+    .demo{
+      border-radius: 26px;
+      border:1px dashed rgba(255,255,255,.22);
+      background: rgba(255,255,255,.04);
+      padding:18px;
+    }
+    .mount{
+      margin-top:12px; min-height: 240px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(7,10,18,.35);
+      display:grid; place-items:center;
+      padding:18px;
+      color: var(--muted);
+      font-weight:800;
+      text-align:center;
+    }
+
+    footer{padding:34px 0 44px; border-top:1px solid rgba(255,255,255,.08); color:var(--muted);}
+    .foot{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap}
+
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .grid3{grid-template-columns:1fr}
+      .miniGrid{grid-template-columns:1fr}
+      .hide-sm{display:none}
+    }
+    @media(min-width:980px){ .hide-sm{display:flex} }
+  </style>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="wrap">
+      <div class="navin">
+        <a class="brand" href="#top">
+          <div class="mark">D</div>
+          <span>DocuBills</span>
+        </a>
+
+        <div class="links hide-sm">
+          <a href="#features">Features</a>
+          <a href="#admins">For Admins</a>
+          <a href="#interactive-demo">Interactive Demo</a>
+        </div>
+
+        <div class="cta">
+          <a class="btn ghost" href="login.php">Login</a>
+          <a class="btn primary" href="register.php">Start Free →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="top" class="hero">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <span class="pill">⚙️ Fast invoicing + enterprise-grade control</span>
+          <h1>Spreadsheet → Invoice → Paid. <span style="color:var(--c)">With admin control built in.</span></h1>
+
+          <p class="sub">
+            DocuBills turns Excel/Google Sheets into invoices in 3 steps. Then it goes further:
+            recurring invoices from preview, bank info + currency inline, reminders cadence with editable templates,
+            and invoice management with paid/unpaid notifications — all governed by roles & permissions.
+          </p>
+
+          <div class="actions">
+            <a class="btn primary" href="register.php">Create account →</a>
+            <a class="btn ghost" href="#interactive-demo">View interactive demo</a>
+          </div>
+
+          <div class="proof">
+            <span>✅ No mapping wizard</span>
+            <span>✅ Deselect rows/columns</span>
+            <span>✅ Reminders + templates</span>
+            <span>✅ Permissions matrix</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panelTop">
+            <b>Admin Snapshot</b>
+            <span style="color:rgba(242,245,255,.52); font-weight:850">Landing preview</span>
+          </div>
+          <div class="panelBody">
+            <div class="miniGrid">
+              <div class="stat"><div class="k">Invoices</div><div class="v">128</div></div>
+              <div class="stat"><div class="k">Automated reminders</div><div class="v">ON</div></div>
+              <div class="stat"><div class="k">Roles</div><div class="v">Super Admin · Admin · Viewer</div></div>
+              <div class="stat"><div class="k">Status notifications</div><div class="v">Enabled</div></div>
+            </div>
+            <div style="margin-top:12px; color:rgba(242,245,255,.70); line-height:1.7; font-weight:650">
+              This landing page highlights your strongest conversion points: speed + control.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <h2 class="title">Core conversion features</h2>
+      <p class="desc">
+        Upload your data, choose the total column, deselect any rows/columns, and generate a clean PDF invoice.
+        Then automate reminders and manage everything in one dashboard.
+      </p>
+
+      <div class="grid3">
+        <div class="card"><div class="ic">📥</div><h4>Excel/Sheets import</h4><p>Upload Excel or paste a Google Sheet URL — auto-read rows/headers.</p></div>
+        <div class="card"><div class="ic">🧮</div><h4>Total column selection</h4><p>Choose the column that calculates totals. Done.</p></div>
+        <div class="card"><div class="ic">✅</div><h4>Deselect rows/columns</h4><p>Uncheck what shouldn’t print. Your PDF stays clean.</p></div>
+        <div class="card"><div class="ic">🔁</div><h4>Recurring from preview</h4><p>Enable recurring invoices right on preview.</p></div>
+        <div class="card"><div class="ic">🏦</div><h4>Bank info + currency</h4><p>Edit bank lines and choose currency per invoice.</p></div>
+        <div class="card"><div class="ic">📧</div><h4>Reminder automation</h4><p>Set cadence + write email templates inside the app.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="admins">
+    <div class="wrap">
+      <h2 class="title">Built for admins too</h2>
+      <p class="desc">
+        Roles + permissions matrix let you control exactly who can access settings, edit templates, change invoice status, and export.
+      </p>
+    </div>
+  </section>
+
+  <section id="interactive-demo">
+    <div class="wrap">
+      <h2 class="title">Interactive Demo</h2>
+      <p class="desc">Reserved space — you’ll share the demo code later and we’ll mount it here.</p>
+
+      <div class="demo">
+        <div style="font-weight:950">Mount point:</div>
+        <div class="mount" id="demoMount">
+          Your interactive demo will be mounted here (#demoMount).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot">
+        <div style="display:flex; align-items:center; gap:10px">
+          <div class="mark" style="width:30px;height:30px;border-radius:12px">D</div>
+          <div style="font-weight:950; color:#F2F5FF">DocuBills</div>
+          <div style="color:rgba(242,245,255,.52); font-weight:800">© 2026</div>
+        </div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap">
+          <a href="#features">Features</a>
+          <a href="#admins">For Admins</a>
+          <a href="#interactive-demo">Demo</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
