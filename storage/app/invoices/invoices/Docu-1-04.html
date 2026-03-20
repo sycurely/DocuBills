@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice Docu-1-04</title>
+  <style>
+    body { font-family: DejaVu Sans, Arial, sans-serif; color: #1f2933; font-size: 12px; }
+    .header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+    .title { font-size: 24px; font-weight: 700; color: #0033D9; background: #FFDC00; padding: 8px 12px; border-radius: 6px; }
+    .meta { text-align: right; }
+    .meta div { margin-bottom: 4px; }
+    .section { margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #e6e6e6; padding: 8px 6px; text-align: left; }
+    th { background: #f5f7fb; }
+    .totals { margin-top: 16px; width: 40%; float: right; }
+    .totals td { border: none; padding: 4px 6px; }
+    .totals .label { text-align: left; }
+    .totals .value { text-align: right; }
+    .clear { clear: both; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Invoice</div>
+    <div class="meta">
+      <div><strong>Invoice #:</strong> Docu-1-04</div>
+      <div><strong>Date:</strong> 2026-02-11</div>
+      <div><strong>Due:</strong> 2026-02-25</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <strong>From</strong><br>
+    DocuBills<br>
+    docubills@gmail.com<br>
+    +92-323-8970703<br>
+    Pakistan
+  </div>
+
+  <div class="section">
+    <strong>Bill To</strong><br>
+    1<br>
+    Web Development Services - Homepage Design<br>
+    1<br>
+    1,500.00<br>
+    1,500.00
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 45%;">Description</th>
+        <th style="width: 10%;">Qty</th>
+        <th style="width: 15%;">Rate</th>
+        <th style="width: 15%;">Tax</th>
+        <th style="width: 15%;">Line Total</th>
+      </tr>
+    </thead>
+    <tbody>
+              <tr>
+          <td>Imported invoice</td>
+          <td>1</td>
+          <td>USD 1.00</td>
+          <td>N/A</td>
+          <td>USD 1.00</td>
+        </tr>
+          </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td class="label">Subtotal</td>
+      <td class="value">USD 1.00</td>
+    </tr>
+    <tr>
+      <td class="label">Line Taxes</td>
+      <td class="value">USD 0.00</td>
+    </tr>
+        <tr>
+      <td class="label"><strong>Total</strong></td>
+      <td class="value"><strong>USD 1.00</strong></td>
+    </tr>
+  </table>
+  <div class="clear"></div>
+</body>
+</html>

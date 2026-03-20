@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice Docu-SNA-02</title>
+  <style>
+    @page { margin: 24px; }
+    body {
+      font-family: DejaVu Sans, Arial, sans-serif;
+      color: #00153a;
+      font-size: 12px;
+      background: #e8e8e8;
+      margin: 0;
+    }
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+    .page {
+      background: #e8e8e8;
+      padding: 10px 6px 16px;
+    }
+    .top {
+      width: 100%;
+      margin-bottom: 14px;
+    }
+    .top td {
+      vertical-align: top;
+      border: none;
+      padding: 0;
+    }
+    .left-company {
+      width: 56%;
+    }
+    .right-billto {
+      width: 44%;
+      text-align: right;
+    }
+    .logo-wrap {
+      width: 78px;
+      height: 78px;
+      background: #ffdc00;
+      margin-bottom: 8px;
+      display: inline-block;
+      text-align: center;
+      line-height: 78px;
+      overflow: hidden;
+    }
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      vertical-align: middle;
+    }
+    .logo-fallback {
+      color: #0033d9;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 78px;
+    }
+    .company-name {
+      font-weight: 700;
+      font-size: 28px;
+      margin: 2px 0;
+    }
+    .company-lines, .bill-lines {
+      font-size: 30px;
+      line-height: 1.28;
+    }
+    .bill-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .invoice-band {
+      background: #FFDC00;
+      color: #0033D9;
+      text-align: center;
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      padding: 9px 10px;
+      margin: 8px 0 14px;
+    }
+    .meta-row {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .meta-row td {
+      border: none;
+      padding: 0;
+      font-size: 30px;
+      font-weight: 700;
+    }
+    .meta-right {
+      text-align: right;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      border: 1px solid #b6b6b6;
+      padding: 7px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #d8d8d8;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    td {
+      background: #e8e8e8;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .money-line strong {
+      font-weight: 700;
+    }
+    .totals-head {
+      margin-top: 12px;
+      background: #d8d8d8;
+      font-size: 32px;
+      font-weight: 700;
+      padding: 7px 10px;
+    }
+    .totals {
+      margin-top: 4px;
+      width: 58%;
+      margin-left: auto;
+      border-collapse: collapse;
+    }
+    .totals td {
+      border: none;
+      padding: 3px 6px;
+      background: transparent;
+      font-size: 24px;
+    }
+    .totals .label { text-align: left; }
+    .totals .value { text-align: right; }
+    .tax-summary-end {
+      margin-top: 12px;
+      padding-top: 6px;
+    }
+    .tax-summary-end h4 {
+      margin: 0 0 6px 0;
+      font-size: 30px;
+      background: #d8d8d8;
+      padding: 7px 10px;
+    }
+    .tax-summary-end table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .tax-summary-end td {
+      border: none;
+      background: transparent;
+      padding: 3px 2px;
+      font-size: 22px;
+    }
+    .tax-summary-end td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+    .clear { clear: both; }
+  </style>
+</head>
+<body>
+    <div class="page">
+    <table class="top">
+      <tr>
+        <td class="left-company">
+          <div class="logo-wrap">
+                          <span class="logo-fallback">DocuBills</span>
+                      </div>
+          <div class="company-lines">
+            <div class="company-name">DocuBills</div>
+            Pakistan<br>
+            +92-323-8970703<br>
+            docubills@gmail.com<br>
+            GST/HST: 9876543210
+          </div>
+        </td>
+        <td class="right-billto">
+          <div class="bill-title">Bill To:</div>
+          <div class="bill-lines">
+            SnapRytr<br>
+            Hassan Malik<br>
+            Plot # 614, st # 22, Block Tulip Overseas, Park View City<br>
+            03424464006<br>
+            visitwritersco@gmail.com
+                          <br><br>
+              <strong>Banking Details</strong><br>
+               Account Holder: Najeeb Maliks<br>                Bank: Standard Chartered Bank (Pakistan) Ltd.<br>                Account No: 01295641101<br>                IBAN: PK15SCBL0000001295641101<br>                SWIFT/BIC: SCBLPKKXLHR<br>                                                   </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="invoice-band">INVOICE</div>
+
+    <table class="meta-row">
+      <tr>
+        <td>
+          <div>Invoice Date: <span style="font-weight:400;">2026-02-12</span></div>
+          <div>Invoice #: <span style="font-weight:400;">Docu-SNA-02</span></div>
+        </td>
+        <td class="meta-right">
+          Due Date: <span style="font-weight:400;">2026-02-26</span>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+    <thead>
+      <tr>
+        <th style="width: 45%;">Description</th>
+        <th style="width: 10%;">Qty</th>
+        <th style="width: 15%;">Rate</th>
+        <th style="width: 15%;">Tax</th>
+        <th style="width: 15%;">Line Total</th>
+      </tr>
+    </thead>
+    <tbody>
+              <tr>
+          <td>1</td>
+          <td>1</td>
+          <td>$ 1,500.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $1,500.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>2</td>
+          <td>1</td>
+          <td>$ 750.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $750.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>3</td>
+          <td>12</td>
+          <td>$ 25.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $300.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>4</td>
+          <td>1</td>
+          <td>$ 99.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $99.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>5</td>
+          <td>1</td>
+          <td>$ 450.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $450.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>6</td>
+          <td>5</td>
+          <td>$ 75.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $375.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>7</td>
+          <td>1</td>
+          <td>$ 200.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $200.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>8</td>
+          <td>1</td>
+          <td>$ 350.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $350.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>9</td>
+          <td>1</td>
+          <td>$ 400.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $400.00</div>
+          </td>
+        </tr>
+              <tr>
+          <td>10</td>
+          <td>2</td>
+          <td>$ 100.00</td>
+          <td>N/A</td>
+          <td>
+            <div class="money-line"><strong>Line Item Amount (Net):</strong> $200.00</div>
+          </td>
+        </tr>
+          </tbody>
+    </table>
+
+    <div class="totals-head">Invoice Totals</div>
+    <table class="totals">
+    <tr>
+      <td class="label">Net Total</td>
+      <td class="value">$ 4,624.00</td>
+    </tr>
+    <tr>
+      <td class="label">Total Line-Level Taxes</td>
+      <td class="value">$ 0.00</td>
+    </tr>
+    <tr>
+      <td class="label">Subtotal</td>
+      <td class="value">$ 4,624.00</td>
+    </tr>
+                              <tr>
+      <td class="label">Total Taxes</td>
+      <td class="value">$ 0.00</td>
+    </tr>
+    <tr>
+      <td class="label"><strong>Grand Total</strong></td>
+      <td class="value"><strong>$ 4,624.00</strong></td>
+    </tr>
+    </table>
+    <div class="clear"></div>
+
+    <div class="tax-summary-end">
+      <h4>Tax Summary</h4>
+      <table>
+        <tr>
+          <td>Net Total</td>
+          <td>$ 4,624.00</td>
+        </tr>
+        <tr>
+          <td>Total Line-Level Taxes</td>
+          <td>$ 0.00</td>
+        </tr>
+                                                  <tr>
+          <td>Total Taxes</td>
+          <td>$ 0.00</td>
+        </tr>
+        <tr>
+          <td><strong>Grand Total</strong></td>
+          <td><strong>$ 4,624.00</strong></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

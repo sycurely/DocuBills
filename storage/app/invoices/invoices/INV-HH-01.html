@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice INV-HH-01</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 11mm;
+    }
+    body {
+      font-family: DejaVu Sans, Arial, sans-serif;
+      color: #10233c;
+      font-size: 10px;
+      margin: 0;
+      line-height: 1.25;
+      background: #ffffff;
+    }
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+    .invoice-shell {
+      width: 100%;
+    }
+    .invoice-header {
+      border-bottom: 1px solid #dbe2ea;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+    .header-grid {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .header-grid td {
+      border: none;
+      vertical-align: top;
+      padding: 0;
+    }
+    .company-col {
+      width: 56%;
+      padding-right: 12px;
+    }
+    .billto-col {
+      width: 44%;
+      text-align: right;
+    }
+    .logo-wrap {
+      margin-bottom: 6px;
+      min-height: 24px;
+    }
+    .logo-wrap img {
+      max-width: 120px;
+      max-height: 44px;
+    }
+    .logo-fallback {
+      display: inline-block;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0b4bd8;
+    }
+    .company-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 2px;
+      color: #0d274f;
+    }
+    .muted {
+      color: #4e6078;
+    }
+    .invoice-band {
+      margin-top: 6px;
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      background: #FFDC00;
+      color: #0033D9;
+    }
+    .billto-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #10233c;
+    }
+    .invoice-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+    }
+    .invoice-meta td {
+      border: none;
+      padding: 0;
+      vertical-align: top;
+    }
+    .meta-right {
+      text-align: right;
+    }
+    .meta-label {
+      font-size: 9px;
+      color: #4e6078;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .meta-value {
+      font-size: 10px;
+      font-weight: 600;
+      color: #10233c;
+      margin-bottom: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .line-table {
+      margin-bottom: 8px;
+    }
+    .line-table th,
+    .line-table td {
+      border: 1px solid #dbe2ea;
+      padding: 4px 5px;
+      vertical-align: top;
+    }
+    .line-table th {
+      background: #f3f6fb;
+      color: #153157;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .line-table td {
+      font-size: 10px;
+    }
+    .amount {
+      text-align: right;
+      white-space: nowrap;
+    }
+    .line-meta {
+      margin-top: 2px;
+      font-size: 8px;
+      color: #5a6e89;
+    }
+    .line-meta span {
+      white-space: nowrap;
+    }
+    .totals-wrap {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
+    }
+    .totals-wrap td {
+      border: none;
+      vertical-align: top;
+      padding: 0;
+    }
+    .totals-box {
+      width: 46%;
+      margin-left: auto;
+    }
+    .totals-box table td {
+      border: none;
+      padding: 1px 0;
+      font-size: 10px;
+    }
+    .totals-box .label {
+      color: #3d4f67;
+    }
+    .totals-box .value {
+      text-align: right;
+      font-weight: 600;
+      color: #10233c;
+      white-space: nowrap;
+    }
+    .totals-box .grand .label,
+    .totals-box .grand .value {
+      font-size: 11px;
+      font-weight: 700;
+      color: #10233c;
+      padding-top: 3px;
+      border-top: 1px solid #dbe2ea;
+    }
+    .tax-summary {
+      margin-top: 7px;
+      border-top: 1px solid #dbe2ea;
+      padding-top: 6px;
+    }
+    .pay-now-row {
+      margin-top: 4px;
+      margin-bottom: 7px;
+      text-align: left;
+    }
+    .pay-now-button {
+      display: inline-block;
+      background: #0d6efd;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 4px 9px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .pay-now-button-disabled {
+      background: #8a94a8;
+      pointer-events: none;
+    }
+    .tax-summary h4 {
+      margin: 0 0 3px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2a3f60;
+    }
+    .tax-summary table td {
+      border: none;
+      padding: 1px 0;
+      font-size: 9px;
+    }
+    .tax-summary table td:last-child {
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .invoice-footer {
+      margin-top: 8px;
+      border-top: 1px solid #dbe2ea;
+      padding-top: 6px;
+      font-size: 8px;
+      color: #526784;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="invoice-shell">
+    <div class="invoice-header">
+      <table class="header-grid">
+        <tr>
+          <td class="company-col">
+            <div class="logo-wrap">
+                              <span class="logo-fallback">DocuBills</span>
+                          </div>
+            <div class="company-name">DocuBills</div>
+                                                            <div class="invoice-band">Invoice</div>
+          </td>
+          <td class="billto-col">
+            <div class="billto-title">Bill To</div>
+            <div>Habiba Hassan</div>
+            <div>IT Solutions</div>            <div>58 NY Street 1 US</div>            <div>4566625471</div>            <div>mrshabibahassan@gmail.com</div>                      </td>
+        </tr>
+      </table>
+    </div>
+
+    <table class="invoice-meta">
+      <tr>
+        <td>
+          <div class="meta-label">Invoice Number</div>
+          <div class="meta-value">INV-HH-01</div>
+        </td>
+        <td class="meta-right">
+          <div class="meta-label">Currency</div>
+          <div class="meta-value">AUD A$</div>
+        </td>
+      </tr>
+    </table>
+
+    <table class="line-table">
+      <thead>
+        <tr>
+          <th style="width:8%;">Item #</th>
+          <th style="width:34%;">Description</th>
+          <th style="width:12%;">Qty</th>
+          <th style="width:15%;">Rate</th>
+          <th style="width:15%;">Tax</th>
+          <th style="width:16%;">Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+                            <tr>
+            <td>1</td>
+            <td>
+              High-Performance GPU Servers (Model XZ-900)
+                              <div class="line-meta">
+                                      <span>Country of Origin: USA</span> |                                       <span>No. of Pkgs: 12</span> |                                       <span>Type of Pkging: Pallet</span> |                                       <span>HS Code: 847150</span> |                                       <span>Unit of Measure: Units</span> |                                       <span>Weight: 580.40</span>                                  </div>
+                          </td>
+            <td class="amount">12.00</td>
+            <td class="amount">A$ 12,999.99</td>
+            <td>N/A</td>
+            <td class="amount">A$ 155,999.88</td>
+          </tr>
+                            <tr>
+            <td>2</td>
+            <td>
+              Autometed Robotic Arms- Industrial Grade (RA-4500 Series)
+                              <div class="line-meta">
+                                      <span>Country of Origin: Germany</span> |                                       <span>No. of Pkgs: 45</span> |                                       <span>Type of Pkging: Crate</span> |                                       <span>HS Code: 842890</span> |                                       <span>Unit of Measure: Units</span> |                                       <span>Weight: 2765.00</span>                                  </div>
+                          </td>
+            <td class="amount">45.00</td>
+            <td class="amount">A$ 18,450.50</td>
+            <td>N/A</td>
+            <td class="amount">A$ 830,272.50</td>
+          </tr>
+                            <tr>
+            <td>3</td>
+            <td>
+              5G Newtwork Infrastructure Modules + Edge Computing Nodes
+                              <div class="line-meta">
+                                      <span>Country of Origin: Japan</span> |                                       <span>No. of Pkgs: 200</span> |                                       <span>Type of Pkging: Box</span> |                                       <span>HS Code: 851762</span> |                                       <span>Unit of Measure: Units</span> |                                       <span>Weight: 1500.80</span>                                  </div>
+                          </td>
+            <td class="amount">200.00</td>
+            <td class="amount">A$ 545.75</td>
+            <td>N/A</td>
+            <td class="amount">A$ 109,150.00</td>
+          </tr>
+                            <tr>
+            <td>4</td>
+            <td>
+              Io Smart Sensor- Multi-Protoco; (LoRaWAN/NB-IoT/WiFi)
+                              <div class="line-meta">
+                                      <span>Country of Origin: China</span> |                                       <span>No. of Pkgs: 1500</span> |                                       <span>Type of Pkging: Container</span> |                                       <span>HS Code: 902610</span> |                                       <span>Unit of Measure: Units</span> |                                       <span>Weight: 1100.20</span>                                  </div>
+                          </td>
+            <td class="amount">1,500.00</td>
+            <td class="amount">A$ 19.90</td>
+            <td>N/A</td>
+            <td class="amount">A$ 29,850.00</td>
+          </tr>
+                            <tr>
+            <td>5</td>
+            <td>
+              OLED Flexible Displays - Grade A Enterprise Batch
+                              <div class="line-meta">
+                                      <span>Country of Origin: South Korea</span> |                                       <span>No. of Pkgs: 75</span> |                                       <span>Type of Pkging: Box</span> |                                       <span>HS Code: 901380</span> |                                       <span>Unit of Measure: Units</span> |                                       <span>Weight: 430.00</span>                                  </div>
+                          </td>
+            <td class="amount">75.00</td>
+            <td class="amount">A$ 780.00</td>
+            <td>N/A</td>
+            <td class="amount">A$ 58,500.00</td>
+          </tr>
+                            <tr>
+            <td>6</td>
+            <td>
+              AI-Powered Supply Chain Optimization Software Licenses ( Enterprise Tier)
+                              <div class="line-meta">
+                                      <span>Country of Origin: France</span> |                                       <span>No. of Pkgs: 10</span> |                                       <span>Type of Pkging: Pallet</span> |                                       <span>HS Code: 852380</span> |                                       <span>Unit of Measure: Licenses</span> |                                       <span>Weight: 0.00</span>                                  </div>
+                          </td>
+            <td class="amount">10.00</td>
+            <td class="amount">A$ 25,000.00</td>
+            <td>N/A</td>
+            <td class="amount">A$ 250,000.00</td>
+          </tr>
+              </tbody>
+    </table>
+
+    <table class="totals-wrap">
+      <tr>
+        <td></td>
+        <td class="totals-box">
+          <table>
+            <tr><td class="label">Net Total</td><td class="value">A$ 1,433,772.38</td></tr>
+            <tr><td class="label">Line-Level Taxes</td><td class="value">A$ 0.00</td></tr>
+            <tr><td class="label">Subtotal</td><td class="value">A$ 1,433,772.38</td></tr>
+                                      <tr><td class="label">Adjusted Subtotal</td><td class="value">A$ 1,433,772.38</td></tr>
+                                      <tr><td class="label">B (5.00% on Adjusted Subtotal)</td><td class="value">A$ 71,688.62</td></tr>
+                                    <tr><td class="label">Total Taxes</td><td class="value">A$ 71,688.62</td></tr>
+            <tr class="grand"><td class="label">Grand Total</td><td class="value">A$ 1,505,461.00</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+          <!-- PAY_NOW_BLOCK_START -->
+      <div class="pay-now-row">
+        <a href="#" class="pay-now-button pay-now-button-disabled" target="_blank">Pay Now</a>
+      </div>
+      <!-- PAY_NOW_BLOCK_END -->
+    
+    <div class="tax-summary">
+      <h4>Tax Summary</h4>
+      <table>
+        <tr><td>Net Total</td><td>A$ 1,433,772.38</td></tr>
+        <tr><td>Total Line-Level Taxes</td><td>A$ 0.00</td></tr>
+                          <tr><td>B (5.00% on Adjusted Subtotal)</td><td>A$ 71,688.62</td></tr>
+                        <tr><td>Total Taxes</td><td>A$ 71,688.62</td></tr>
+      </table>
+    </div>
+
+    <div class="invoice-footer">
+              This invoice is generated according to your company settings and tax configuration.
+          </div>
+  </div>
+</body>
+</html>
