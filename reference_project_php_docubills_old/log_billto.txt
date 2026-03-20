@@ -1,8 +1,0 @@
-Array
-(
-    [Company Name] => 138 IGS
-    [Contact Name] => Najeeb Malik
-    [Address] => 184, Nargis Block, Allama Iqbal Town
-    [Phone] => 03238970703
-    [Email] => marto9ine@gmail.com
-)
