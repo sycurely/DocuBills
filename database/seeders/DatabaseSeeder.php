@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RolePermissionSeeder::class,
             SettingSeeder::class,
+            TaxSeeder::class,
             NotificationTypeSeeder::class,
             UserSeeder::class,
             EnsureNoraParkerAdminSeeder::class,
