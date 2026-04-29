@@ -1,5 +1,9 @@
 ﻿@extends('layouts.app')
 
+@php
+  $activeMenu = 'invoices';
+@endphp
+
 @section('title', 'Invoice Management')
 
 @push('styles')
@@ -98,20 +102,28 @@
     }
 
     .badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 84px;
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 700;
+      line-height: 1;
+      border: 1px solid transparent;
     }
 
     .badge-success {
-      background: var(--success);
-      color: white;
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d;
     }
 
     .badge-danger {
-      background: var(--danger);
-      color: white;
+      background: #ffe4ef;
+      border-color: #f43f5e;
+      color: #be123c;
     }
 
     .search-filters {
@@ -131,6 +143,22 @@
     .search-input {
       flex: 1;
       min-width: 200px;
+    }
+    .pagination-summary {
+      margin-top: 1rem;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+    .pagination-controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .pagination-controls .btn[aria-disabled="true"] {
+      pointer-events: none;
+      opacity: 0.6;
     }
     .modal-backdrop {
       position: fixed;
@@ -228,11 +256,14 @@
 @endpush
 
 @section('content')
+  @php
+    $invoiceAccessDenied = $invoiceAccessDenied ?? false;
+  @endphp
 
   <div class="container">
     <div class="page-header">
       <h1 class="page-title">Invoice Management</h1>
-      @if(has_permission('create_invoice'))
+      @if(!$invoiceAccessDenied && has_permission('create_invoice'))
         <a href="{{ route('invoices.create') }}" class="btn btn-primary">
           <i class="fas fa-plus"></i> Create Invoice
         </a>
@@ -250,80 +281,115 @@
       </div>
     @endif
 
-    <form method="GET" action="{{ route('invoices.index') }}" class="search-filters">
-      <input type="text" name="search" class="search-input" placeholder="Search by invoice number or client..." value="{{ request('search') }}">
-      <select name="status" class="filter-select">
-        <option value="">All Statuses</option>
-        <option value="Paid" {{ request('status') === 'Paid' ? 'selected' : '' }}>Paid</option>
-        <option value="Unpaid" {{ request('status') === 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
-      </select>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-search"></i> Search
-      </button>
-    </form>
+    @if($invoiceAccessDenied)
+      <div class="table-container" style="padding: 2rem; text-align: center;">
+        <div style="max-width: 760px; margin: 0 auto;">
+          <h2 style="color: var(--primary); margin-bottom: 1rem;">Invoice Management</h2>
+          <p style="font-size: 1.1rem; color: #b91c1c; font-weight: 600;">
+            You don't have access to this. Please ask your Super Admin or Admin.
+          </p>
+        </div>
+      </div>
+    @else
+      <form method="GET" action="{{ route('invoices.index') }}" class="search-filters">
+        <input type="text" name="search" class="search-input" placeholder="Search by invoice number or client..." value="{{ request('search') }}">
+        <select name="status" class="filter-select">
+          <option value="">All Statuses</option>
+          <option value="Paid" {{ request('status') === 'Paid' ? 'selected' : '' }}>Paid</option>
+          <option value="Unpaid" {{ request('status') === 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+        </select>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </form>
 
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Invoice Number</th>
-            <th>Client</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($invoices as $invoice)
+      <div class="table-container">
+        <table>
+          <thead>
             <tr>
-              <td><strong>{{ $invoice->invoice_number }}</strong></td>
-              <td>{{ $invoice->bill_to_name ?? ($invoice->client->company_name ?? 'N/A') }}</td>
-              <td>{{ $invoice->currency_display ?? $invoice->currency_code }} {{ number_format($invoice->total_amount, 2) }}</td>
-              <td>{{ $invoice->invoice_date->format('Y-m-d') }}</td>
-              <td>{{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : 'N/A' }}</td>
-              <td>
-                <span class="badge {{ $invoice->status === 'Paid' ? 'badge-success' : 'badge-danger' }}">
-                  {{ $invoice->status }}
-                </span>
-              </td>
-              <td>
-                <a href="{{ route('invoices.show', $invoice) }}" class="btn" style="padding: 0.5rem; background: var(--primary); color: white;">
-                  <i class="fas fa-eye"></i>
-                </a>
-                @if(has_permission('download_invoice_pdf'))
-                  <a href="{{ route('invoices.download-pdf', $invoice) }}" class="btn" style="padding: 0.5rem; background: var(--success); color: white;">
-                    <i class="fas fa-download"></i>
+              <th>Invoice Number</th>
+              <th>Client</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($invoices as $invoice)
+              <tr>
+                <td><strong>{{ $invoice->invoice_number }}</strong></td>
+                <td>{{ $invoice->bill_to_name ?? ($invoice->client->company_name ?? 'N/A') }}</td>
+                <td>{{ $invoice->currency_display ?? $invoice->currency_code }} {{ number_format($invoice->total_amount, 2) }}</td>
+                <td>{{ $invoice->invoice_date->format('Y-m-d') }}</td>
+                <td>{{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : 'N/A' }}</td>
+                <td>
+                  <span class="badge {{ $invoice->status === 'Paid' ? 'badge-success' : 'badge-danger' }}">
+                    {{ $invoice->status }}
+                  </span>
+                </td>
+                <td>
+                  <a href="{{ route('invoices.show', $invoice) }}" class="btn" style="padding: 0.5rem; background: var(--primary); color: white;">
+                    <i class="fas fa-eye"></i>
                   </a>
-                @endif
-                @if(has_permission('mark_invoice_paid') && $invoice->status === 'Unpaid')
-                  <button
-                    type="button"
-                    class="btn btn-action-icon js-mark-paid-btn"
-                    data-action="{{ route('invoices.mark-paid', $invoice) }}"
-                    data-invoice="{{ $invoice->invoice_number }}"
-                    aria-label="Mark invoice {{ $invoice->invoice_number }} as paid"
-                  >
-                    <i class="fas fa-check"></i>
-                  </button>
-                @endif
-              </td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="7" style="text-align: center; padding: 2rem;">
-                No invoices found.
-              </td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
+                  @if(has_permission('download_invoice_pdf'))
+                    <a href="{{ route('invoices.download-pdf', $invoice) }}" class="btn" style="padding: 0.5rem; background: var(--success); color: white;">
+                      <i class="fas fa-download"></i>
+                    </a>
+                  @endif
+                  @if(has_permission('mark_invoice_paid') && $invoice->status === 'Unpaid')
+                    <button
+                      type="button"
+                      class="btn btn-action-icon js-mark-paid-btn"
+                      data-action="{{ route('invoices.mark-paid', $invoice) }}"
+                      data-invoice="{{ $invoice->invoice_number }}"
+                      aria-label="Mark invoice {{ $invoice->invoice_number }} as paid"
+                    >
+                      <i class="fas fa-check"></i>
+                    </button>
+                  @endif
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem;">
+                  No invoices found.
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
 
-    <div style="margin-top: 1.5rem;">
-      {{ $invoices->links() }}
-    </div>
+      <div class="pagination-summary">
+        @if($invoices->total() > 0)
+          Showing {{ $invoices->firstItem() }}-{{ $invoices->lastItem() }} of {{ $invoices->total() }} invoices
+        @else
+          No invoices found.
+        @endif
+      </div>
+
+      @if($invoices->hasPages())
+        <div class="pagination-controls">
+          <a href="{{ $invoices->url(1) }}" class="btn btn-primary" aria-disabled="{{ $invoices->onFirstPage() ? 'true' : 'false' }}">
+            &laquo; First
+          </a>
+          <a href="{{ $invoices->previousPageUrl() ?? '#' }}" class="btn btn-primary" aria-disabled="{{ $invoices->onFirstPage() ? 'true' : 'false' }}">
+            &lsaquo; Prev
+          </a>
+          <span class="btn" style="background: var(--light); color: var(--dark); cursor: default;">
+            Page {{ $invoices->currentPage() }} of {{ $invoices->lastPage() }}
+          </span>
+          <a href="{{ $invoices->nextPageUrl() ?? '#' }}" class="btn btn-primary" aria-disabled="{{ $invoices->hasMorePages() ? 'false' : 'true' }}">
+            Next &rsaquo;
+          </a>
+          <a href="{{ $invoices->url($invoices->lastPage()) }}" class="btn btn-primary" aria-disabled="{{ $invoices->hasMorePages() ? 'false' : 'true' }}">
+            Last &raquo;
+          </a>
+        </div>
+      @endif
+    @endif
   </div>
 
   <div class="modal-backdrop" id="markPaidModal">

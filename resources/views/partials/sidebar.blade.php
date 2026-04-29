@@ -1,4 +1,8 @@
 @php
+  $canCreateInvoice = has_permission('create_invoice');
+  $canViewInvoices = has_permission('view_invoices');
+  $currentRoleName = auth()->check() ? (auth()->user()->role?->name ?? null) : null;
+  $canAccessBasicSettings = in_array($currentRoleName, ['admin', 'super_admin'], true);
   $activeMenu = $activeMenu ?? 'dashboard';
   $activeTab = $activeTab ?? '';
   $activeSub = $activeSub ?? '';
@@ -46,9 +50,11 @@
       <span class="material-icons-outlined submenu-toggle-icon">expand_more</span>
     </div>
     <div class="submenu {{ $isSettingsPage ? 'show' : '' }}">
-      <a href="{{ route('settings.index') }}" class="submenu-item {{ $activeTab === 'basic' ? 'active' : '' }}">
-        <span class="material-icons-outlined">tune</span> Basic
-      </a>
+      @if($canAccessBasicSettings)
+        <a href="{{ route('settings.index') }}" class="submenu-item {{ $activeTab === 'basic' ? 'active' : '' }}">
+          <span class="material-icons-outlined">tune</span> Basic
+        </a>
+      @endif
       <a href="{{ route('users.index') }}" class="submenu-item {{ $activeTab === 'users' ? 'active' : '' }}">
         <span class="material-icons-outlined">admin_panel_settings</span> Users
       </a>
