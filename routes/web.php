@@ -35,6 +35,7 @@ Route::middleware(['auth', 'session.active'])->group(function () {
     Route::post('/settings/reminders', [ReminderSettingsController::class, 'update'])->name('settings.reminders.update')->middleware('permission:manage_reminder_settings');
     Route::post('/settings/reminders/preview', [ReminderSettingsController::class, 'preview'])->name('settings.reminders.preview')->middleware('permission:manage_reminder_settings');
     Route::get('/settings/permissions', [PermissionController::class, 'index'])->name('settings.permissions');
+    Route::post('/settings/permissions/matrix', [PermissionController::class, 'updateMatrix'])->name('settings.permissions.matrix.update');
     Route::post('/settings/permissions/{role}', [PermissionController::class, 'update'])->name('settings.permissions.update');
     Route::get('/api/settings/recommended-permissions', [PermissionController::class, 'getRecommended'])->name('api.settings.recommended-permissions');
     

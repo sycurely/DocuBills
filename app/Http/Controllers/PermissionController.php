@@ -36,6 +36,32 @@ class PermissionController extends Controller
     }
 
     /**
+     * Update all role permissions from the matrix form.
+     */
+    public function updateMatrix(Request $request)
+    {
+        $validated = $request->validate([
+            'role_permissions' => 'array',
+            'role_permissions.*' => 'array',
+        ]);
+
+        $roles = Role::all();
+        $permissionIds = Permission::pluck('id')->map(fn ($id) => (string) $id)->all();
+        $validPermissionIds = array_flip($permissionIds);
+
+        foreach ($roles as $role) {
+            $submitted = $validated['role_permissions'][$role->id] ?? [];
+            $selectedIds = array_values(array_filter(array_keys($submitted), function ($permissionId) use ($validPermissionIds) {
+                return isset($validPermissionIds[(string) $permissionId]);
+            }));
+
+            $role->permissions()->sync($selectedIds);
+        }
+
+        return redirect()->route('settings.permissions')->with('success', 'Permission matrix updated successfully.');
+    }
+
+    /**
      * Get recommended permissions for a role.
      */
     public function getRecommended(Request $request)
