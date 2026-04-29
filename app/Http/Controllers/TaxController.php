@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TaxController extends Controller
 {
-    private function ensureSettingsAccess(): void
+    private function ensureAdminAccess(): void
     {
-        if (!has_any_setting_permission()) {
+        if (!auth()->user()?->isAdminOrSuperAdmin()) {
             abort(403, 'Access denied');
         }
     }
@@ -23,9 +23,11 @@ class TaxController extends Controller
      */
     public function index()
     {
-        $this->ensureSettingsAccess();
+        $this->ensureAdminAccess();
+
         $taxes = Tax::orderBy('id')->get();
-        return view('settings.taxes', compact('taxes'));
+        return view('settings.taxes', compact('taxes'))
+            ->with('taxesAccessDenied', false);
     }
 
     /**
@@ -33,7 +35,7 @@ class TaxController extends Controller
      */
     public function api(Request $request): JsonResponse
     {
-        if (!has_any_setting_permission()) {
+        if (!auth()->user()?->isAdminOrSuperAdmin()) {
             return response()->json(['success' => false, 'message' => 'Access denied'], 403);
         }
 

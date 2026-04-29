@@ -9,21 +9,27 @@ use Illuminate\Support\Facades\Log;
 
 class EmailTemplateController extends Controller
 {
+    private function ensureAdminAccess(): void
+    {
+        if (!Auth::user()?->isAdminOrSuperAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     /**
      * Display a listing of email templates.
      */
     public function index()
     {
-        if (!has_permission('access_email_templates_page')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         $templates = EmailTemplate::with('creator')
             ->whereNull('deleted_at')
             ->orderBy('template_name')
             ->get();
 
-        return view('email-templates.index', compact('templates'));
+        return view('email-templates.index', compact('templates'))
+            ->with('emailTemplatesAccessDenied', false);
     }
 
     /**
@@ -31,9 +37,7 @@ class EmailTemplateController extends Controller
      */
     public function create()
     {
-        if (!has_permission('add_email_template')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         return view('email-templates.create');
     }
@@ -43,9 +47,7 @@ class EmailTemplateController extends Controller
      */
     public function store(Request $request)
     {
-        if (!has_permission('add_email_template')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         $validated = $request->validate([
             'template_name' => 'required|string|max:255',
@@ -90,9 +92,7 @@ class EmailTemplateController extends Controller
      */
     public function show(EmailTemplate $emailTemplate)
     {
-        if (!has_permission('access_email_templates_page')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         return view('email-templates.show', compact('emailTemplate'));
     }
@@ -102,9 +102,7 @@ class EmailTemplateController extends Controller
      */
     public function edit(EmailTemplate $emailTemplate)
     {
-        if (!has_permission('edit_email_template')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         return view('email-templates.edit', compact('emailTemplate'));
     }
@@ -114,9 +112,7 @@ class EmailTemplateController extends Controller
      */
     public function update(Request $request, EmailTemplate $emailTemplate)
     {
-        if (!has_permission('edit_email_template')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         $validated = $request->validate([
             'template_name' => 'required|string|max:255',
@@ -160,9 +156,7 @@ class EmailTemplateController extends Controller
      */
     public function destroy(EmailTemplate $emailTemplate)
     {
-        if (!has_permission('delete_email_template')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         $emailTemplate->delete();
 
@@ -174,9 +168,7 @@ class EmailTemplateController extends Controller
      */
     public function getByCategory(Request $request)
     {
-        if (!has_permission('access_email_templates_page')) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->ensureAdminAccess();
 
         $templateId = (int) $request->input('template_id', 0);
         $template = $templateId > 0

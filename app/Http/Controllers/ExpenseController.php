@@ -5,19 +5,43 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Expense;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExpenseController extends Controller
 {
+    private function ensureAdminAccess(): void
+    {
+        if (!Auth::user()?->isAdminOrSuperAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     /**
      * Display a listing of expenses.
      */
     public function index(Request $request)
     {
+        $this->ensureAdminAccess();
+
         if (!has_permission('access_expenses_tab')) {
-            abort(403, 'Unauthorized action.');
+            return view('expenses.index', [
+                'expenses' => new LengthAwarePaginator(
+                    collect(),
+                    0,
+                    20,
+                    LengthAwarePaginator::resolveCurrentPage(),
+                    [
+                        'path' => $request->url(),
+                        'query' => $request->query(),
+                    ]
+                ),
+                'clients' => collect(),
+                'categories' => collect(),
+                'expensesAccessDenied' => true,
+            ]);
         }
 
         $query = Expense::with(['client', 'creator']);
@@ -85,7 +109,8 @@ class ExpenseController extends Controller
             ->sort()
             ->values();
 
-        return view('expenses.index', compact('expenses', 'clients', 'categories'));
+        return view('expenses.index', compact('expenses', 'clients', 'categories'))
+            ->with('expensesAccessDenied', false);
     }
 
     /**
@@ -374,6 +399,8 @@ class ExpenseController extends Controller
      */
     public function export(Request $request): StreamedResponse
     {
+        $this->ensureAdminAccess();
+
         if (!has_permission('export_expenses')) {
             abort(403, 'Unauthorized action.');
         }
