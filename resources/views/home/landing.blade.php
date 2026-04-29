@@ -781,9 +781,22 @@
                 </div>
                 
                 <div class="cta-form">
-                    <form id="signupForm">
+                    @if (session('success'))
+                        <div style="margin-bottom: 16px; padding: 14px 16px; border-radius: 12px; background: rgba(31, 214, 117, 0.15); color: #d8ffe8; border: 1px solid rgba(31, 214, 117, 0.35);">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->has('email'))
+                        <div style="margin-bottom: 16px; padding: 14px 16px; border-radius: 12px; background: rgba(255, 99, 99, 0.15); color: #ffdede; border: 1px solid rgba(255, 99, 99, 0.35);">
+                            {{ $errors->first('email') }}
+                        </div>
+                    @endif
+
+                    <form id="signupForm" method="POST" action="{{ route('signup.trial') }}">
+                        @csrf
                         <div class="form-group">
-                            <input type="email" class="form-input" placeholder="Enter your work email" required>
+                            <input type="email" name="email" class="form-input" placeholder="Enter your work email" value="{{ old('email') }}" required>
                             <button type="submit" class="btn btn-accent btn-lg">
                                 Start Free Trial <i class="fas fa-arrow-right"></i>
                             </button>
@@ -914,23 +927,6 @@
                     toggleMobileMenu();
                 }
             });
-        });
-
-        // Form submission
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            
-            if (email) {
-                // Show success message
-                alert(`Thank you for signing up! A confirmation email has been sent to ${email}. You can now access your free trial.`);
-                
-                // Reset form
-                this.querySelector('input[type="email"]').value = '';
-                
-                // In a real implementation, you would send this data to your server
-                console.log('Signup email:', email);
-            }
         });
 
         // Smooth scrolling for anchor links (only for # links)
