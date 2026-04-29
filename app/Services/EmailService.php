@@ -13,9 +13,17 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class EmailService
 {
+    public static function invoiceViewUrl(Invoice $invoice, array $parameters = []): string
+    {
+        return URL::signedRoute('invoices.public.show', array_merge([
+            'invoice' => $invoice->getKey(),
+        ], $parameters));
+    }
+
     /**
      * Return DB email setting keys that are currently missing.
      */
@@ -521,6 +529,8 @@ class EmailService
     {
         $companyName = SettingService::getSetting('company_name', 'DocuBills');
         $currencyDisplay = $invoice->currency_display ?: ($invoice->currency_code ?: '$');
+        $invoiceViewUrl = self::invoiceViewUrl($invoice);
+        $paymentLink = trim((string) ($invoice->payment_link ?? ''));
 
         return [
             'client_name' => $clientName,
@@ -528,7 +538,8 @@ class EmailService
             'company_name' => $companyName,
             'total_amount' => $currencyDisplay . ' ' . number_format((float) $invoice->total_amount, 2),
             'amount_due' => $currencyDisplay . ' ' . number_format((float) $invoice->total_amount, 2),
-            'payment_link' => (string) ($invoice->payment_link ?: '#'),
+            'payment_link' => $paymentLink !== '' ? $paymentLink : $invoiceViewUrl,
+            'invoice_link' => $invoiceViewUrl,
             'due_date' => optional($invoice->due_date)->format('Y-m-d') ?: 'N/A',
             'invoice_date' => optional($invoice->invoice_date)->format('Y-m-d') ?: optional($invoice->created_at)->format('Y-m-d'),
             'reminder_type' => '',
@@ -644,7 +655,7 @@ class EmailService
         $invoiceDate = optional($invoice->invoice_date)->format('Y-m-d') ?: 'N/A';
         $dueDate = optional($invoice->due_date)->format('Y-m-d') ?: 'N/A';
         $paymentLink = trim((string) ($invoice->payment_link ?? ''));
-        $invoiceFallback = url('/invoices/' . $invoice->id);
+        $invoiceFallback = self::invoiceViewUrl($invoice);
         $hasPaymentLink = $paymentLink !== '';
         $payNowHref = $hasPaymentLink ? $paymentLink : $invoiceFallback;
         $payNowLabel = $hasPaymentLink ? 'View / Pay Invoice' : 'View Invoice';
@@ -736,10 +747,77 @@ class EmailService
 
     private static function defaultPaymentConfirmationBody(Invoice $invoice, string $clientName): string
     {
+        $currencyDisplay = $invoice->currency_display ?: ($invoice->currency_code ?: '$');
+        $companyName = (string) SettingService::getSetting('company_name', 'DocuBills');
+        $companyLogo = self::resolveCompanyLogoMarkup();
+        $invoiceViewUrl = self::invoiceViewUrl($invoice);
+        $paidDate = now()->format('Y-m-d');
+        $logoLine = $companyLogo !== '' ? $companyLogo : '';
+
         return sprintf(
-            '<p>Dear <strong>%s</strong>,</p><p>Payment has been received for invoice <strong>%s</strong>.</p><p>Thank you.</p>',
+            '<div style="margin:0;padding:0;background:#f8fafc;font-family:Arial,Helvetica,sans-serif;">
+              <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="padding:24px 12px;">
+                <tr>
+                  <td align="center">
+                    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+                      <tr>
+                        <td style="padding:20px 24px;background:#0f172a;color:#ffffff;">
+                          <table role="presentation" width="100%%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="vertical-align:middle;">
+                                <div style="font-size:18px;font-weight:700;">Payment Received</div>
+                                <div style="font-size:13px;opacity:0.85;">%s</div>
+                              </td>
+                              <td align="right" style="vertical-align:middle;">%s</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:22px 24px;color:#0f172a;">
+                          <p style="margin:0 0 12px;">Hello <strong>%s</strong>,</p>
+                          <p style="margin:0 0 12px;">Payment has been received for invoice <strong>%s</strong>.</p>
+                          <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="margin:12px 0 16px;border:1px solid #e2e8f0;border-radius:10px;">
+                            <tr>
+                              <td style="padding:12px 14px;">
+                                <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Payment Date</div>
+                                <div style="font-size:16px;font-weight:600;color:#0f172a;">%s</div>
+                              </td>
+                              <td style="padding:12px 14px;border-left:1px solid #e2e8f0;">
+                                <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Invoice Number</div>
+                                <div style="font-size:16px;font-weight:600;color:#0f172a;">%s</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="padding:12px 14px;border-top:1px solid #e2e8f0;">
+                                <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Amount Paid</div>
+                                <div style="font-size:18px;font-weight:700;color:#0f172a;">%s %s</div>
+                              </td>
+                            </tr>
+                          </table>
+                          <div style="text-align:center;margin:18px 0 10px;">
+                            <a href="%s" style="display:inline-block;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;background:#16a34a;color:#ffffff;">View Invoice</a>
+                          </div>
+                          <p style="margin:0;color:#475569;font-size:13px;">Thank you for your payment.</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:14px 24px;background:#f1f5f9;color:#64748b;font-size:12px;">Powered by DocuBills</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>',
+            e($companyName),
+            $logoLine,
             e($clientName),
-            e($invoice->invoice_number)
+            e($invoice->invoice_number),
+            e($paidDate),
+            e($invoice->invoice_number),
+            e($currencyDisplay),
+            number_format((float) $invoice->total_amount, 2),
+            e($invoiceViewUrl)
         );
     }
 
@@ -754,7 +832,7 @@ class EmailService
         $companyName = (string) SettingService::getSetting('company_name', 'DocuBills');
         $companyLogo = self::resolveCompanyLogoMarkup();
         $paymentLink = trim((string) ($invoice->payment_link ?? ''));
-        $invoiceFallback = url('/invoices/' . $invoice->id);
+        $invoiceFallback = self::invoiceViewUrl($invoice);
         $hasPaymentLink = $paymentLink !== '';
         $payNowHref = $hasPaymentLink ? $paymentLink : $invoiceFallback;
         $payNowLabel = $hasPaymentLink ? 'Pay Now' : 'View Invoice';

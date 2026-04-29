@@ -65,13 +65,29 @@ class TemplateResolutionService
     {
         $config = $invoice->emailConfiguration;
         $templateId = (int) ($config->payment_confirmation_template_id ?? 0);
-        if ($templateId <= 0) {
-            return null;
+        if ($templateId > 0) {
+            $template = EmailTemplate::query()
+                ->where('id', $templateId)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if ($template) {
+                return $template;
+            }
+        }
+
+        $byNotification = EmailTemplate::query()
+            ->where('assigned_notification_type', 'payment_confirmation')
+            ->whereNull('deleted_at')
+            ->first();
+        if ($byNotification) {
+            return $byNotification;
         }
 
         return EmailTemplate::query()
-            ->where('id', $templateId)
+            ->where('category', 'payment_confirmation')
             ->whereNull('deleted_at')
+            ->orderByDesc('id')
             ->first();
     }
 
