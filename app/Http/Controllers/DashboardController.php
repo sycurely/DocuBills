@@ -15,6 +15,23 @@ class DashboardController extends Controller
     private const PAID_STATUS_SQL = "LOWER(TRIM(status)) = 'paid'";
     private const UNPAID_STATUS_SQL = "LOWER(TRIM(status)) = 'unpaid'";
 
+    private function dateLabelExpression(string $period): string
+    {
+        $driver = DB::connection()->getDriverName();
+
+        return match ($period) {
+            'monthly', 'all' => $driver === 'sqlite'
+                ? "strftime('%Y-%m', created_at)"
+                : "DATE_FORMAT(created_at, '%Y-%m')",
+            'yearly' => $driver === 'sqlite'
+                ? "strftime('%Y', created_at)"
+                : 'YEAR(created_at)',
+            default => $driver === 'sqlite'
+                ? 'date(created_at)'
+                : 'DATE(created_at)',
+        };
+    }
+
     /**
      * Display the dashboard.
      */
@@ -93,49 +110,53 @@ class DashboardController extends Controller
 
             switch ($period) {
                 case 'monthly':
+                    $labelExpression = $this->dateLabelExpression('monthly');
                     $data = $query->select(
-                        DB::raw("DATE_FORMAT(created_at, '%Y-%m') AS label"),
+                        DB::raw("{$labelExpression} AS label"),
                         DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
                         DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
                         ->where('created_at', '>=', now()->subMonths(6))
-                        ->groupBy('label')
+                        ->groupBy(DB::raw($labelExpression))
                         ->orderBy('label')
                         ->get();
                     break;
 
                 case 'yearly':
+                    $labelExpression = $this->dateLabelExpression('yearly');
                     $data = $query->select(
-                        DB::raw('YEAR(created_at) AS label'),
+                        DB::raw("{$labelExpression} AS label"),
                         DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
                         DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
-                        ->groupBy('label')
+                        ->groupBy(DB::raw($labelExpression))
                         ->orderByDesc('label')
                         ->limit(5)
                         ->get();
                     break;
 
                 case 'all':
+                    $labelExpression = $this->dateLabelExpression('all');
                     $data = $query->select(
-                        DB::raw("DATE_FORMAT(created_at, '%Y-%m') AS label"),
+                        DB::raw("{$labelExpression} AS label"),
                         DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
                         DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
-                        ->groupBy('label')
+                        ->groupBy(DB::raw($labelExpression))
                         ->orderBy('label')
                         ->get();
                     break;
 
                 case 'daily':
                 default:
+                    $labelExpression = $this->dateLabelExpression('daily');
                     $data = $query->select(
-                        DB::raw('DATE(created_at) AS label'),
+                        DB::raw("{$labelExpression} AS label"),
                         DB::raw("COUNT(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 END) AS paid"),
                         DB::raw("COUNT(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 END) AS unpaid")
                     )
                         ->where('created_at', '>=', now()->subDays(7))
-                        ->groupBy(DB::raw('DATE(created_at)'))
+                        ->groupBy(DB::raw($labelExpression))
                         ->orderBy('label')
                         ->get();
                     break;
