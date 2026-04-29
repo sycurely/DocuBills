@@ -239,6 +239,36 @@
     color: var(--gray);
     border-top: 1px solid var(--border);
   }
+  .permission-readonly-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .permission-readonly-table th,
+  .permission-readonly-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .permission-readonly-table th {
+    background: color-mix(in srgb, var(--card-bg) 88%, var(--primary) 12%);
+    color: var(--dark);
+    font-weight: 800;
+  }
+  .permission-readonly-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803d;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .permission-readonly-pill .material-icons-outlined {
+    font-size: 1rem;
+  }
   .perm-switch {
     position: relative;
     display: inline-block;
@@ -305,7 +335,9 @@
   <div class="page-header permissions-page-header">
     <div>
       <h1 class="page-title">Permission Matrix</h1>
-      <p class="page-subtitle">Assign permissions to roles.</p>
+      <p class="page-subtitle">
+        {{ $canManagePermissions ? 'Assign permissions to roles.' : 'View the permissions assigned to your role.' }}
+      </p>
     </div>
     <div class="permission-search">
       <span class="material-icons-outlined">search</span>
@@ -322,7 +354,96 @@
     </div>
   @endif
 
-  <form method="POST" action="{{ route('settings.permissions.matrix.update') }}" class="permission-matrix-card">
+  @if(!$canManagePermissions)
+    <section class="permission-matrix-card">
+      <div class="permission-matrix-toolbar">
+        <div class="matrix-help">
+          These permissions are assigned to your role. You can view them only; changes are restricted to admin users.
+        </div>
+      </div>
+
+      <div class="permission-table-wrap">
+        <table class="permission-readonly-table">
+          @foreach($permissionGroups as $groupName => $permissionNames)
+            @php
+              $groupKey = \Illuminate\Support\Str::slug($groupName);
+              $groupPermissions = $permissions->whereIn('name', $permissionNames)->sortBy(function ($permission) use ($permissionNames) {
+                return array_search($permission->name, $permissionNames);
+              });
+            @endphp
+
+            @if($groupPermissions->isNotEmpty())
+              <tbody data-permission-group="{{ $groupKey }}">
+                <tr class="permission-group-row" data-group-row="{{ $groupKey }}">
+                  <th colspan="2">
+                    <span class="permission-group-label">
+                      <span class="material-icons-outlined">folder_open</span>
+                      {{ $groupName }}
+                    </span>
+                  </th>
+                </tr>
+                @foreach($groupPermissions as $permission)
+                  @php
+                    $permissionLabel = $permission->description ?: ucwords(str_replace('_', ' ', $permission->name));
+                  @endphp
+                  <tr data-permission-row data-group-key="{{ $groupKey }}" data-search-text="{{ strtolower($permissionLabel . ' ' . $permission->name . ' ' . $groupName) }}">
+                    <td>
+                      <span class="permission-name">{{ $permissionLabel }}</span>
+                    </td>
+                    <td style="width: 170px;">
+                      <span class="permission-readonly-pill">
+                        <span class="material-icons-outlined">visibility</span>
+                        View Only
+                      </span>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            @endif
+          @endforeach
+
+          @php
+            $otherPermissions = $permissions->whereNotIn('name', $groupedPermissionNames);
+          @endphp
+
+          @if($otherPermissions->isNotEmpty())
+            <tbody data-permission-group="other-permissions">
+              <tr class="permission-group-row" data-group-row="other-permissions">
+                <th colspan="2">
+                  <span class="permission-group-label">
+                    <span class="material-icons-outlined">folder_open</span>
+                    Other Permissions
+                  </span>
+                </th>
+              </tr>
+              @foreach($otherPermissions as $permission)
+                @php
+                  $permissionLabel = $permission->description ?: ucwords(str_replace('_', ' ', $permission->name));
+                @endphp
+                <tr data-permission-row data-group-key="other-permissions" data-search-text="{{ strtolower($permissionLabel . ' ' . $permission->name . ' Other Permissions') }}">
+                  <td>
+                    <span class="permission-name">{{ $permissionLabel }}</span>
+                  </td>
+                  <td style="width: 170px;">
+                    <span class="permission-readonly-pill">
+                      <span class="material-icons-outlined">visibility</span>
+                      View Only
+                    </span>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          @endif
+        </table>
+      </div>
+
+      @if($permissions->isEmpty())
+        <div class="permission-empty-state" style="display:block;">No permissions are assigned to your role.</div>
+      @endif
+      <div class="permission-empty-state" id="permissionEmptyState">No permissions match your search.</div>
+    </section>
+  @else
+    <form method="POST" action="{{ route('settings.permissions.matrix.update') }}" class="permission-matrix-card">
     @csrf
     <div class="permission-matrix-toolbar">
       <div class="matrix-help">Permissions are listed on the left. Role toggles are shown across each row.</div>
@@ -424,7 +545,8 @@
     </div>
 
     <div class="permission-empty-state" id="permissionEmptyState">No permissions match your search.</div>
-  </form>
+    </form>
+  @endif
 @endsection
 
 @push('scripts')

@@ -3,7 +3,6 @@
   $canViewInvoices = has_permission('view_invoices');
   $currentRoleName = auth()->check() ? (auth()->user()->role?->name ?? null) : null;
   $canAccessBasicSettings = in_array($currentRoleName, ['admin', 'super_admin'], true);
-  $canAccessAdminOnly = in_array($currentRoleName, ['admin', 'super_admin'], true);
   $activeMenu = $activeMenu ?? 'dashboard';
   $activeTab = $activeTab ?? '';
   $activeSub = $activeSub ?? '';
@@ -34,18 +33,16 @@
       <span class="menu-text">Clients</span>
     </a>
 
-    @if($canAccessAdminOnly)
-      <div class="menu-item has-submenu {{ $isExpensesPage ? 'active' : '' }}">
-        <span class="material-icons-outlined">account_balance_wallet</span>
-        <span class="menu-text">Expenses</span>
-        <span class="material-icons-outlined submenu-toggle-icon">expand_more</span>
-      </div>
-      <div class="submenu {{ $isExpensesPage ? 'show' : '' }}">
-        <a href="{{ route('expenses.index') }}" class="submenu-item {{ $activeMenu === 'expenses' ? 'active' : '' }}">
-          <span class="material-icons-outlined">list</span> All Expenses
-        </a>
-      </div>
-    @endif
+    <div class="menu-item has-submenu {{ $isExpensesPage ? 'active' : '' }}">
+      <span class="material-icons-outlined">account_balance_wallet</span>
+      <span class="menu-text">Expenses</span>
+      <span class="material-icons-outlined submenu-toggle-icon">expand_more</span>
+    </div>
+    <div class="submenu {{ $isExpensesPage ? 'show' : '' }}">
+      <a href="{{ route('expenses.index') }}" class="submenu-item {{ $activeMenu === 'expenses' ? 'active' : '' }}">
+        <span class="material-icons-outlined">list</span> All Expenses
+      </a>
+    </div>
 
     <div class="menu-item has-submenu {{ $isSettingsPage ? 'active' : '' }}">
       <span class="material-icons-outlined">settings</span>
@@ -79,14 +76,12 @@
           <span class="material-icons-outlined">notifications_active</span> Reminder Settings
         </a>
       @endif
-      @if($canAccessAdminOnly)
-        <a href="{{ route('settings.taxes') }}" class="submenu-item {{ $activeTab === 'taxes' ? 'active' : '' }}">
-          <span class="material-icons-outlined">percent</span> Tax Classes
-        </a>
-        <a href="{{ route('email-templates.index') }}" class="submenu-item {{ $activeTab === 'email_templates' ? 'active' : '' }}">
-          <span class="material-icons-outlined">mail</span> Email Templates
-        </a>
-      @endif
+      <a href="{{ route('settings.taxes') }}" class="submenu-item {{ $activeTab === 'taxes' ? 'active' : '' }}">
+        <span class="material-icons-outlined">percent</span> Tax Classes
+      </a>
+      <a href="{{ route('email-templates.index') }}" class="submenu-item {{ $activeTab === 'email_templates' ? 'active' : '' }}">
+        <span class="material-icons-outlined">mail</span> Email Templates
+      </a>
     </div>
 
     @if(has_permission('view_login_logs'))

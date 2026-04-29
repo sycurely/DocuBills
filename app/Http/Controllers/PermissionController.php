@@ -9,15 +9,40 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
+    private function canManagePermissions(): bool
+    {
+        $user = auth()->user();
+
+        return (bool) ($user?->isAdminOrSuperAdmin() || has_permission('manage_permissions'));
+    }
+
+    private function ensureCanManagePermissions(): void
+    {
+        if (!$this->canManagePermissions()) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     /**
      * Show the permission matrix.
      */
     public function index()
     {
-        $roles = Role::with('permissions')->get();
-        $permissions = Permission::orderBy('name')->get();
+        $canManagePermissions = $this->canManagePermissions();
+        $user = auth()->user();
 
-        return view('settings.permissions', compact('roles', 'permissions'));
+        if ($canManagePermissions) {
+            $roles = Role::with('permissions')->get();
+            $permissions = Permission::orderBy('name')->get();
+        } else {
+            $user?->loadMissing('role.permissions');
+            $roles = collect([$user?->role])->filter()->values();
+            $permissions = $user?->role?->permissions
+                ? $user->role->permissions->sortBy('name')->values()
+                : collect();
+        }
+
+        return view('settings.permissions', compact('roles', 'permissions', 'canManagePermissions'));
     }
 
     /**
@@ -25,6 +50,8 @@ class PermissionController extends Controller
      */
     public function update(Request $request, Role $role)
     {
+        $this->ensureCanManagePermissions();
+
         $validated = $request->validate([
             'permissions' => 'array',
             'permissions.*' => 'exists:permissions,id',
@@ -40,6 +67,8 @@ class PermissionController extends Controller
      */
     public function updateMatrix(Request $request)
     {
+        $this->ensureCanManagePermissions();
+
         $validated = $request->validate([
             'role_permissions' => 'array',
             'role_permissions.*' => 'array',
@@ -66,6 +95,8 @@ class PermissionController extends Controller
      */
     public function getRecommended(Request $request)
     {
+        $this->ensureCanManagePermissions();
+
         $roleName = $request->get('role');
         $role = Role::where('name', $roleName)->first();
 
