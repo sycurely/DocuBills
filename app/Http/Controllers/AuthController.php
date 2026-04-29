@@ -146,7 +146,20 @@ class AuthController extends Controller
         $existingUser = User::where('email', $email)->whereNull('deleted_at')->first();
 
         if ($existingUser) {
-            return back()->withInput()->with('success', 'This email is already registered. Please sign in with your existing account.');
+            $sent = EmailService::sendRenderedReminderNow(
+                toEmail: $existingUser->email,
+                toName: $existingUser->full_name ?: $existingUser->name ?: $existingUser->username,
+                subject: 'Your DocuBills account is already active',
+                body: $this->buildExistingAccountEmail($existingUser)
+            );
+
+            if (!$sent) {
+                return back()->withInput()->withErrors([
+                    'email' => 'Ye email already registered hai, lekin account email send nahi ho saki. Mail settings check karein.',
+                ]);
+            }
+
+            return back()->withInput()->with('success', 'Ye email already registered hai. Login details email par bhej di gayi hain.');
         }
 
         $baseUsername = Str::lower((string) Str::before($email, '@'));
@@ -215,6 +228,26 @@ class AuthController extends Controller
   <p><strong>Email:</strong> {$safeEmail}<br><strong>Username:</strong> {$safeUsername}<br><strong>Password:</strong> {$safePassword}</p>
   <p>You can sign in here: <a href="{$safeLoginUrl}">{$safeLoginUrl}</a></p>
   <p>For security, please log in and change your password after your first sign-in.</p>
+</div>
+HTML;
+    }
+
+    private function buildExistingAccountEmail(User $user): string
+    {
+        $loginUrl = route('login');
+        $safeName = e($user->full_name ?: $user->name ?: $user->username);
+        $safeEmail = e($user->email);
+        $safeUsername = e($user->username);
+        $safeLoginUrl = e($loginUrl);
+
+        return <<<HTML
+<div style="font-family: Arial, sans-serif; color: #1f2544; line-height: 1.6;">
+  <h2 style="margin-bottom: 16px;">Your DocuBills account</h2>
+  <p>Hello <strong>{$safeName}</strong>,</p>
+  <p>An account already exists for this email.</p>
+  <p><strong>Email:</strong> {$safeEmail}<br><strong>Username:</strong> {$safeUsername}</p>
+  <p>You can sign in here: <a href="{$safeLoginUrl}">{$safeLoginUrl}</a></p>
+  <p>If you forgot your password, please contact the administrator to reset it.</p>
 </div>
 HTML;
     }

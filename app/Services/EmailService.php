@@ -305,19 +305,26 @@ class EmailService
     private static function configureMail(): void
     {
         $smtpHost = SettingService::getSetting('smtp_host');
-        $smtpPort = SettingService::getSetting('smtp_port', '587');
+        $smtpPort = SettingService::getSetting('smtp_port', config('mail.mailers.smtp.port', '587'));
         $smtpUsername = SettingService::getSetting('smtp_username');
         $smtpPassword = SettingService::getSetting('smtp_password');
+        $smtpEncryption = SettingService::getSetting('smtp_encryption');
         $fromName = SettingService::getSetting('email_from_name', 'DocuBills');
         $fromAddress = SettingService::getSetting('email_from_address');
 
         if ($smtpHost && $smtpUsername && $smtpPassword) {
+            $smtpPort = (int) $smtpPort;
+            $smtpEncryption = strtolower(trim((string) $smtpEncryption));
+            if (!in_array($smtpEncryption, ['tls', 'ssl'], true)) {
+                $smtpEncryption = $smtpPort === 465 ? 'ssl' : 'tls';
+            }
+
             Config::set('mail.default', 'smtp');
             Config::set('mail.mailers.smtp.host', $smtpHost);
             Config::set('mail.mailers.smtp.port', $smtpPort);
             Config::set('mail.mailers.smtp.username', $smtpUsername);
             Config::set('mail.mailers.smtp.password', $smtpPassword);
-            Config::set('mail.mailers.smtp.encryption', (int) $smtpPort === 465 ? 'ssl' : 'tls');
+            Config::set('mail.mailers.smtp.encryption', $smtpEncryption);
         }
 
         if ($fromAddress) {
