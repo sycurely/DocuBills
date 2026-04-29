@@ -1,5 +1,10 @@
 ﻿@extends('layouts.app')
 
+@php
+  $activeMenu = 'settings';
+  $activeTab = 'users';
+@endphp
+
 @section('title', 'User Management')
 
 @push('styles')
@@ -91,14 +96,47 @@
     }
 
     .btn-icon {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 32px;
       padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       vertical-align: middle;
-      border-radius: var(--radius);
+      border-radius: 8px;
+      box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn-icon i {
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .btn-action-view {
+      background: #4361ee;
+      color: #fff;
+    }
+
+    .btn-action-edit {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .btn-action-delete {
+      background: #ec2088;
+      color: #fff;
+    }
+
+    .btn-action-lock {
+      background: #f1f5f9;
+      color: #f59e0b;
+      border-radius: 999px;
+    }
+
+    .btn-action-locked {
+      background: #ec2088;
+      color: #facc15;
+      border-radius: 999px;
     }
 
     button[disabled] {
@@ -162,7 +200,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      white-space: nowrap;
     }
 
     /* Modals */
@@ -289,11 +328,14 @@
 @endpush
 
 @section('content')
+  @php
+    $usersAccessDenied = $usersAccessDenied ?? false;
+  @endphp
 
   <div class="container">
     <div class="page-header">
-      <h1 class="page-title">User Management</h1>
-      @if(has_permission('add_user'))
+      <h1 class="page-title">Users</h1>
+      @if(!$usersAccessDenied && has_permission('add_user'))
         <button class="btn btn-primary" onclick="openAddUserModal()">
           <i class="fas fa-plus"></i> New User
         </button>
@@ -332,6 +374,14 @@
       </script>
     @endif
 
+    @if($usersAccessDenied)
+      <div class="table-container" style="padding: 2rem; text-align: center;">
+        <p style="font-size: 1.1rem; color: #b91c1c; font-weight: 600;">
+          You don't have access to this. Please ask your Super Admin or Admin.
+        </p>
+      </div>
+    @else
+
     <div class="table-container">
       <table>
         <thead>
@@ -369,20 +419,22 @@
               <td>{{ $user->role ? ucwords(str_replace('_', ' ', $user->role->name)) : 'Unassigned' }}</td>
               <td>{{ $user->created_at->format('Y-m-d') }}</td>
               <td class="actions-cell">
-                <button class="btn btn-sm btn-primary" onclick="openViewModal({{ $user->id }})">
+                <button class="btn btn-icon btn-action-view" onclick="openViewModal({{ $user->id }})" title="View user" aria-label="View user">
                   <i class="fas fa-eye"></i>
                 </button>
 
                 @if(has_permission('edit_user'))
-                  <button class="btn btn-sm btn-warning" onclick="openEditModal({{ $user->id }})">
-                    <i class="fas fa-edit"></i>
+                  <button class="btn btn-icon btn-action-edit" onclick="openEditModal({{ $user->id }})" title="Edit user" aria-label="Edit user">
+                    <i class="fas fa-pen-to-square"></i>
                   </button>
                 @endif
 
                 @if(has_permission('delete_user'))
-                  <button class="btn btn-sm btn-danger delete-user-btn"
+                  <button class="btn btn-icon btn-action-delete delete-user-btn"
                           data-id="{{ $user->id }}"
-                          data-username="{{ $user->username }}">
+                          data-username="{{ $user->username }}"
+                          title="Delete user"
+                          aria-label="Delete user">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 @endif
@@ -391,12 +443,12 @@
                   <form method="POST" action="{{ route('users.toggle-suspend', $user) }}" class="suspend-form">
                     @csrf
                     @if($user->is_suspended)
-                      <button type="button" class="btn btn-sm btn-danger btn-icon suspend-toggle" title="Unsuspend user">
-                        <span style="color:#f8961e;font-size:1.2em;line-height:1;">ðŸ”’</span>
+                      <button type="button" class="btn btn-icon btn-action-locked suspend-toggle" title="Unsuspend user" aria-label="Unsuspend user">
+                        <i class="fas fa-lock"></i>
                       </button>
                     @else
-                      <button type="button" class="btn btn-sm btn-success btn-icon suspend-toggle" title="Suspend user">
-                        <span style="color:#fff;font-size:1.2em;line-height:1;">ðŸ”“</span>
+                      <button type="button" class="btn btn-icon btn-action-lock suspend-toggle" title="Suspend user" aria-label="Suspend user">
+                        <i class="fas fa-lock-open"></i>
                       </button>
                     @endif
                   </form>
@@ -717,6 +769,7 @@
       }
     }
   </script>
+  @endif
 
 @endsection
 
