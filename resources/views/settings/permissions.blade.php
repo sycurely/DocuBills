@@ -214,12 +214,6 @@
     font-weight: 600;
     line-height: 1.25;
   }
-  .permission-key {
-    display: block;
-    margin-top: 0.18rem;
-    color: var(--gray);
-    font-size: 0.78rem;
-  }
   .permission-toggle-cell {
     text-align: center;
   }
@@ -375,7 +369,6 @@
                 <tr data-permission-row data-group-key="{{ $groupKey }}" data-search-text="{{ strtolower($permissionLabel . ' ' . $permission->name . ' ' . $groupName) }}">
                   <td class="permission-name-cell">
                     <span class="permission-name">{{ $permissionLabel }}</span>
-                    <span class="permission-key">{{ $permission->name }}</span>
                   </td>
                   @foreach($roles as $role)
                     <td class="permission-toggle-cell">
@@ -413,7 +406,6 @@
               <tr data-permission-row data-group-key="other-permissions" data-search-text="{{ strtolower($permissionLabel . ' ' . $permission->name . ' Other Permissions') }}">
                 <td class="permission-name-cell">
                   <span class="permission-name">{{ $permissionLabel }}</span>
-                  <span class="permission-key">{{ $permission->name }}</span>
                 </td>
                 @foreach($roles as $role)
                   <td class="permission-toggle-cell">
