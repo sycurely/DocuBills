@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserSession;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -127,6 +130,93 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    /**
+     * Handle public trial signup from the landing page.
+     */
+    public function signupTrial(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+
+        $existingUser = User::where('email', $email)->whereNull('deleted_at')->first();
+
+        if ($existingUser) {
+            return back()->withInput()->with('success', 'This email is already registered. Please sign in with your existing account.');
+        }
+
+        $baseUsername = Str::lower((string) Str::before($email, '@'));
+        $baseUsername = preg_replace('/[^a-z0-9._-]/', '', $baseUsername) ?: 'user';
+        $username = $baseUsername;
+        $suffix = 1;
+
+        while (User::where('username', $username)->whereNull('deleted_at')->exists()) {
+            $username = $baseUsername . $suffix;
+            $suffix++;
+        }
+
+        $plainPassword = Str::password(12, true, true, false, false);
+        $roleId = Role::where('name', 'manager')->value('id')
+            ?? Role::where('name', 'assistant')->value('id')
+            ?? Role::where('name', 'viewer')->value('id')
+            ?? Role::orderBy('id')->value('id');
+        $displayName = Str::title(str_replace(['.', '_', '-'], ' ', $baseUsername));
+
+        $user = User::create([
+            'username' => $username,
+            'name' => $displayName,
+            'full_name' => $displayName,
+            'email' => $email,
+            'password' => Hash::make($plainPassword),
+            'role_id' => $roleId,
+            'is_suspended' => false,
+        ]);
+
+        try {
+            $sent = EmailService::sendRenderedReminderNow(
+                toEmail: $user->email,
+                toName: $user->full_name ?: $user->name ?: $user->username,
+                subject: 'Your DocuBills account details',
+                body: $this->buildTrialSignupEmail($user->email, $username, $plainPassword)
+            );
+
+            if (!$sent) {
+                throw new \RuntimeException('Mail transport returned false.');
+            }
+        } catch (\Throwable $e) {
+            $user->delete();
+
+            report($e);
+
+            return back()->withInput()->withErrors([
+                'email' => 'Account create ho gaya tha lekin confirmation email send nahi ho saki. Mail settings check karein aur dubara try karein.',
+            ]);
+        }
+
+        return back()->with('success', 'Account create ho gaya hai. Login details aap ke email par bhej di gayi hain.');
+    }
+
+    private function buildTrialSignupEmail(string $email, string $username, string $plainPassword): string
+    {
+        $loginUrl = route('login');
+        $safeEmail = e($email);
+        $safeUsername = e($username);
+        $safePassword = e($plainPassword);
+        $safeLoginUrl = e($loginUrl);
+
+        return <<<HTML
+<div style="font-family: Arial, sans-serif; color: #1f2544; line-height: 1.6;">
+  <h2 style="margin-bottom: 16px;">Welcome to DocuBills</h2>
+  <p>Your free trial account is ready.</p>
+  <p><strong>Email:</strong> {$safeEmail}<br><strong>Username:</strong> {$safeUsername}<br><strong>Password:</strong> {$safePassword}</p>
+  <p>You can sign in here: <a href="{$safeLoginUrl}">{$safeLoginUrl}</a></p>
+  <p>For security, please log in and change your password after your first sign-in.</p>
+</div>
+HTML;
     }
 
     /**

@@ -23,6 +23,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/signup-trial', [AuthController::class, 'signupTrial'])->name('signup.trial');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Settings routes (protected)
@@ -58,7 +59,7 @@ Route::middleware(['auth', 'session.active'])->group(function () {
     Route::post('/clients/delete-all', [ClientController::class, 'deleteAll'])->name('clients.delete-all');
 
     // User Management routes (protected by user management permissions)
-    Route::get('/users', [UserController::class, 'index'])->name('users.index')->middleware('permission:manage_users_page');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store')->middleware('permission:add_user');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('permission:edit_user');
@@ -81,8 +82,8 @@ Route::middleware(['auth', 'session.active'])->group(function () {
         ->middleware('permission:access_trashbin');
 
     // Invoice routes (protected by invoice permissions)
-    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index')->middleware('permission:view_invoices');
-    Route::get('/invoices/create', [InvoiceController::class, 'create'])->name('invoices.create')->middleware('permission:create_invoice');
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/create', [InvoiceController::class, 'create'])->name('invoices.create');
     Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.store')->middleware('permission:create_invoice');
     Route::post('/invoices/import', [InvoiceController::class, 'import'])->name('invoices.import')->middleware('permission:create_invoice');
     Route::post('/invoices/import-source', [InvoiceController::class, 'importFromSource'])->name('invoices.import-source')->middleware('permission:create_invoice');
@@ -97,7 +98,7 @@ Route::middleware(['auth', 'session.active'])->group(function () {
     Route::get('/invoices/{invoice}/download-pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf')->middleware('permission:download_invoice_pdf');
 
     // Expense routes (protected by expense permissions)
-    Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index')->middleware('permission:access_expenses_tab');
+    Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
     Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create')->middleware('permission:add_expense');
     Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store')->middleware('permission:add_expense');
     Route::get('/expenses/{expense}', [ExpenseController::class, 'show'])->name('expenses.show')->middleware('permission:view_expenses');
@@ -111,7 +112,7 @@ Route::middleware(['auth', 'session.active'])->group(function () {
     Route::get('/expenses/export/csv', [ExpenseController::class, 'export'])->name('expenses.export')->middleware('permission:export_expenses');
 
     // Email Template routes (protected by email template permissions)
-    Route::get('/settings/email-templates', [EmailTemplateController::class, 'index'])->name('email-templates.index')->middleware('permission:access_email_templates_page');
+    Route::get('/settings/email-templates', [EmailTemplateController::class, 'index'])->name('email-templates.index');
     Route::get('/settings/email-templates/create', [EmailTemplateController::class, 'create'])->name('email-templates.create')->middleware('permission:add_email_template');
     Route::post('/settings/email-templates', [EmailTemplateController::class, 'store'])->name('email-templates.store')->middleware('permission:add_email_template');
     Route::get('/settings/email-templates/{emailTemplate}', [EmailTemplateController::class, 'show'])->name('email-templates.show')->middleware('permission:access_email_templates_page');
@@ -135,5 +136,8 @@ Route::middleware(['auth', 'session.active'])->group(function () {
 });
 
 // Payment callback (no auth required)
+Route::get('/invoice-view/{invoice}', [InvoiceController::class, 'showPublic'])
+    ->name('invoices.public.show')
+    ->middleware('signed');
 Route::get('/payment-success', [InvoiceController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('/stripe/webhook', [InvoiceController::class, 'stripeWebhook'])->name('stripe.webhook');
