@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    private const PAID_STATUS_SQL = "LOWER(TRIM(status)) = 'paid'";
+    private const UNPAID_STATUS_SQL = "LOWER(TRIM(status)) = 'unpaid'";
+
     /**
      * Display the dashboard.
      */
@@ -39,7 +42,7 @@ class DashboardController extends Controller
 
         // Handle specific client requests
         if ($unpaidClients) {
-            $topUnpaid = Invoice::where('status', 'Unpaid')
+            $topUnpaid = Invoice::whereRaw(self::UNPAID_STATUS_SQL)
                 ->whereNull('deleted_at')
                 ->select('bill_to_name', DB::raw('COUNT(*) as count'))
                 ->groupBy('bill_to_name')
@@ -79,7 +82,7 @@ class DashboardController extends Controller
                 ->get();
 
             foreach ($statusCounts as $row) {
-                $status = strtolower($row->status);
+                $status = strtolower(trim((string) $row->status));
                 if (isset($response['status'][$status])) {
                     $response['status'][$status] = (int) $row->count;
                 }
@@ -92,8 +95,8 @@ class DashboardController extends Controller
                 case 'monthly':
                     $data = $query->select(
                         DB::raw("DATE_FORMAT(created_at, '%Y-%m') AS label"),
-                        DB::raw("SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) AS paid"),
-                        DB::raw("SUM(CASE WHEN status = 'Unpaid' THEN 1 ELSE 0 END) AS unpaid")
+                        DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
+                        DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
                         ->where('created_at', '>=', now()->subMonths(6))
                         ->groupBy('label')
@@ -104,8 +107,8 @@ class DashboardController extends Controller
                 case 'yearly':
                     $data = $query->select(
                         DB::raw('YEAR(created_at) AS label'),
-                        DB::raw("SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) AS paid"),
-                        DB::raw("SUM(CASE WHEN status = 'Unpaid' THEN 1 ELSE 0 END) AS unpaid")
+                        DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
+                        DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
                         ->groupBy('label')
                         ->orderByDesc('label')
@@ -116,8 +119,8 @@ class DashboardController extends Controller
                 case 'all':
                     $data = $query->select(
                         DB::raw("DATE_FORMAT(created_at, '%Y-%m') AS label"),
-                        DB::raw("SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) AS paid"),
-                        DB::raw("SUM(CASE WHEN status = 'Unpaid' THEN 1 ELSE 0 END) AS unpaid")
+                        DB::raw("SUM(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS paid"),
+                        DB::raw("SUM(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 ELSE 0 END) AS unpaid")
                     )
                         ->groupBy('label')
                         ->orderBy('label')
@@ -128,8 +131,8 @@ class DashboardController extends Controller
                 default:
                     $data = $query->select(
                         DB::raw('DATE(created_at) AS label'),
-                        DB::raw("COUNT(CASE WHEN status = 'Paid' THEN 1 END) AS paid"),
-                        DB::raw("COUNT(CASE WHEN status = 'Unpaid' THEN 1 END) AS unpaid")
+                        DB::raw("COUNT(CASE WHEN " . self::PAID_STATUS_SQL . " THEN 1 END) AS paid"),
+                        DB::raw("COUNT(CASE WHEN " . self::UNPAID_STATUS_SQL . " THEN 1 END) AS unpaid")
                     )
                         ->where('created_at', '>=', now()->subDays(7))
                         ->groupBy(DB::raw('DATE(created_at)'))
@@ -145,7 +148,7 @@ class DashboardController extends Controller
             }
 
             // Total revenue (paid invoices)
-            $response['total_revenue'] = (float) Invoice::where('status', 'Paid')
+            $response['total_revenue'] = (float) Invoice::whereRaw(self::PAID_STATUS_SQL)
                 ->whereNull('deleted_at')
                 ->sum('total_amount');
 
@@ -199,14 +202,19 @@ class DashboardController extends Controller
 
         try {
             // Total Revenue from Paid Invoices
-            $totalRevenue = (float) Invoice::where('status', 'Paid')
+            $totalRevenue = (float) Invoice::whereRaw(self::PAID_STATUS_SQL)
                 ->whereNull('deleted_at')
                 ->sum('total_amount');
 
             // Total Deficit from Unpaid Invoices
-            $totalDeficit = (float) Invoice::where('status', 'Unpaid')
+            $totalDeficit = (float) Invoice::whereRaw(self::UNPAID_STATUS_SQL)
                 ->whereNull('deleted_at')
                 ->sum('total_amount');
+
+            $status = [
+                'paid' => (int) Invoice::whereRaw(self::PAID_STATUS_SQL)->whereNull('deleted_at')->count(),
+                'unpaid' => (int) Invoice::whereRaw(self::UNPAID_STATUS_SQL)->whereNull('deleted_at')->count(),
+            ];
 
             // Recent 5 Invoices
             $recentInvoices = Invoice::whereNull('deleted_at')
@@ -218,6 +226,7 @@ class DashboardController extends Controller
             $response = [
                 'total_revenue' => $totalRevenue,
                 'total_deficit' => $totalDeficit,
+                'status' => $status,
                 'recent_invoices' => $recentInvoices->map(function ($invoice) {
                     return [
                         'invoice_number' => $invoice->invoice_number,
