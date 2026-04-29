@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Expense;
 use App\Models\Client;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,17 @@ class DashboardController extends Controller
 {
     private const PAID_STATUS_SQL = "LOWER(TRIM(status)) = 'paid'";
     private const UNPAID_STATUS_SQL = "LOWER(TRIM(status)) = 'unpaid'";
+
+    private function invoiceQuery(): Builder
+    {
+        $query = Invoice::query()->whereNull('deleted_at');
+
+        if (!has_permission('view_all_invoices')) {
+            $query->where('created_by', Auth::id());
+        }
+
+        return $query;
+    }
 
     private function dateLabelExpression(string $period): string
     {
@@ -59,8 +71,8 @@ class DashboardController extends Controller
 
         // Handle specific client requests
         if ($unpaidClients) {
-            $topUnpaid = Invoice::whereRaw(self::UNPAID_STATUS_SQL)
-                ->whereNull('deleted_at')
+            $topUnpaid = $this->invoiceQuery()
+                ->whereRaw(self::UNPAID_STATUS_SQL)
                 ->select('bill_to_name', DB::raw('COUNT(*) as count'))
                 ->groupBy('bill_to_name')
                 ->orderByDesc('count')
@@ -71,7 +83,8 @@ class DashboardController extends Controller
         }
 
         if ($paidClients) {
-            $topClients = Invoice::whereNull('deleted_at')
+            $topClients = $this->invoiceQuery()
+                ->whereRaw(self::PAID_STATUS_SQL)
                 ->select('bill_to_name', DB::raw('COUNT(*) as total'))
                 ->groupBy('bill_to_name')
                 ->orderByDesc('total')
@@ -93,7 +106,7 @@ class DashboardController extends Controller
 
         try {
             // Count Paid/Unpaid (for doughnut chart)
-            $statusCounts = Invoice::whereNull('deleted_at')
+            $statusCounts = $this->invoiceQuery()
                 ->select('status', DB::raw('COUNT(*) as count'))
                 ->groupBy('status')
                 ->get();
@@ -106,7 +119,7 @@ class DashboardController extends Controller
             }
 
             // Time-based grouped bar data
-            $query = Invoice::whereNull('deleted_at');
+            $query = $this->invoiceQuery();
 
             switch ($period) {
                 case 'monthly':
@@ -169,12 +182,13 @@ class DashboardController extends Controller
             }
 
             // Total revenue (paid invoices)
-            $response['total_revenue'] = (float) Invoice::whereRaw(self::PAID_STATUS_SQL)
-                ->whereNull('deleted_at')
+            $response['total_revenue'] = (float) $this->invoiceQuery()
+                ->whereRaw(self::PAID_STATUS_SQL)
                 ->sum('total_amount');
 
             // Top 5 clients
-            $topClients = Invoice::whereNull('deleted_at')
+            $topClients = $this->invoiceQuery()
+                ->whereRaw(self::PAID_STATUS_SQL)
                 ->select('bill_to_name', DB::raw('COUNT(*) AS total'))
                 ->groupBy('bill_to_name')
                 ->orderByDesc('total')
@@ -189,7 +203,7 @@ class DashboardController extends Controller
             })->toArray();
 
             // Recent 5 invoices
-            $recentInvoices = Invoice::whereNull('deleted_at')
+            $recentInvoices = $this->invoiceQuery()
                 ->select('invoice_number', 'bill_to_name', 'total_amount', 'status', 'created_at')
                 ->orderByDesc('created_at')
                 ->limit(5)
@@ -223,22 +237,22 @@ class DashboardController extends Controller
 
         try {
             // Total Revenue from Paid Invoices
-            $totalRevenue = (float) Invoice::whereRaw(self::PAID_STATUS_SQL)
-                ->whereNull('deleted_at')
+            $totalRevenue = (float) $this->invoiceQuery()
+                ->whereRaw(self::PAID_STATUS_SQL)
                 ->sum('total_amount');
 
             // Total Deficit from Unpaid Invoices
-            $totalDeficit = (float) Invoice::whereRaw(self::UNPAID_STATUS_SQL)
-                ->whereNull('deleted_at')
+            $totalDeficit = (float) $this->invoiceQuery()
+                ->whereRaw(self::UNPAID_STATUS_SQL)
                 ->sum('total_amount');
 
             $status = [
-                'paid' => (int) Invoice::whereRaw(self::PAID_STATUS_SQL)->whereNull('deleted_at')->count(),
-                'unpaid' => (int) Invoice::whereRaw(self::UNPAID_STATUS_SQL)->whereNull('deleted_at')->count(),
+                'paid' => (int) $this->invoiceQuery()->whereRaw(self::PAID_STATUS_SQL)->count(),
+                'unpaid' => (int) $this->invoiceQuery()->whereRaw(self::UNPAID_STATUS_SQL)->count(),
             ];
 
             // Recent 5 Invoices
-            $recentInvoices = Invoice::whereNull('deleted_at')
+            $recentInvoices = $this->invoiceQuery()
                 ->select('invoice_number', 'bill_to_name', 'total_amount', 'status', 'created_at')
                 ->orderByDesc('created_at')
                 ->limit(5)

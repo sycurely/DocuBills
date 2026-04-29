@@ -148,6 +148,23 @@
     height: 300px;
   }
 
+  .dash-chart-empty {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--gray);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 10px;
+  }
+
+  html.dark-mode .dash-chart-empty {
+    background: rgba(22, 28, 45, 0.72);
+  }
+
   .dash-table {
     width: 100%;
     border-collapse: collapse;
@@ -410,10 +427,32 @@
   let timeChart;
   const currencySymbol = '{{ setting("currency_symbol") ?: "$" }}';
 
+  function setChartEmpty(canvasId, isEmpty, message) {
+    const canvas = document.getElementById(canvasId);
+    const wrapper = canvas.closest('.dash-chart-wrap');
+    let emptyState = wrapper.querySelector('.dash-chart-empty');
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.className = 'dash-chart-empty';
+      wrapper.appendChild(emptyState);
+    }
+
+    emptyState.textContent = message;
+    emptyState.style.display = isEmpty ? 'flex' : 'none';
+    canvas.style.display = isEmpty ? 'none' : 'block';
+  }
+
   function renderStatusChart(data) {
     const statusCtx = document.getElementById('statusChart').getContext('2d');
     if (statusChart) {
       statusChart.destroy();
+    }
+
+    const hasStatusData = Number(data.status.paid || 0) + Number(data.status.unpaid || 0) > 0;
+    setChartEmpty('statusChart', !hasStatusData, 'No invoice status data yet');
+    if (!hasStatusData) {
+      return;
     }
 
     statusChart = new Chart(statusCtx, {
@@ -452,20 +491,27 @@
       timeChart.destroy();
     }
 
+    const hasTrendData = [...(data.paid_series || []), ...(data.unpaid_series || [])]
+      .some(value => Number(value || 0) > 0);
+    setChartEmpty('timeChart', !hasTrendData, 'No invoice activity yet');
+    if (!hasTrendData) {
+      return;
+    }
+
     timeChart = new Chart(trendCtx, {
       type: 'bar',
       data: {
-        labels: data.labels.length ? data.labels : ['No Data'],
+        labels: data.labels,
         datasets: [
           {
             label: 'Paid',
-            data: data.paid_series.length ? data.paid_series : [0],
+            data: data.paid_series,
             backgroundColor: '#4cc9f0',
             borderRadius: 6
           },
           {
             label: 'Unpaid',
-            data: data.unpaid_series.length ? data.unpaid_series : [0],
+            data: data.unpaid_series,
             backgroundColor: '#f72585',
             borderRadius: 6
           }
