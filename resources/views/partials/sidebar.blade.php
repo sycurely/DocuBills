@@ -3,8 +3,51 @@
   $canViewInvoices = has_permission('view_invoices');
   $currentRoleName = auth()->check() ? (auth()->user()->role?->name ?? null) : null;
   $canAccessBasicSettings = in_array($currentRoleName, ['admin', 'super_admin'], true);
-  $activeMenu = $activeMenu ?? 'dashboard';
-  $activeTab = $activeTab ?? '';
+
+  if (!isset($activeMenu)) {
+      if (request()->routeIs('dashboard')) {
+          $activeMenu = 'dashboard';
+      } elseif (request()->routeIs('invoices.create')) {
+          $activeMenu = 'create-invoice';
+      } elseif (request()->routeIs('invoices.*')) {
+          $activeMenu = 'invoices';
+      } elseif (request()->routeIs('clients.*')) {
+          $activeMenu = 'clients';
+      } elseif (request()->routeIs('expenses.*')) {
+          $activeMenu = 'expenses';
+      } elseif (request()->routeIs('users.*')) {
+          $activeMenu = 'settings';
+      } elseif (request()->routeIs('settings.*') || request()->routeIs('email-templates.*')) {
+          $activeMenu = 'settings';
+      } elseif (request()->routeIs('login-logs.*')) {
+          $activeMenu = 'login-logs';
+      } elseif (request()->routeIs('trash-bin.*')) {
+          $activeMenu = 'trashbin';
+      } else {
+          $activeMenu = '';
+      }
+  }
+
+  if (!isset($activeTab)) {
+      if (request()->routeIs('settings.index')) {
+          $activeTab = 'basic';
+      } elseif (request()->routeIs('users.*')) {
+          $activeTab = 'users';
+      } elseif (request()->routeIs('settings.permissions*')) {
+          $activeTab = 'permissions';
+      } elseif (request()->routeIs('settings.payment-methods*')) {
+          $activeTab = 'payments';
+      } elseif (request()->routeIs('settings.reminders*')) {
+          $activeTab = 'reminders';
+      } elseif (request()->routeIs('settings.taxes*')) {
+          $activeTab = 'taxes';
+      } elseif (request()->routeIs('email-templates.*')) {
+          $activeTab = 'email_templates';
+      } else {
+          $activeTab = '';
+      }
+  }
+
   $activeSub = $activeSub ?? '';
   $isSettingsPage = ($activeMenu === 'settings');
   $isExpensesPage = in_array($activeMenu, ['expenses', 'expenses_trash']);

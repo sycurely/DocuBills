@@ -649,13 +649,14 @@
         /* Features Section */
         .features {
             background-color: var(--white);
+            padding-bottom: 44px;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
-            margin-bottom: 60px;
+            margin-bottom: 24px;
         }
 
         .feature-card {
@@ -741,6 +742,7 @@
             background-color: var(--light-bg);
             position: relative;
             overflow: hidden;
+            padding-top: 56px;
         }
 
         .steps::before {
@@ -1267,6 +1269,8 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            padding: 56px 0 64px;
+            margin-top: 0;
         }
 
         .cta::before {
@@ -1288,14 +1292,14 @@
         }
 
         .cta h2 {
-            font-size: 42px;
-            margin-bottom: 20px;
+            font-size: 34px;
+            margin-bottom: 16px;
         }
 
         .cta p {
-            font-size: 18px;
+            font-size: 15px;
             opacity: 0.9;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
@@ -1303,26 +1307,24 @@
 
         .cta-badges {
             display: flex;
-            gap: 20px;
+            gap: 14px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 40px;
+            margin-bottom: 34px;
         }
 
         .cta-badge {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 24px;
+            padding: 10px 18px;
             border-radius: 50px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .cta-form {
-            max-width: 600px;
-            margin: 0 auto;
+            gap: 8px;
+            font-size: 14px;
+            min-width: 206px;
+            justify-content: center;
         }
 
         .form-group {
@@ -1345,6 +1347,168 @@
         .form-input:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+
+        .cta-signup-shell {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .cta-alert {
+            margin: 0 auto 14px;
+            max-width: 840px;
+            padding: 14px 16px;
+            border-radius: 12px;
+        }
+
+        .cta-alert-success {
+            background: rgba(31, 214, 117, 0.15);
+            color: #d8ffe8;
+            border: 1px solid rgba(31, 214, 117, 0.35);
+        }
+
+        .cta-alert-error {
+            background: rgba(255, 99, 99, 0.15);
+            color: #ffdede;
+            border: 1px solid rgba(255, 99, 99, 0.35);
+        }
+
+        .signup-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            text-align: left;
+            align-items: stretch;
+        }
+
+        .signup-option-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 24px;
+            padding: 24px 26px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 22px 60px rgba(8, 15, 37, 0.32);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .signup-option-card-featured {
+            background: linear-gradient(180deg, rgba(67, 97, 238, 0.22) 0%, rgba(255, 191, 0, 0.12) 100%);
+            border-color: rgba(255, 255, 255, 0.24);
+            transform: translateY(-6px);
+        }
+
+        .signup-option-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-size: 22px;
+        }
+
+        .signup-option-icon-featured {
+            background: linear-gradient(135deg, #4361ee 0%, #ffcc00 100%);
+            color: #0f172a;
+        }
+
+        .signup-option-header h3 {
+            font-size: 22px;
+            line-height: 1.18;
+            margin-bottom: 6px;
+        }
+
+        .signup-option-header p {
+            margin: 0;
+            max-width: none;
+            font-size: 14px;
+            line-height: 1.45;
+            opacity: 0.85;
+        }
+
+        .signup-option-eyebrow {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9fb3ff;
+        }
+
+        .signup-option-points {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px 14px;
+        }
+
+        .signup-option-points span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.92);
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .signup-option-points i {
+            color: #ffcc00;
+        }
+
+        .signup-form-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .signup-form-group .form-input {
+            min-width: 100%;
+            padding: 13px 18px;
+            font-size: 15px;
+        }
+
+        .signup-card-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 14px 20px;
+        }
+
+        .signup-card-btn-featured {
+            margin-top: auto;
+        }
+
+        .signup-company-preview {
+            margin-top: auto;
+            display: grid;
+            gap: 8px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(10, 16, 37, 0.34);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .signup-company-preview-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .signup-company-preview-row strong {
+            color: #ffffff;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .cta-terms {
+            font-size: 13px;
+            margin-top: 18px;
+            opacity: 0.7;
         }
 
         /* Footer */
@@ -1485,6 +1649,10 @@
             section {
                 padding: 80px 0;
             }
+
+            .cta {
+                padding: 40px 0 48px;
+            }
             
             .hero-text h1 {
                 font-size: 40px;
@@ -1492,6 +1660,26 @@
             
             .section-title h2 {
                 font-size: 32px;
+            }
+
+            .cta h2 {
+                font-size: 28px;
+            }
+
+            .cta p {
+                font-size: 14px;
+                margin-bottom: 22px;
+            }
+
+            .cta-badges {
+                gap: 10px;
+                margin-bottom: 24px;
+            }
+
+            .cta-badge {
+                font-size: 13px;
+                padding: 9px 14px;
+                min-width: 0;
             }
             
             .nav-links, .nav-actions {
@@ -1540,8 +1728,40 @@
                 flex-direction: column;
             }
             
+            .signup-options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signup-option-points {
+                grid-template-columns: 1fr;
+            }
+
+            .signup-option-card-featured {
+                transform: none;
+            }
+
+            .signup-option-card {
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            .signup-option-header h3 {
+                font-size: 24px;
+            }
+
             .form-input {
                 min-width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .signup-company-preview-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .signup-company-preview-row strong {
+                text-align: left;
             }
         }
         

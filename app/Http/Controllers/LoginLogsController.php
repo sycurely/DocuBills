@@ -97,6 +97,10 @@ class LoginLogsController extends Controller
      */
     public function terminateSession(UserSession $session): RedirectResponse
     {
+        if (!in_array((int) $session->user_id, workspace_user_ids(), true)) {
+            abort(404);
+        }
+
         $canTerminateAnySession = has_permission('terminate_sessions');
         $canTerminateOwnSession = has_permission('terminate_own_session');
 

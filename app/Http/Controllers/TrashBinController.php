@@ -135,16 +135,12 @@ class TrashBinController extends Controller
 
     private function canAccessItem(object $item): bool
     {
-        if (has_permission('view_all_trash')) {
-            return true;
-        }
-
         if (isset($item->created_by)) {
-            return (int) ($item->created_by ?? 0) === (int) Auth::id();
+            return in_array((int) ($item->created_by ?? 0), workspace_user_ids(), true);
         }
 
         if ($item instanceof User) {
-            return (int) $item->id === (int) Auth::id();
+            return $item->workspaceOwnerId() === current_workspace_owner_id();
         }
 
         return false;
@@ -216,9 +212,11 @@ class TrashBinController extends Controller
             ->withTrashed()
             ->orderByDesc('deleted_at');
 
-        if (!$canViewAllTrash) {
-            $query->where('id', Auth::id());
-        }
+        $ownerId = current_workspace_owner_id();
+        $query->where(function ($inner) use ($ownerId) {
+            $inner->where('workspace_owner_id', $ownerId)
+                ->orWhere('id', $ownerId);
+        });
 
         return $query->limit(100)->get();
     }

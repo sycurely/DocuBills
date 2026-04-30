@@ -4,6 +4,9 @@
 
 @push('styles')
 <style>
+  .create-invoice-shell {
+    width: min(1240px, 100%);
+  }
   .form-section {
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -223,127 +226,138 @@
 @section('content')
   @php
     $validationMessages = \App\Services\InvoiceValidationContract::uiMessages();
+    $createInvoiceAccessDenied = $createInvoiceAccessDenied ?? false;
   @endphp
-  <div class="page-header">
-    <h1 class="page-title">Create New Invoice</h1>
+  <div class="create-invoice-shell">
+    <div class="page-header">
+      <h1 class="page-title">Create Invoice</h1>
+    </div>
+
+    @if($createInvoiceAccessDenied)
+      <div class="form-section" style="text-align: center;">
+        <p style="font-size: 1.1rem; color: #b91c1c; font-weight: 600;">
+          You don't have access to this. Please ask your Super Admin or Admin.
+        </p>
+      </div>
+    @else
+      <form id="invoiceForm" method="POST" action="{{ route('invoices.import-source') }}" enctype="multipart/form-data">
+        @csrf
+
+        <div class="form-section">
+          <h2 class="form-section-title"><span class="material-icons-outlined">apartment</span> Bill To Information</h2>
+          <div class="form-grid">
+            <div class="form-row position-relative">
+              <label for="companyName" class="form-label required">Company Name</label>
+              <input type="text" id="companyName" name="bill_to[Company Name]" class="form-control @error('bill_to.Company Name') is-invalid @enderror" placeholder="Enter company name" required autocomplete="off" value="{{ old('bill_to.Company Name') }}">
+              <div id="clientSuggestions" class="autocomplete-list"></div>
+              @error('bill_to.Company Name')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+            <div class="form-row">
+              <label for="contactName" class="form-label">Contact Name</label>
+              <input type="text" id="contactName" name="bill_to[Contact Name]" class="form-control @error('bill_to.Contact Name') is-invalid @enderror" placeholder="Contact person's name" value="{{ old('bill_to.Contact Name') }}">
+              @error('bill_to.Contact Name')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+            <div class="form-row">
+              <label for="billAddress" class="form-label">Address</label>
+              <input type="text" id="billAddress" name="bill_to[Address]" class="form-control @error('bill_to.Address') is-invalid @enderror" placeholder="Full address" value="{{ old('bill_to.Address') }}">
+              @error('bill_to.Address')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+            <div class="form-row">
+              <label for="billPhone" class="form-label">Phone</label>
+              <input type="text" id="billPhone" name="bill_to[Phone]" class="form-control @error('bill_to.Phone') is-invalid @enderror" placeholder="Phone number" value="{{ old('bill_to.Phone') }}">
+              @error('bill_to.Phone')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+            <div class="form-row">
+              <label for="billEmail" class="form-label required">Email</label>
+              <input type="email" id="billEmail" name="bill_to[Email]" class="form-control @error('bill_to.Email') is-invalid @enderror" placeholder="Email address" required value="{{ old('bill_to.Email') }}">
+              @error('bill_to.Email')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="form-section-title"><span class="material-icons-outlined">storage</span> Invoice Data Source</h2>
+          <div class="form-row">
+            <label class="form-label">Choose Invoice Source</label>
+            <div class="source-picker" id="sourcePicker">
+              <label class="source-option" data-source-card data-source="google">
+                <input type="radio" name="invoice_source" value="google" {{ old('invoice_source', session('import_error') ? 'upload' : 'google') === 'google' ? 'checked' : '' }}>
+                <span>
+                  <span class="source-title"><span class="material-icons-outlined">link</span> Google Sheet URL</span>
+                  <span class="source-desc">Use a shared Google Sheet as invoice data source.</span>
+                </span>
+              </label>
+              <label class="source-option" data-source-card data-source="upload">
+                <input type="radio" name="invoice_source" value="upload" {{ old('invoice_source', session('import_error') ? 'upload' : 'google') === 'upload' ? 'checked' : '' }}>
+                <span>
+                  <span class="source-title"><span class="material-icons-outlined">upload_file</span> Upload Excel File</span>
+                  <span class="source-desc">Upload local `.xls`, `.xlsx`, or `.csv` data.</span>
+                </span>
+              </label>
+            </div>
+            @error('invoice_source')
+              <div class="error-text">{{ $message }}</div>
+            @enderror
+            <div id="sourceError" class="error-text source-error is-hidden"></div>
+          </div>
+
+          <div id="google-section" class="source-panel">
+            <div class="form-row">
+              <label for="google_sheet_url" class="form-label required">Google Sheet URL</label>
+              <input type="url" id="google_sheet_url" name="google_sheet_url" class="form-control @error('google_sheet_url') is-invalid @enderror" placeholder="https://docs.google.com/spreadsheets/..." value="{{ old('google_sheet_url') }}">
+              <p class="upload-hint">Make sure the sheet is shared as "Anyone with the link can view".</p>
+              @error('google_sheet_url')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
+
+          <div id="upload-section" class="source-panel is-hidden">
+            @if(session('import_error'))
+              <div class="alert alert-danger">
+                <span class="material-icons-outlined">error</span>
+                {{ session('import_error') }}
+              </div>
+            @endif
+            <div class="form-row">
+              <label class="form-label required">Upload Excel File</label>
+              <div class="upload-container" id="uploadArea">
+                <div class="upload-icon"><span class="material-icons-outlined">table_view</span></div>
+                <p class="upload-text">Drag and drop your Excel file here or click to browse</p>
+                <p class="upload-hint">
+                  @if($zipAvailable)
+                    Supports .xls, .xlsx, .csv
+                  @else
+                    XLSX requires PHP Zip. Please upload .csv
+                  @endif
+                </p>
+                <input type="file" id="excel_file" name="file" accept="{{ $zipAvailable ? '.xls,.xlsx,.csv' : '.csv' }}" class="is-hidden">
+              </div>
+              <div id="fileName" class="file-name"></div>
+              <div id="fileError" class="error-text is-hidden"></div>
+              @error('file')
+                <div class="error-text">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
+        </div>
+
+        <div class="actions-bar">
+          <button type="submit" class="btn btn-primary"><span class="material-icons-outlined">receipt_long</span> Create Invoice</button>
+        </div>
+      </form>
+    @endif
   </div>
-
-  <form id="invoiceForm" method="POST" action="{{ route('invoices.import-source') }}" enctype="multipart/form-data">
-    @csrf
-
-    <div class="form-section">
-      <h2 class="form-section-title"><span class="material-icons-outlined">apartment</span> Bill To Information</h2>
-      <div class="form-grid">
-        <div class="form-row position-relative">
-          <label for="companyName" class="form-label required">Company Name</label>
-          <input type="text" id="companyName" name="bill_to[Company Name]" class="form-control @error('bill_to.Company Name') is-invalid @enderror" placeholder="Enter company name" required autocomplete="off" value="{{ old('bill_to.Company Name') }}">
-          <div id="clientSuggestions" class="autocomplete-list"></div>
-          @error('bill_to.Company Name')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-        <div class="form-row">
-          <label for="contactName" class="form-label">Contact Name</label>
-          <input type="text" id="contactName" name="bill_to[Contact Name]" class="form-control @error('bill_to.Contact Name') is-invalid @enderror" placeholder="Contact person's name" value="{{ old('bill_to.Contact Name') }}">
-          @error('bill_to.Contact Name')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-        <div class="form-row">
-          <label for="billAddress" class="form-label">Address</label>
-          <input type="text" id="billAddress" name="bill_to[Address]" class="form-control @error('bill_to.Address') is-invalid @enderror" placeholder="Full address" value="{{ old('bill_to.Address') }}">
-          @error('bill_to.Address')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-        <div class="form-row">
-          <label for="billPhone" class="form-label">Phone</label>
-          <input type="text" id="billPhone" name="bill_to[Phone]" class="form-control @error('bill_to.Phone') is-invalid @enderror" placeholder="Phone number" value="{{ old('bill_to.Phone') }}">
-          @error('bill_to.Phone')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-        <div class="form-row">
-          <label for="billEmail" class="form-label required">Email</label>
-          <input type="email" id="billEmail" name="bill_to[Email]" class="form-control @error('bill_to.Email') is-invalid @enderror" placeholder="Email address" required value="{{ old('bill_to.Email') }}">
-          @error('bill_to.Email')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <h2 class="form-section-title"><span class="material-icons-outlined">storage</span> Invoice Data Source</h2>
-      <div class="form-row">
-        <label class="form-label">Choose Invoice Source</label>
-        <div class="source-picker" id="sourcePicker">
-          <label class="source-option" data-source-card data-source="google">
-            <input type="radio" name="invoice_source" value="google" {{ old('invoice_source', session('import_error') ? 'upload' : 'google') === 'google' ? 'checked' : '' }}>
-            <span>
-              <span class="source-title"><span class="material-icons-outlined">link</span> Google Sheet URL</span>
-              <span class="source-desc">Use a shared Google Sheet as invoice data source.</span>
-            </span>
-          </label>
-          <label class="source-option" data-source-card data-source="upload">
-            <input type="radio" name="invoice_source" value="upload" {{ old('invoice_source', session('import_error') ? 'upload' : 'google') === 'upload' ? 'checked' : '' }}>
-            <span>
-              <span class="source-title"><span class="material-icons-outlined">upload_file</span> Upload Excel File</span>
-              <span class="source-desc">Upload local `.xls`, `.xlsx`, or `.csv` data.</span>
-            </span>
-          </label>
-        </div>
-        @error('invoice_source')
-          <div class="error-text">{{ $message }}</div>
-        @enderror
-        <div id="sourceError" class="error-text source-error is-hidden"></div>
-      </div>
-
-      <div id="google-section" class="source-panel">
-        <div class="form-row">
-          <label for="google_sheet_url" class="form-label required">Google Sheet URL</label>
-          <input type="url" id="google_sheet_url" name="google_sheet_url" class="form-control @error('google_sheet_url') is-invalid @enderror" placeholder="https://docs.google.com/spreadsheets/..." value="{{ old('google_sheet_url') }}">
-          <p class="upload-hint">Make sure the sheet is shared as "Anyone with the link can view".</p>
-          @error('google_sheet_url')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-      </div>
-
-      <div id="upload-section" class="source-panel is-hidden">
-        @if(session('import_error'))
-          <div class="alert alert-danger">
-            <span class="material-icons-outlined">error</span>
-            {{ session('import_error') }}
-          </div>
-        @endif
-        <div class="form-row">
-          <label class="form-label required">Upload Excel File</label>
-          <div class="upload-container" id="uploadArea">
-            <div class="upload-icon"><span class="material-icons-outlined">table_view</span></div>
-            <p class="upload-text">Drag and drop your Excel file here or click to browse</p>
-            <p class="upload-hint">
-              @if($zipAvailable)
-                Supports .xls, .xlsx, .csv
-              @else
-                XLSX requires PHP Zip. Please upload .csv
-              @endif
-            </p>
-            <input type="file" id="excel_file" name="file" accept="{{ $zipAvailable ? '.xls,.xlsx,.csv' : '.csv' }}" class="is-hidden">
-          </div>
-          <div id="fileName" class="file-name"></div>
-          <div id="fileError" class="error-text is-hidden"></div>
-          @error('file')
-            <div class="error-text">{{ $message }}</div>
-          @enderror
-        </div>
-      </div>
-    </div>
-
-    <div class="actions-bar">
-      <button type="submit" class="btn btn-primary"><span class="material-icons-outlined">receipt_long</span> Create Invoice</button>
-    </div>
-  </form>
 @endsection
 
 @push('scripts')

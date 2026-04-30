@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +10,23 @@ use Illuminate\Support\Facades\Schema;
 
 class Tax extends Model
 {
+    protected static function booted(): void
+    {
+        static::addGlobalScope('workspace', function (Builder $builder): void {
+            if (!auth()->check() || !Schema::hasColumn('taxes', 'created_by')) {
+                return;
+            }
+
+            $userIds = workspace_user_ids();
+            if ($userIds === []) {
+                $builder->whereRaw('1 = 0');
+                return;
+            }
+
+            $builder->whereIn($builder->qualifyColumn('created_by'), $userIds);
+        });
+    }
+
     protected $fillable = [
         'name',
         'percentage',
@@ -33,7 +51,13 @@ class Tax extends Model
             return $query;
         }
 
-        return $query->where('created_by', Auth::id());
+        $userIds = workspace_user_ids();
+
+        if ($userIds === []) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereIn('created_by', $userIds);
     }
 
     /**

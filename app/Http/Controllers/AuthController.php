@@ -144,6 +144,7 @@ class AuthController extends Controller
         $email = strtolower(trim($validated['email']));
 
         $existingUser = User::where('email', $email)->whereNull('deleted_at')->first();
+        $trashedUser = User::onlyTrashed()->where('email', $email)->first();
 
         if ($existingUser) {
             $sent = EmailService::sendRenderedReminderNow(
@@ -155,11 +156,15 @@ class AuthController extends Controller
 
             if (!$sent) {
                 return back()->withInput()->withErrors([
-                    'email' => 'Ye email already registered hai, lekin account email send nahi ho saki. Mail settings check karein.',
+                    'email' => 'This email is already registered, but we could not send the account email. Please check the mail settings.',
                 ]);
             }
 
-            return back()->withInput()->with('success', 'Ye email already registered hai. Login details email par bhej di gayi hain.');
+            return back()->withInput()->with('success', 'This email is already registered. Login details have been sent to the email address.');
+        }
+
+        if ($trashedUser) {
+            $trashedUser->forceDelete();
         }
 
         $baseUsername = Str::lower((string) Str::before($email, '@'));
@@ -167,7 +172,7 @@ class AuthController extends Controller
         $username = $baseUsername;
         $suffix = 1;
 
-        while (User::where('username', $username)->whereNull('deleted_at')->exists()) {
+        while (User::withTrashed()->where('username', $username)->exists()) {
             $username = $baseUsername . $suffix;
             $suffix++;
         }
@@ -186,8 +191,11 @@ class AuthController extends Controller
             'email' => $email,
             'password' => Hash::make($plainPassword),
             'role_id' => $roleId,
+            'workspace_owner_id' => null,
             'is_suspended' => false,
         ]);
+
+        $user->forceFill(['workspace_owner_id' => $user->id])->save();
 
         try {
             $sent = EmailService::sendRenderedReminderNow(
@@ -206,11 +214,103 @@ class AuthController extends Controller
             report($e);
 
             return back()->withInput()->withErrors([
-                'email' => 'Account create ho gaya tha lekin confirmation email send nahi ho saki. Mail settings check karein aur dubara try karein.',
+                'email' => 'The account was created, but we could not send the confirmation email. Please check the mail settings and try again.',
             ]);
         }
 
-        return back()->with('success', 'Account create ho gaya hai. Login details aap ke email par bhej di gayi hain.');
+        return back()->with('success', 'Your account has been created. Login details have been sent to your email address.');
+    }
+
+    /**
+     * Handle public company signup from the landing page.
+     */
+    public function signupCompany(Request $request)
+    {
+        $validated = $request->validate([
+            'company_name' => 'required|string|max:255',
+            'full_name' => 'required|string|max:255',
+            'company_email' => 'required|string|email|max:255',
+        ]);
+
+        $companyName = trim($validated['company_name']);
+        $fullName = trim($validated['full_name']);
+        $email = strtolower(trim($validated['company_email']));
+
+        $existingUser = User::where('email', $email)->whereNull('deleted_at')->first();
+        $trashedUser = User::onlyTrashed()->where('email', $email)->first();
+
+        if ($existingUser) {
+            $sent = EmailService::sendRenderedReminderNow(
+                toEmail: $existingUser->email,
+                toName: $existingUser->full_name ?: $existingUser->name ?: $existingUser->username,
+                subject: 'Your DocuBills company account is already active',
+                body: $this->buildExistingAccountEmail($existingUser)
+            );
+
+            if (!$sent) {
+                return back()->withInput()->withErrors([
+                    'company_email' => 'This company email is already registered, but we could not send the account email. Please check the mail settings.',
+                ]);
+            }
+
+            return back()->withInput()->with('success', 'This company email is already registered. Login details have been sent to the email address.');
+        }
+
+        if ($trashedUser) {
+            $trashedUser->forceDelete();
+        }
+
+        $baseUsername = Str::lower((string) Str::before($email, '@'));
+        $baseUsername = preg_replace('/[^a-z0-9._-]/', '', $baseUsername) ?: 'companyadmin';
+        $username = $baseUsername;
+        $suffix = 1;
+
+        while (User::withTrashed()->where('username', $username)->exists()) {
+            $username = $baseUsername . $suffix;
+            $suffix++;
+        }
+
+        $plainPassword = Str::password(12, true, true, false, false);
+        $roleId = Role::where('name', 'admin')->value('id')
+            ?? Role::where('name', 'super_admin')->value('id')
+            ?? Role::where('name', 'manager')->value('id')
+            ?? Role::orderBy('id')->value('id');
+
+        $user = User::create([
+            'username' => $username,
+            'name' => $fullName,
+            'full_name' => $fullName,
+            'email' => $email,
+            'password' => Hash::make($plainPassword),
+            'role_id' => $roleId,
+            'workspace_owner_id' => null,
+            'is_suspended' => false,
+        ]);
+
+        $user->forceFill(['workspace_owner_id' => $user->id])->save();
+
+        try {
+            $sent = EmailService::sendRenderedReminderNow(
+                toEmail: $user->email,
+                toName: $user->full_name ?: $user->name ?: $user->username,
+                subject: 'Your DocuBills company admin account details',
+                body: $this->buildCompanySignupEmail($companyName, $fullName, $user->email, $username, $plainPassword)
+            );
+
+            if (!$sent) {
+                throw new \RuntimeException('Mail transport returned false.');
+            }
+        } catch (\Throwable $e) {
+            $user->delete();
+
+            report($e);
+
+            return back()->withInput()->withErrors([
+                'company_email' => 'The company account was created, but we could not send the confirmation email. Please check the mail settings and try again.',
+            ]);
+        }
+
+        return back()->with('success', 'The company account has been created. Admin login details have been sent to the email address.');
     }
 
     private function buildTrialSignupEmail(string $email, string $username, string $plainPassword): string
@@ -248,6 +348,28 @@ HTML;
   <p><strong>Email:</strong> {$safeEmail}<br><strong>Username:</strong> {$safeUsername}</p>
   <p>You can sign in here: <a href="{$safeLoginUrl}">{$safeLoginUrl}</a></p>
   <p>If you forgot your password, please contact the administrator to reset it.</p>
+</div>
+HTML;
+    }
+
+    private function buildCompanySignupEmail(string $companyName, string $fullName, string $email, string $username, string $plainPassword): string
+    {
+        $loginUrl = route('login');
+        $safeCompanyName = e($companyName);
+        $safeFullName = e($fullName);
+        $safeEmail = e($email);
+        $safeUsername = e($username);
+        $safePassword = e($plainPassword);
+        $safeLoginUrl = e($loginUrl);
+
+        return <<<HTML
+<div style="font-family: Arial, sans-serif; color: #1f2544; line-height: 1.6;">
+  <h2 style="margin-bottom: 16px;">Welcome to DocuBills</h2>
+  <p>Hello <strong>{$safeFullName}</strong>,</p>
+  <p>Your company workspace request for <strong>{$safeCompanyName}</strong> has been created and your account is set up as an Admin.</p>
+  <p><strong>Email:</strong> {$safeEmail}<br><strong>Username:</strong> {$safeUsername}<br><strong>Password:</strong> {$safePassword}</p>
+  <p>You can sign in here: <a href="{$safeLoginUrl}">{$safeLoginUrl}</a></p>
+  <p>For security, please log in and change your password after your first sign-in.</p>
 </div>
 HTML;
     }

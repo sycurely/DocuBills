@@ -7,13 +7,25 @@ use Illuminate\Support\Facades\Cache;
 
 class SettingService
 {
+    private static function scopedKey(string $key): string
+    {
+        if (!auth()->check()) {
+            return $key;
+        }
+
+        $ownerId = current_workspace_owner_id();
+        return $ownerId ? "workspace_{$ownerId}.{$key}" : $key;
+    }
+
     /**
      * Get a setting value.
      */
     public static function get(string $key, $default = '')
     {
-        return Cache::remember("setting.{$key}", 3600, function () use ($key, $default) {
-            return Setting::get($key, $default);
+        $scopedKey = self::scopedKey($key);
+
+        return Cache::remember("setting.{$scopedKey}", 3600, function () use ($scopedKey, $default) {
+            return Setting::get($scopedKey, $default);
         });
     }
 
@@ -30,8 +42,10 @@ class SettingService
      */
     public static function set(string $key, $value): void
     {
-        Setting::set($key, $value);
-        Cache::forget("setting.{$key}");
+        $scopedKey = self::scopedKey($key);
+
+        Setting::set($scopedKey, $value);
+        Cache::forget("setting.{$scopedKey}");
     }
 
     /**

@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Services\PermissionService;
 use App\Services\SettingService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 if (!function_exists('has_permission')) {
@@ -95,6 +96,39 @@ if (!function_exists('setting')) {
     function setting(string $key, $default = '')
     {
         return SettingService::get($key, $default);
+    }
+}
+
+if (!function_exists('current_workspace_owner_id')) {
+    function current_workspace_owner_id(): ?int
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return null;
+        }
+
+        return (int) ($user->workspace_owner_id ?: $user->id);
+    }
+}
+
+if (!function_exists('workspace_user_ids')) {
+    function workspace_user_ids(): array
+    {
+        $ownerId = current_workspace_owner_id();
+
+        if (!$ownerId) {
+            return [];
+        }
+
+        return User::query()
+            ->where('workspace_owner_id', $ownerId)
+            ->orWhere('id', $ownerId)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }
 

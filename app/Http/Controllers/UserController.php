@@ -14,23 +14,40 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    private function ensureSameWorkspace(User $user): void
+    {
+        if ($user->workspaceOwnerId() !== current_workspace_owner_id()) {
+            abort(404);
+        }
+    }
+
     /**
      * Display a listing of users.
      */
     public function index()
     {
         if (!has_permission('manage_users_page')) {
-            abort(403, 'Unauthorized action.');
+            return view('users.index', [
+                'users' => collect(),
+                'roles' => collect(),
+                'usersAccessDenied' => true,
+            ]);
         }
 
         $users = User::with('role')
+            ->where(function ($query) {
+                $ownerId = current_workspace_owner_id();
+                $query->where('workspace_owner_id', $ownerId)
+                    ->orWhere('id', $ownerId);
+            })
             ->whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $roles = Role::orderBy('id')->get();
 
-        return view('users.index', compact('users', 'roles'));
+        return view('users.index', compact('users', 'roles'))
+            ->with('usersAccessDenied', false);
     }
 
     /**
@@ -40,6 +57,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
+        $data['workspace_owner_id'] = current_workspace_owner_id();
 
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
@@ -59,6 +77,8 @@ class UserController extends Controller
      */
     public function show(User $user, Request $request)
     {
+        $this->ensureSameWorkspace($user);
+
         $isSelfProfile = Auth::id() === $user->id;
         if (!$isSelfProfile && !has_permission('manage_users_page')) {
             abort(403, 'Unauthorized action.');
@@ -78,6 +98,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->ensureSameWorkspace($user);
+
         if (!has_permission('edit_user')) {
             abort(403, 'Unauthorized action.');
         }
@@ -94,6 +116,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+        $this->ensureSameWorkspace($user);
+
         $data = $request->validated();
 
         // Update password only if provided
@@ -127,6 +151,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->ensureSameWorkspace($user);
+
         if (!has_permission('delete_user')) {
             abort(403, 'Unauthorized action.');
         }
@@ -146,6 +172,8 @@ class UserController extends Controller
      */
     public function toggleSuspend(User $user)
     {
+        $this->ensureSameWorkspace($user);
+
         if (!has_permission('suspend_users')) {
             abort(403, 'Unauthorized action.');
         }
@@ -225,7 +253,7 @@ class UserController extends Controller
         $request->validate([
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:8',
-            'confirm_password' => 'required|string|same:new_password',
+            'new_password_confirmation' => 'required|string|same:new_password',
         ]);
 
         $user = Auth::user();
@@ -243,7 +271,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Password updated successfully.',
+            'message' => 'Your password has been changed successfully.',
         ]);
     }
 }

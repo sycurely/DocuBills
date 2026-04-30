@@ -13,7 +13,7 @@ class PermissionController extends Controller
     {
         $user = auth()->user();
 
-        return (bool) ($user?->isAdminOrSuperAdmin() || has_permission('manage_permissions'));
+        return (bool) ($user?->isSuperAdmin());
     }
 
     private function ensureCanManagePermissions(): void

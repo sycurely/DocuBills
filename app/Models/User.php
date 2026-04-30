@@ -27,6 +27,7 @@ class User extends Authenticatable
         'full_name',
         'password',
         'role_id',
+        'workspace_owner_id',
         'is_suspended',
         'avatar',
     ];
@@ -62,6 +63,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function workspaceOwner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'workspace_owner_id');
+    }
+
     /**
      * Get the permissions for the user through their role.
      */
@@ -93,6 +99,11 @@ class User extends Authenticatable
     public function sessions(): HasMany
     {
         return $this->hasMany(UserSession::class);
+    }
+
+    public function workspaceUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'workspace_owner_id');
     }
 
     /**
@@ -170,5 +181,10 @@ class User extends Authenticatable
     public function isSuspended(): bool
     {
         return $this->is_suspended === true;
+    }
+
+    public function workspaceOwnerId(): int
+    {
+        return (int) ($this->workspace_owner_id ?: $this->id);
     }
 }

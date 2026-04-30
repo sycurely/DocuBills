@@ -780,29 +780,95 @@
                     </div>
                 </div>
                 
-                <div class="cta-form">
+                <div class="cta-signup-shell">
                     @if (session('success'))
-                        <div style="margin-bottom: 16px; padding: 14px 16px; border-radius: 12px; background: rgba(31, 214, 117, 0.15); color: #d8ffe8; border: 1px solid rgba(31, 214, 117, 0.35);">
+                        <div class="cta-alert cta-alert-success">
                             {{ session('success') }}
                         </div>
                     @endif
 
                     @if ($errors->has('email'))
-                        <div style="margin-bottom: 16px; padding: 14px 16px; border-radius: 12px; background: rgba(255, 99, 99, 0.15); color: #ffdede; border: 1px solid rgba(255, 99, 99, 0.35);">
+                        <div class="cta-alert cta-alert-error">
                             {{ $errors->first('email') }}
                         </div>
                     @endif
 
-                    <form id="signupForm" method="POST" action="{{ route('signup.trial') }}">
-                        @csrf
-                        <div class="form-group">
-                            <input type="email" name="email" class="form-input" placeholder="Enter your work email" value="{{ old('email') }}" required>
-                            <button type="submit" class="btn btn-accent btn-lg">
-                                Start Free Trial <i class="fas fa-arrow-right"></i>
-                            </button>
+                    @if ($errors->has('company_email'))
+                        <div class="cta-alert cta-alert-error">
+                            {{ $errors->first('company_email') }}
                         </div>
-                    </form>
-                    <p style="font-size: 14px; margin-top: 20px; opacity: 0.7;">By signing up, you agree to our Terms of Service and Privacy Policy.</p>
+                    @endif
+
+                    <div class="signup-options-grid">
+                        <div class="signup-option-card">
+                            <div class="signup-option-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="signup-option-header">
+                                <span class="signup-option-eyebrow">For Individuals</span>
+                                <h3>Individual Signup</h3>
+                                <p>Create invoices and manage billing with a fast personal setup.</p>
+                            </div>
+
+                            <div class="signup-option-points">
+                                <span><i class="fas fa-check-circle"></i> Quick setup</span>
+                                <span><i class="fas fa-check-circle"></i> Single user access</span>
+                                <span><i class="fas fa-check-circle"></i> Best for freelancers</span>
+                            </div>
+
+                            <form id="signupForm" method="POST" action="{{ route('signup.trial') }}">
+                                @csrf
+                                <div class="form-group signup-form-group">
+                                    <input type="email" name="email" class="form-input" placeholder="Enter your work email" value="{{ old('email') }}" required>
+                                    <button type="submit" class="btn btn-secondary btn-lg signup-card-btn">
+                                        Sign Up as User <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="signup-option-card signup-option-card-featured">
+                            <div class="signup-option-icon signup-option-icon-featured">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="signup-option-header">
+                                <span class="signup-option-eyebrow">For Teams & Businesses</span>
+                                <h3>Company Signup</h3>
+                                <p>Register your company and join as the Admin.</p>
+                            </div>
+
+                            <div class="signup-option-points">
+                                <span><i class="fas fa-check-circle"></i> Create company workspace</span>
+                                <span><i class="fas fa-check-circle"></i> Manage team roles</span>
+                                <span><i class="fas fa-check-circle"></i> Admin controls</span>
+                            </div>
+
+                            <div class="signup-company-preview">
+                                <div class="signup-company-preview-row">
+                                    <span>Workspace</span>
+                                    <strong>Your Company Billing Hub</strong>
+                                </div>
+                                <div class="signup-company-preview-row">
+                                    <span>Access</span>
+                                    <strong>Admin + Team Invitations</strong>
+                                </div>
+                            </div>
+
+                            <form method="POST" action="{{ route('signup.company') }}">
+                                @csrf
+                                <div class="form-group signup-form-group">
+                                    <input type="text" name="company_name" class="form-input" placeholder="Company name" value="{{ old('company_name') }}" required>
+                                    <input type="text" name="full_name" class="form-input" placeholder="Your full name" value="{{ old('full_name') }}" required>
+                                    <input type="email" name="company_email" class="form-input" placeholder="Work email" value="{{ old('company_email') }}" required>
+                                    <button type="submit" class="btn btn-accent btn-lg signup-card-btn signup-card-btn-featured">
+                                        Register Company <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <p class="cta-terms">By signing up, you agree to our Terms of Service and Privacy Policy.</p>
                 </div>
             </div>
         </div>
