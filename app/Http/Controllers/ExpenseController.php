@@ -24,8 +24,6 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
-        $this->ensureAdminAccess();
-
         if (!has_permission('access_expenses_tab')) {
             return view('expenses.index', [
                 'expenses' => new LengthAwarePaginator(
