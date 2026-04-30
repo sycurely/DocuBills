@@ -7,6 +7,7 @@ use App\Models\Tax;
 use App\Services\TaxService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TaxController extends Controller
@@ -24,7 +25,7 @@ class TaxController extends Controller
     public function index()
     {
         $taxes = Tax::forCurrentUser()->orderBy('id')->get();
-        $canManageTaxes = auth()->user()?->isAdminOrSuperAdmin() ?? false;
+        $canManageTaxes = Auth::check();
 
         return view('settings.taxes', compact('taxes', 'canManageTaxes'))
             ->with('taxesAccessDenied', false);
@@ -35,7 +36,7 @@ class TaxController extends Controller
      */
     public function api(Request $request): JsonResponse
     {
-        if (!auth()->user()?->isAdminOrSuperAdmin()) {
+        if (!Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Access denied'], 403);
         }
 
