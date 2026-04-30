@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -39,7 +40,21 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         if (!has_permission('view_invoices') && !has_permission('view_all_invoices')) {
-            abort(403, 'Unauthorized action.');
+            $invoices = new LengthAwarePaginator(
+                collect(),
+                0,
+                20,
+                LengthAwarePaginator::resolveCurrentPage(),
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
+
+            return view('invoices.index', [
+                'invoices' => $invoices,
+                'invoiceAccessDenied' => true,
+            ]);
         }
 
         $query = Invoice::with(['client', 'creator']);
@@ -63,9 +78,12 @@ class InvoiceController extends Controller
             });
         }
 
-        $invoices = $query->orderByDesc('created_at')->paginate(20);
+        $invoices = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 
-        return view('invoices.index', compact('invoices'));
+        return view('invoices.index', [
+            'invoices' => $invoices,
+            'invoiceAccessDenied' => false,
+        ]);
     }
 
     /**
@@ -74,22 +92,31 @@ class InvoiceController extends Controller
     public function create()
     {
         if (!has_permission('create_invoice')) {
-            abort(403, 'Unauthorized action.');
+            return view('invoices.create', [
+                'clients' => collect(),
+                'lineTaxes' => collect(),
+                'invoiceTaxes' => collect(),
+                'defaultCurrency' => SettingService::getSetting('currency_code', 'USD'),
+                'currencySymbol' => SettingService::getSetting('currency_symbol', '$'),
+                'zipAvailable' => class_exists(\ZipArchive::class),
+                'createInvoiceAccessDenied' => true,
+            ]);
         }
 
         $clients = Client::whereNull('deleted_at')
             ->orderBy('company_name')
             ->get();
 
-        $lineTaxes = Tax::lineLevel()->get();
-        $invoiceTaxes = Tax::invoiceLevel()->orderedByCalcOrder()->get();
+        $lineTaxes = Tax::forCurrentUser()->lineLevel()->get();
+        $invoiceTaxes = Tax::forCurrentUser()->invoiceLevel()->orderedByCalcOrder()->get();
 
         $defaultCurrency = SettingService::getSetting('currency_code', 'USD');
         $currencySymbol = SettingService::getSetting('currency_symbol', '$');
 
         $zipAvailable = class_exists(\ZipArchive::class);
 
-        return view('invoices.create', compact('clients', 'lineTaxes', 'invoiceTaxes', 'defaultCurrency', 'currencySymbol', 'zipAvailable'));
+        return view('invoices.create', compact('clients', 'lineTaxes', 'invoiceTaxes', 'defaultCurrency', 'currencySymbol', 'zipAvailable'))
+            ->with('createInvoiceAccessDenied', false);
     }
 
     /**
@@ -131,12 +158,12 @@ class InvoiceController extends Controller
             'line_items.*.tax_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'line')),
+                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'line')->where('created_by', Auth::id())),
             ],
             'invoice_tax_ids' => 'nullable|array',
             'invoice_tax_ids.*' => [
                 'integer',
-                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'invoice')),
+                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'invoice')->where('created_by', Auth::id())),
             ],
             'delivery_template_id' => 'nullable|integer|exists:email_templates,id',
             'payment_confirmation_template_id' => 'nullable|integer|exists:email_templates,id',
@@ -185,9 +212,9 @@ class InvoiceController extends Controller
                 ['company_name' => $validated['bill_to']['Company Name']],
                 [
                     'representative' => $validated['bill_to']['Contact Name'] ?? null,
-                    'email' => $validated['bill_to']['Email'] ?? null,
-                    'phone' => $validated['bill_to']['Phone'] ?? null,
-                    'address' => $validated['bill_to']['Address'] ?? null,
+                    'email' => trim((string) ($validated['bill_to']['Email'] ?? '')),
+                    'phone' => trim((string) ($validated['bill_to']['Phone'] ?? '')),
+                    'address' => trim((string) ($validated['bill_to']['Address'] ?? '')),
                     'gst_hst' => $validated['bill_to']['gst_hst'] ?? null,
                     'notes' => $validated['bill_to']['notes'] ?? null,
                     'created_by' => Auth::id(),
@@ -198,9 +225,9 @@ class InvoiceController extends Controller
             if ($client->wasRecentlyCreated === false) {
                 $client->update([
                     'representative' => $validated['bill_to']['Contact Name'] ?? $client->representative,
-                    'email' => $validated['bill_to']['Email'] ?? $client->email,
-                    'phone' => $validated['bill_to']['Phone'] ?? $client->phone,
-                    'address' => $validated['bill_to']['Address'] ?? $client->address,
+                    'email' => (($email = trim((string) ($validated['bill_to']['Email'] ?? ''))) !== '') ? $email : (string) $client->email,
+                    'phone' => (($phone = trim((string) ($validated['bill_to']['Phone'] ?? ''))) !== '') ? $phone : (string) $client->phone,
+                    'address' => (($address = trim((string) ($validated['bill_to']['Address'] ?? ''))) !== '') ? $address : (string) $client->address,
                     'gst_hst' => $validated['bill_to']['gst_hst'] ?? $client->gst_hst,
                     'notes' => $validated['bill_to']['notes'] ?? $client->notes,
                 ]);
@@ -354,6 +381,16 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Display a public signed view of the invoice for client-facing email links.
+     */
+    public function showPublic(Invoice $invoice)
+    {
+        $invoice->loadMissing('client');
+
+        return view('invoices.public-show', compact('invoice'));
+    }
+
+    /**
      * Generate invoice number based on client name.
      */
     private function generateInvoiceNumber(string $clientName): string
@@ -462,7 +499,7 @@ class InvoiceController extends Controller
                         ]],
                         'mode' => 'payment',
                         'success_url' => url("/payment-success?invoice={$invoice->id}"),
-                        'cancel_url' => url("/invoices/{$invoice->id}"),
+                        'cancel_url' => EmailService::invoiceViewUrl($invoice, ['payment' => 'cancelled']),
                         'metadata' => [
                             'invoice_id' => $invoice->id,
                             'invoice_number' => $invoice->invoice_number,
@@ -550,12 +587,13 @@ class InvoiceController extends Controller
         $invoice = Invoice::find($invoiceId);
 
         if (!$invoice) {
-            return redirect()->route('invoices.index')->with('error', 'Invoice not found.');
+            return redirect()->route('home')->with('error', 'Invoice not found.');
         }
 
         $this->markInvoicePaid($invoice);
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Payment received. Invoice marked as paid.');
+        return redirect(EmailService::invoiceViewUrl($invoice, ['payment' => 'success']))
+            ->with('success', 'Payment received. Invoice marked as paid.');
     }
 
     /**
@@ -907,8 +945,8 @@ class InvoiceController extends Controller
         }
 
         $tableRows = $this->buildPreviewTableRows($items, $includeCols, $priceColumn, $priceMode);
-        $lineTaxes = Tax::lineLevel()->get(['id', 'name', 'percentage']);
-        $invoiceTaxes = Tax::invoiceLevel()->orderedByCalcOrder()->get(['id', 'name', 'percentage', 'calc_order']);
+        $lineTaxes = Tax::forCurrentUser()->lineLevel()->get(['id', 'name', 'percentage']);
+        $invoiceTaxes = Tax::forCurrentUser()->invoiceLevel()->orderedByCalcOrder()->get(['id', 'name', 'percentage', 'calc_order']);
         $emailTemplates = EmailTemplate::query()
             ->whereNull('deleted_at')
             ->orderBy('template_name')
@@ -1037,12 +1075,12 @@ class InvoiceController extends Controller
             'line_tax_matrix_mode' => 'nullable|boolean',
             'line_tax_ids.*' => [
                 'integer',
-                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'line')),
+                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'line')->where('created_by', Auth::id())),
             ],
             'invoice_tax_ids' => 'nullable|array',
             'invoice_tax_ids.*' => [
                 'integer',
-                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'invoice')),
+                Rule::exists('taxes', 'id')->where(fn ($query) => $query->where('tax_type', 'invoice')->where('created_by', Auth::id())),
             ],
             'delivery_template_id' => 'nullable|integer|exists:email_templates,id',
             'payment_confirmation_template_id' => 'nullable|integer|exists:email_templates,id',
@@ -1450,9 +1488,9 @@ class InvoiceController extends Controller
             ['company_name' => $billTo['Company Name']],
             [
                 'representative' => $billTo['Contact Name'] ?: null,
-                'email' => $billTo['Email'] ?: null,
-                'phone' => $billTo['Phone'] ?: null,
-                'address' => $billTo['Address'] ?: null,
+                'email' => trim((string) ($billTo['Email'] ?? '')),
+                'phone' => trim((string) ($billTo['Phone'] ?? '')),
+                'address' => trim((string) ($billTo['Address'] ?? '')),
                 'created_by' => Auth::id(),
             ]
         );
@@ -3014,9 +3052,9 @@ class InvoiceController extends Controller
                 ['company_name' => $billTo['Company Name']],
                 [
                     'representative' => $billTo['Contact Name'] ?: null,
-                    'email' => $billTo['Email'] ?: null,
-                    'phone' => $billTo['Phone'] ?: null,
-                    'address' => $billTo['Address'] ?: null,
+                    'email' => trim((string) ($billTo['Email'] ?? '')),
+                    'phone' => trim((string) ($billTo['Phone'] ?? '')),
+                    'address' => trim((string) ($billTo['Address'] ?? '')),
                     'created_by' => Auth::id(),
                 ]
             );

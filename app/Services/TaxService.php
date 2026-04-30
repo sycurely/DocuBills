@@ -12,7 +12,7 @@ class TaxService
      */
     public static function getAllGrouped(): array
     {
-        $taxes = Tax::orderedByCalcOrder()->get();
+        $taxes = Tax::forCurrentUser()->orderedByCalcOrder()->get();
         
         return [
             'line' => $taxes->where('tax_type', 'line')->values(),
@@ -25,7 +25,7 @@ class TaxService
      */
     public static function getLineTaxes()
     {
-        return Tax::lineLevel()->orderBy('name')->get();
+        return Tax::forCurrentUser()->lineLevel()->orderBy('name')->get();
     }
 
     /**
@@ -33,7 +33,7 @@ class TaxService
      */
     public static function getInvoiceTaxes()
     {
-        return Tax::invoiceLevel()->orderedByCalcOrder()->get();
+        return Tax::forCurrentUser()->invoiceLevel()->orderedByCalcOrder()->get();
     }
 
     /**
@@ -94,7 +94,7 @@ class TaxService
             return null;
         }
 
-        return Tax::lineLevel()->whereKey($id)->exists() ? $id : null;
+        return Tax::forCurrentUser()->lineLevel()->whereKey($id)->exists() ? $id : null;
     }
 
     /**
@@ -115,7 +115,8 @@ class TaxService
             return [];
         }
 
-        return Tax::lineLevel()
+        return Tax::forCurrentUser()
+            ->lineLevel()
             ->whereIn('id', $ids)
             ->orderBy('name')
             ->orderBy('id')
@@ -143,7 +144,8 @@ class TaxService
             return [];
         }
 
-        return Tax::invoiceLevel()
+        return Tax::forCurrentUser()
+            ->invoiceLevel()
             ->whereIn('id', $ids)
             ->orderedByCalcOrder()
             ->pluck('id')
@@ -162,7 +164,8 @@ class TaxService
             return collect();
         }
 
-        return Tax::invoiceLevel()
+        return Tax::forCurrentUser()
+            ->invoiceLevel()
             ->whereIn('id', $sanitized)
             ->orderedByCalcOrder()
             ->get();
@@ -178,7 +181,8 @@ class TaxService
             return collect();
         }
 
-        return Tax::lineLevel()
+        return Tax::forCurrentUser()
+            ->lineLevel()
             ->whereIn('id', $sanitized)
             ->orderBy('name')
             ->orderBy('id')

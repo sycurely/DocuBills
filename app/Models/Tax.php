@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class Tax extends Model
 {
@@ -11,12 +14,27 @@ class Tax extends Model
         'percentage',
         'tax_type',
         'calc_order',
+        'created_by',
     ];
 
     protected $casts = [
         'percentage' => 'decimal:2',
         'calc_order' => 'integer',
     ];
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function scopeForCurrentUser($query)
+    {
+        if (!Schema::hasColumn('taxes', 'created_by')) {
+            return $query;
+        }
+
+        return $query->where('created_by', Auth::id());
+    }
 
     /**
      * Scope for line-level taxes.

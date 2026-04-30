@@ -23,7 +23,7 @@ class TaxController extends Controller
      */
     public function index()
     {
-        $taxes = Tax::orderBy('id')->get();
+        $taxes = Tax::forCurrentUser()->orderBy('id')->get();
         $canManageTaxes = auth()->user()?->isAdminOrSuperAdmin() ?? false;
 
         return view('settings.taxes', compact('taxes', 'canManageTaxes'))
@@ -81,6 +81,7 @@ class TaxController extends Controller
                 $request->input('calc_order', 1),
                 $request->input('tax_type', 'line')
             ),
+            'created_by' => auth()->id(),
         ]);
 
         return response()->json([
@@ -114,7 +115,7 @@ class TaxController extends Controller
             ], 422);
         }
 
-        $tax = Tax::findOrFail($request->input('id'));
+        $tax = Tax::forCurrentUser()->findOrFail($request->input('id'));
         $taxType = TaxService::normalizeTaxType($request->input('tax_type', 'line'));
         $tax->update([
             'name' => trim($request->input('name')),
@@ -142,7 +143,7 @@ class TaxController extends Controller
             ], 422);
         }
 
-        $tax = Tax::findOrFail($request->input('id'));
+        $tax = Tax::forCurrentUser()->findOrFail($request->input('id'));
         $tax->delete();
 
         return response()->json(['success' => true]);
