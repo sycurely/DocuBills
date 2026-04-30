@@ -23,10 +23,10 @@ class TaxController extends Controller
      */
     public function index()
     {
-        $this->ensureAdminAccess();
-
         $taxes = Tax::orderBy('id')->get();
-        return view('settings.taxes', compact('taxes'))
+        $canManageTaxes = auth()->user()?->isAdminOrSuperAdmin() ?? false;
+
+        return view('settings.taxes', compact('taxes', 'canManageTaxes'))
             ->with('taxesAccessDenied', false);
     }
 

@@ -89,20 +89,33 @@
 @endpush
 
 @section('content')
+  @php
+    $taxesAccessDenied = $taxesAccessDenied ?? false;
+    $canManageTaxes = $canManageTaxes ?? false;
+  @endphp
   <div class="tax-shell">
     <div class="page-header">
       <h1 class="page-title">Tax Classes</h1>
       <p class="page-subtitle">Manage tax classes for invoices.</p>
     </div>
 
+    @if($taxesAccessDenied)
+      <div class="card" style="padding: 2rem; text-align: center;">
+        <p style="font-size: 1.1rem; color: #b91c1c; font-weight: 600;">
+          You don't have access to this. Please ask your Super Admin or Admin.
+        </p>
+      </div>
+    @else
     <div id="alert-container" class="tax-inline-alert"></div>
 
     <div class="card">
       <div class="tax-toolbar">
         <h2>Tax Classes</h2>
-        <button class="btn btn-primary" type="button" onclick="openModal()">
-          <span class="material-icons-outlined">add</span> Add Tax Class
-        </button>
+        @if($canManageTaxes)
+          <button class="btn btn-primary" type="button" onclick="openModal()">
+            <span class="material-icons-outlined">add</span> Add Tax Class
+          </button>
+        @endif
       </div>
 
       <div class="table-container">
@@ -113,7 +126,9 @@
               <th>Percentage</th>
               <th>Tax Scope</th>
               <th>Calculation Order</th>
-              <th>Actions</th>
+              @if($canManageTaxes)
+                <th>Actions</th>
+              @endif
             </tr>
           </thead>
           <tbody id="taxes-table-body">
@@ -135,16 +150,18 @@
               <td class="tax-cell-percent">{{ number_format($tax->percentage, 2) }}%</td>
               <td>{{ $scopeLabel }}</td>
               <td>{{ $calcLabel }}</td>
-              <td class="actions">
-                <div class="tax-action-group">
-                  <button class="btn btn-primary btn-sm" type="button" onclick="editTax({{ $tax->id }}, @js($tax->name), {{ (float) $tax->percentage }}, @js($tax->tax_type), {{ (int) $tax->calc_order }})">
-                    <span class="material-icons-outlined">edit</span> Edit
-                  </button>
-                  <button class="btn btn-danger btn-sm" type="button" onclick="deleteTax({{ $tax->id }})">
-                    <span class="material-icons-outlined">delete</span> Delete
-                  </button>
-                </div>
-              </td>
+              @if($canManageTaxes)
+                <td class="actions">
+                  <div class="tax-action-group">
+                    <button class="btn btn-primary btn-sm" type="button" onclick="editTax({{ $tax->id }}, @js($tax->name), {{ (float) $tax->percentage }}, @js($tax->tax_type), {{ (int) $tax->calc_order }})">
+                      <span class="material-icons-outlined">edit</span> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" type="button" onclick="deleteTax({{ $tax->id }})">
+                      <span class="material-icons-outlined">delete</span> Delete
+                    </button>
+                  </div>
+                </td>
+              @endif
             </tr>
             @endforeach
           </tbody>
@@ -152,7 +169,9 @@
       </div>
     </div>
   </div>
+  @endif
 
+  @if(!$taxesAccessDenied && $canManageTaxes)
   <div class="modal-overlay" id="taxModal" aria-hidden="true">
     <div class="modal-card">
       <div class="tax-modal-head">
@@ -195,8 +214,10 @@
       </form>
     </div>
   </div>
+  @endif
 @endsection
 
+@if(!$taxesAccessDenied && ($canManageTaxes ?? false))
 @push('scripts')
 <script>
   function showAlert(message, type = 'success') {
@@ -329,3 +350,4 @@
   toggleCalcOrder();
 </script>
 @endpush
+@endif
