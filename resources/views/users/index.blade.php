@@ -96,19 +96,19 @@
     }
 
     .btn-icon {
-      width: 36px;
-      height: 32px;
+      width: 30px;
+      height: 28px;
       padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       vertical-align: middle;
-      border-radius: 8px;
+      border-radius: 7px;
       box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08);
     }
 
     .btn-icon i {
-      font-size: 0.9rem;
+      font-size: 0.78rem;
       line-height: 1;
     }
 
@@ -200,7 +200,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
+      gap: 0.45rem;
       white-space: nowrap;
     }
 
@@ -321,7 +321,7 @@
 
     .suspend-form {
       display: inline;
-      margin-left: 4px;
+      margin-left: 2px;
     }
   
 </style>
